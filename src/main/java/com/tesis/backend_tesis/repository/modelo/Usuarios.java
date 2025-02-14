@@ -38,10 +38,10 @@ public class Usuarios {
     @Column(name = "usua_activo")
     private Boolean activo;
 
-    /*
-    @OneToOne(mappedBy = "usuarios", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Estudiantes usuariosEstudiantes;
-    */
+
 
 
 }

@@ -16,6 +16,9 @@ public class AuthServiceImpl implements IAuthService {
     @Autowired
     private IUsuariosRepository usuariosRepository;
 
+    @Autowired
+    private IEncriptionService encriptionService;
+
     @Override
     public Integer registroEstudiante(RegistroRequest registroRequest) {
         var flag = 0;
@@ -23,6 +26,21 @@ public class AuthServiceImpl implements IAuthService {
                 && registroRequest.getPassword() != null && !registroRequest.getPassword().isEmpty()) {
             if (!this.usuariosRepository.existeUsuarioConEmail(registroRequest.getCorreo())) {
                 try {
+
+                    Usuarios usua = Usuarios.builder()
+                            .username(registroRequest.getPrimer_nombre() + ' ' + registroRequest.getPrimer_apellido())
+                            .correo(registroRequest.getCorreo())
+                            .password(this.encriptionService.encriptPass(registroRequest.getPassword()))
+                            .usua_rol(registroRequest.getRol())
+                            .fechaCreacion(registroRequest.getFecha_registro())
+                            .activo(registroRequest.getActivo())
+                            .build();
+                    Usuarios usuarioGuardado = this.usuariosRepository.insertar(usua);
+
+                    if (usuarioGuardado == null || usuarioGuardado.getId() == null) {
+                        throw new RuntimeException("Error al guardar el usuario");
+                    }
+
                     Estudiantes estu = Estudiantes.builder()
                             .primer_nombre(registroRequest.getPrimer_nombre())
                             .segundo_nombre(registroRequest.getSegundo_nombre())
@@ -30,17 +48,11 @@ public class AuthServiceImpl implements IAuthService {
                             .segundo_apellido(registroRequest.getSegundo_apellido())
                             .cedula(registroRequest.getCedula())
                             .activo(registroRequest.getActivo())
+                            .usuario(usuarioGuardado)  // ASIGNAR ID DEL USUARIO
                             .build();
-                    Usuarios usua = Usuarios.builder()
-                            .username(registroRequest.getPrimer_nombre() + ' ' + registroRequest.getPrimer_apellido())
-                            .correo((registroRequest.getCorreo()))
-                            .password(registroRequest.getPassword())
-                            .usua_rol(registroRequest.getRol())
-                            .fechaCreacion(registroRequest.getFecha_registro())
-                            .activo(registroRequest.getActivo())
-                            .build();
+
+
                     this.estudiantesRepository.insertar(estu);
-                    this.usuariosRepository.insertar(usua);
                     flag = usua.getId();
                 } catch (Exception ex) {
                     ex.printStackTrace();

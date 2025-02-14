@@ -16,7 +16,8 @@ public class UsuariosRepositoryImpl implements IUsuariosRepository {
 
     @Override
     public Usuarios insertar(Usuarios usuarios) {
-        return null;
+        this.entityManager.persist(usuarios);
+        return usuarios;
     }
 
     @Override

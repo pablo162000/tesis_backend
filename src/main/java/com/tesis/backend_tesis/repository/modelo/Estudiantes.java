@@ -38,9 +38,9 @@ public class Estudiantes {
     @Column(name = "estu_activo")
     private Boolean activo;
 
-    /*
+
     @OneToOne
     @JoinColumn(name = "estu_id_usuario") // Este es el nombre de la columna que actúa como clave foránea
-    private Usuarios usuarios;
-    */
+    private Usuarios usuario;
+
 }
