@@ -2,9 +2,7 @@ package com.tesis.backend_tesis.service;
 
 import com.tesis.backend_tesis.repository.IEstudiantesRepository;
 import com.tesis.backend_tesis.repository.IUsuariosRepository;
-import com.tesis.backend_tesis.repository.modelo.Estudiantes;
-import com.tesis.backend_tesis.repository.modelo.RegistroRequest;
-import com.tesis.backend_tesis.repository.modelo.Usuarios;
+import com.tesis.backend_tesis.repository.modelo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +31,7 @@ public class AuthServiceImpl implements IAuthService {
                             .password(this.encriptionService.encriptPass(registroRequest.getPassword()))
                             .usua_rol(registroRequest.getRol())
                             .fechaCreacion(registroRequest.getFecha_registro())
+                            .usua_rol("estudiante")
                             .activo(registroRequest.getActivo())
                             .build();
                     Usuarios usuarioGuardado = this.usuariosRepository.insertar(usua);
@@ -61,4 +60,71 @@ public class AuthServiceImpl implements IAuthService {
         }
         return flag;
     }
+
+    public AuthResponse loginUsuario(LoginRequest loginRequest) {
+        Usuarios usua = this.usuariosRepository.buscarPorEmail(loginRequest.getCorreo());
+
+        // Validar si el usuario existe
+        if (usua == null) {
+            throw new RuntimeException("El usuario no está registrado.");
+        }
+
+        // Verificar la contraseña encriptada
+        if (!this.encriptionService.verificarEncriptedText(usua.getPassword(), loginRequest.getPassword())) {
+            throw new RuntimeException("Credenciales incorrectas.");
+        }
+
+        // Determinar el rol y obtener la información correspondiente
+        String rol = usua.getUsua_rol();
+        if ("estudiante".equals(rol)) {
+            Estudiantes estu = this.estudiantesRepository.findByIdUsuario(usua.getId());
+
+            return AuthResponse.builder()
+                    .id(estu.getId())
+                    .primer_nombre(estu.getPrimer_nombre())
+                    .segundo_nombre(estu.getSegundo_nombre())
+                    .primer_apellido(estu.getPrimer_apellido())
+                    .segundo_apellido(estu.getSegundo_apellido())
+                    .rol("estudiante")
+                    .activo(true)
+                    .build();
+
+        } else if ("docente".equals(rol)) {
+            /*
+            Docentes doc = this.docentesRepository.findByIdUsuario(usua.getId());
+
+            return AuthResponse.builder()
+                    .id(doc.getId())
+                    .primer_nombre(doc.getPrimer_nombre())
+                    .segundo_nombre(doc.getSegundo_nombre())
+                    .primer_apellido(doc.getPrimer_apellido())
+                    .segundo_apellido(doc.getSegundo_apellido())
+                    .rol("docente")
+                    .activo(true)
+                    .build();
+
+            */
+
+        } else if ("administrativo".equals(rol)) {
+
+            /*
+            Administrativos admin = this.administrativosRepository.findByIdUsuario(usua.getId());
+
+            return AuthResponse.builder()
+                    .id(admin.getId())
+                    .primer_nombre(admin.getPrimer_nombre())
+                    .segundo_nombre(admin.getSegundo_nombre())
+                    .primer_apellido(admin.getPrimer_apellido())
+                    .segundo_apellido(admin.getSegundo_apellido())
+                    .rol("administrativo")
+                    .activo(true)
+                    .build();
+
+             */
+        }
+
+        // Si el rol no es reconocido, lanzar excepción
+        throw new RuntimeException("Rol de usuario desconocido.");
+    }
+
 }

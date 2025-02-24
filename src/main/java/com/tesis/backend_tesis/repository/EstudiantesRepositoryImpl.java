@@ -21,4 +21,25 @@ public class EstudiantesRepositoryImpl implements IEstudiantesRepository {
         return estudiantes;
     }
 
+    @Override
+    public Estudiantes findByIdUsuario(Integer idUsuario) {
+
+        Estudiantes estu = null;
+        try {
+            System.out.println("ingresa en repository");
+            TypedQuery<Estudiantes> myQuery = this.entityManager.createQuery(
+                    "SELECT e FROM Estudiantes e JOIN e.usuario u WHERE u.id = :idUsuario",
+                    Estudiantes.class
+            );
+            estu = myQuery.setParameter("idUsuario", idUsuario).getSingleResult();
+
+            System.out.println(estu);
+            return  estu;
+        } catch (NoResultException e) {
+
+            return null;
+
+        }
+    }
+
 }

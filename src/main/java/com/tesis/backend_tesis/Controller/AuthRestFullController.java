@@ -1,5 +1,7 @@
 package com.tesis.backend_tesis.Controller;
 
+import com.tesis.backend_tesis.repository.modelo.AuthResponse;
+import com.tesis.backend_tesis.repository.modelo.LoginRequest;
 import com.tesis.backend_tesis.repository.modelo.RegistroRequest;
 import com.tesis.backend_tesis.service.IAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,5 +26,13 @@ public class AuthRestFullController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id);
         }
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
+        AuthResponse response = authService.loginUsuario(loginRequest);
+        return ResponseEntity.ok(response);
+    }
+
+
 
 }

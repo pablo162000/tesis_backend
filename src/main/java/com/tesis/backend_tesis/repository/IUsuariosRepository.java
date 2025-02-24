@@ -7,4 +7,5 @@ public interface IUsuariosRepository {
 
     public Usuarios insertar(Usuarios usuarios);
     public boolean existeUsuarioConEmail(String email) ;
+    public Usuarios buscarPorEmail(String email);
 }

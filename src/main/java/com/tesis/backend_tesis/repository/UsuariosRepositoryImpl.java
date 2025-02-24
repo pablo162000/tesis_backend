@@ -31,4 +31,19 @@ public class UsuariosRepositoryImpl implements IUsuariosRepository {
             return false;
         }
     }
+
+    @Override
+    public Usuarios buscarPorEmail(String email) {
+        Usuarios usua = null;
+        try {
+            TypedQuery<Usuarios> myQuery = this.entityManager.createQuery("SELECT u FROM Usuarios u WHERE u.correo=:email",
+                    Usuarios.class);
+            usua = myQuery.setParameter("email", email).getSingleResult();
+            return  usua;
+        } catch (NoResultException e) {
+
+            return null;
+
+        }
+    }
 }

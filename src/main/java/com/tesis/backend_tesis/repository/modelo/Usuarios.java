@@ -38,7 +38,7 @@ public class Usuarios {
     @Column(name = "usua_activo")
     private Boolean activo;
 
-
+    @ToString.Exclude
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Estudiantes usuariosEstudiantes;
 
