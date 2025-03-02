@@ -30,6 +30,24 @@
         <java.version>21</java.version>
     </properties>
     <dependencies>
+
+        <!-- AWS SDK for S3 -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>2.20.110</version>  <!-- Usa una versión estable -->
+        </dependency>
+
+     <!--  core
+
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>core</artifactId>
+            <version>2.20.110</version>
+        </dependency>
+
+     -->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>

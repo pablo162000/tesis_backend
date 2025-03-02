@@ -1,0 +1,138 @@
+package com.distribuida.alumno.service.dto.utils;
+
+
+import com.distribuida.alumno.repository.IArchivoRepository;
+import com.distribuida.alumno.repository.IEstudianteRepository;
+import com.distribuida.alumno.repository.modelo.Estudiante;
+import com.distribuida.alumno.repository.modelo.Propuesta;
+import com.distribuida.alumno.service.dto.EstudianteDTO;
+import com.distribuida.alumno.service.dto.PropuestaDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Component
+public class Converter {
+
+/*
+    @Autowired
+    private IEstudianteRepository estudiantesRepository;
+
+
+    public Estudiante toEntity(EstudianteDTO estudianteDTO) {
+
+
+        Estudiante estudiante = new Estudiante();
+        estudiante.setId(estudianteDTO.getId());
+        estudiante.setPrimerApellido(estudianteDTO.getPrimerNombre());
+        estudiante.setSegundoNombre(estudianteDTO.getSegundoNombre());
+        estudiante.setPrimerApellido(estudianteDTO.getPrimerApellido());
+        estudiante.setSegundoApellido(estudianteDTO.getSegundoApellido());
+        estudiante.setCedula(estudianteDTO.getCedula());
+        estudiante.setCelular(estudianteDTO.getCelular());
+        estudiante.setActivo(estudianteDTO.getActivo());
+        estudiante.setIdUsuario(estudianteDTO.getIdUsuario());
+
+        return estudiante;
+
+    }
+
+    public EstudianteDTO toDTO(Estudiante estudiante) {
+
+
+        EstudianteDTO estudianteDTO = new EstudianteDTO();
+        estudianteDTO.setId(estudiante.getId());
+        estudianteDTO.setPrimerNombre(estudiante.getPrimerNombre()); // Corregido
+        estudianteDTO.setSegundoNombre(estudiante.getSegundoNombre());
+        estudianteDTO.setPrimerApellido(estudiante.getPrimerApellido());
+        estudianteDTO.setSegundoApellido(estudiante.getSegundoApellido());
+        estudianteDTO.setCedula(estudiante.getCedula());
+        estudianteDTO.setCelular(estudiante.getCelular());
+        estudianteDTO.setActivo(estudiante.getActivo());
+        estudianteDTO.setIdUsuario(estudiante.getIdUsuario());
+        return estudianteDTO;
+
+    }
+
+
+ */
+
+    @Autowired
+    private IEstudianteRepository estudianteRepository;
+
+    @Autowired
+    private IArchivoRepository archivoRepository;
+
+    public Propuesta toEntity(PropuestaDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        return Propuesta.builder()
+                .id(dto.getId())
+                .primerEstudiante(this.estudianteRepository.findByIdUsuario(dto.getEstudiantePrimero()))
+                .segundoEstudiante(this.estudianteRepository.findByIdUsuario(dto.getEstudianteSegundo()))
+                .tercerEstudiante(this.estudianteRepository.findByIdUsuario(dto.getEstudianteTercero()))
+                .archivoPropuesta(this.archivoRepository.buscarPorId(dto.getArchivoPropuesta()))
+                .tema(dto.getTema())
+                .observacion(dto.getObservacion())
+                .validacion(dto.getValidacion())
+                .periodo(dto.getPeriodo())
+                .idDocenteTutor(dto.getIdDocenteTutor())
+                .idDocentePrimerRevisor(dto.getIdDocentePrimerRevisor())
+                .notaPrimerRevisor(dto.getNotaPrimerRevisor())
+                .fechaPrimerRevisor(dto.getFechaPrimerRevisor())
+                .archivoRubricaPrimerRevisor(this.archivoRepository.buscarPorId(dto.getArchivoRubricaPrimerRevisor()))
+                .idDocenteSegundoRevisor(dto.getIdDocenteSegundoRevisor())
+                .notaSegundoRevisor(dto.getNotaSegundoRevisor())
+                .fechaSegundoRevisor(dto.getFechaSegundoRevisor())
+                .archivoRubricaSegundoRevisor(this.archivoRepository.buscarPorId(dto.getArchivoRubricaSegundoRevisor()))
+                .estadoAprobación(dto.getEstadoAprobación())
+                .idEstuCreacion(dto.getIdEstuCreacion())
+                .fechaEnvio(dto.getFechaEnvio())
+                .build();
+    }
+
+    public PropuestaDTO toDTO(Propuesta propuesta) {
+        if (propuesta == null) {
+            return null;
+        }
+
+        return PropuestaDTO.builder()
+                .id(propuesta.getId())
+                .estudiantePrimero(propuesta.getPrimerEstudiante().getId())
+                .estudianteSegundo(propuesta.getSegundoEstudiante().getId())
+                .estudianteTercero(propuesta.getTercerEstudiante().getId())
+                .archivoPropuesta(propuesta.getArchivoPropuesta().getId())
+                .tema(propuesta.getTema())
+                .observacion(propuesta.getObservacion())
+                .validacion(propuesta.getValidacion())
+                .periodo(propuesta.getPeriodo())
+                .idDocenteTutor(propuesta.getIdDocenteTutor())
+                .idDocentePrimerRevisor(propuesta.getIdDocentePrimerRevisor())
+                .notaPrimerRevisor(propuesta.getNotaPrimerRevisor())
+                .fechaPrimerRevisor(propuesta.getFechaPrimerRevisor())
+                .archivoRubricaPrimerRevisor(propuesta.getArchivoRubricaPrimerRevisor().getId())
+                .idDocenteSegundoRevisor(propuesta.getIdDocenteSegundoRevisor())
+                .notaSegundoRevisor(propuesta.getNotaSegundoRevisor())
+                .fechaSegundoRevisor(propuesta.getFechaSegundoRevisor())
+                .archivoRubricaSegundoRevisor(propuesta.getArchivoRubricaSegundoRevisor().getId())
+                .estadoAprobación(propuesta.getEstadoAprobación())
+                .idEstuCreacion(propuesta.getIdEstuCreacion())
+                .fechaEnvio(propuesta.getFechaEnvio())
+                .build();
+    }
+
+    public List<PropuestaDTO> toDTOList(List<Propuesta> propuestas) {
+        if (propuestas == null || propuestas.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return propuestas.stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+
+}

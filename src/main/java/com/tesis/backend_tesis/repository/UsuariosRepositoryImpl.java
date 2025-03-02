@@ -46,4 +46,40 @@ public class UsuariosRepositoryImpl implements IUsuariosRepository {
 
         }
     }
+
+    @Override
+    public Usuarios buscarPorId(int id) {
+        try {
+            return this.entityManager.find(Usuarios.class, id);
+        } catch (Exception e) {
+            // Registra el error y devuelve null o lanza una excepción personalizada
+            System.err.println("Error al buscar el usuario con ID: " + id);
+            e.printStackTrace();
+            return null; // O puedes lanzar una excepción personalizada
+        }
+    }
+
+    @Override
+    public boolean esCorreoValido(String correo) {
+        return correo != null && correo.toLowerCase().endsWith("@uce.edu.ec");
+    }
+
+    @Override
+    public Boolean activarUsuario(Usuarios usuarios) {
+        try {
+            Usuarios usuarioExistente = this.entityManager.find(Usuarios.class, usuarios.getId());
+
+            if (usuarioExistente != null) {
+                usuarioExistente.setActivo(true); // Actualiza el estado
+                this.entityManager.merge(usuarioExistente); // Guarda los cambios
+                return true;
+            } else {
+                return false; // No se encontró la propuesta con el ID dado
+            }
+        } catch (Exception e) {
+            //logger.error("Error al activar usuario con ID " + usuarios.getId(), e);
+            e.printStackTrace();
+            return false; // En caso de error, se retorna false
+        }
+    }
 }

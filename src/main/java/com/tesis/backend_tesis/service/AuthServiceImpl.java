@@ -6,6 +6,10 @@ import com.tesis.backend_tesis.repository.modelo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Service
 public class AuthServiceImpl implements IAuthService {
 
@@ -29,10 +33,9 @@ public class AuthServiceImpl implements IAuthService {
                             .username(registroRequest.getPrimer_nombre() + ' ' + registroRequest.getPrimer_apellido())
                             .correo(registroRequest.getCorreo())
                             .password(this.encriptionService.encriptPass(registroRequest.getPassword()))
-                            .usua_rol(registroRequest.getRol())
-                            .fechaCreacion(registroRequest.getFecha_registro())
-                            .usua_rol("estudiante")
-                            .activo(registroRequest.getActivo())
+                            .fechaCreacion(LocalDateTime.now())//cambie del original
+                            .rol("estudiante")
+                            .activo(false)
                             .build();
                     Usuarios usuarioGuardado = this.usuariosRepository.insertar(usua);
 
@@ -75,7 +78,7 @@ public class AuthServiceImpl implements IAuthService {
         }
 
         // Determinar el rol y obtener la información correspondiente
-        String rol = usua.getUsua_rol();
+        String rol = usua.getRol();
         if ("estudiante".equals(rol)) {
             Estudiantes estu = this.estudiantesRepository.findByIdUsuario(usua.getId());
 

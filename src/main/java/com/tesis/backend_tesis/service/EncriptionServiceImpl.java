@@ -10,7 +10,7 @@ public class EncriptionServiceImpl implements IEncriptionService{
     private final PasswordEncoder passwordEncoder;
 
 
-     @Autowired
+    @Autowired
     public EncriptionServiceImpl(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     }

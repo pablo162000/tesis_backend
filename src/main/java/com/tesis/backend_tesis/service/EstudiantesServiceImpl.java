@@ -15,4 +15,14 @@ public class EstudiantesServiceImpl implements IEstudiantesService {
     public Estudiantes insertar(Estudiantes estudiantes) {
         return this.estudiantesRepository.insertar(estudiantes);
     }
+
+    @Override
+    public Estudiantes existeConEmail(String correo) {
+        return this.estudiantesRepository.existeEstudiante(correo);
+    }
+
+    @Override
+    public Estudiantes buscarPorId(Integer id) {
+        return this.estudiantesRepository.findById(id);
+    }
 }

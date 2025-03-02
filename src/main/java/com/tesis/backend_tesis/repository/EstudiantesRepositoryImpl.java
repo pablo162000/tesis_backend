@@ -1,6 +1,8 @@
 package com.tesis.backend_tesis.repository;
 
 import com.tesis.backend_tesis.repository.modelo.Estudiantes;
+import com.tesis.backend_tesis.repository.modelo.Usuarios;
+import com.tesis.backend_tesis.service.dto.EstudianteDTO;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
@@ -41,5 +43,44 @@ public class EstudiantesRepositoryImpl implements IEstudiantesRepository {
 
         }
     }
+
+    @Override
+    public Estudiantes existeEstudiante(String correo) {
+
+        try {
+            System.out.println("Ingresa en repository método existencia Estudiante");
+
+            TypedQuery<Usuarios> myQuery = this.entityManager.createQuery(
+                    "SELECT u FROM Usuarios u WHERE u.correo = :correo",
+                    Usuarios.class
+            );
+
+            Usuarios estu = myQuery.setParameter("correo", correo).getSingleResult();
+
+            if ("estudiante".equals(estu.getRol())) {
+                return findByIdUsuario(estu.getId());
+            }
+
+            System.out.println(estu); // Borrar después de depuración
+
+        } catch (NoResultException e) {
+            System.out.println("No se encontró un usuario con el correo: " + correo);
+        }
+
+        return null;
+
+    }
+
+    @Override
+    public Estudiantes findById(Integer id) {
+        try {
+            return entityManager.find(Estudiantes.class, id);
+        } catch (Exception e) {
+            System.err.println("Error al buscar el estudiante con ID: " + id);
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
 }

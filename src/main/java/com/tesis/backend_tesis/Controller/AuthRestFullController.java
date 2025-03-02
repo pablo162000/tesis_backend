@@ -18,7 +18,7 @@ public class AuthRestFullController {
     private IAuthService authService;
 
     @PostMapping("/registro")
-    public ResponseEntity<Integer> registroUsuarioAtleta(@RequestBody RegistroRequest registroRequest) {
+    public ResponseEntity<Integer> registroUsuario(@RequestBody RegistroRequest registroRequest) {
         Integer id = authService.registroEstudiante(registroRequest);
         if (id != 0) {
             return ResponseEntity.ok(id);

@@ -1,5 +1,7 @@
 package com.tesis.backend_tesis.repository.modelo;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -42,5 +44,19 @@ public class Estudiantes {
     @OneToOne
     @JoinColumn(name = "estu_id_usuario") // Este es el nombre de la columna que actúa como clave foránea
     private Usuarios usuario;
+
+    // Relación bidireccional con Propuesta
+    @OneToMany(mappedBy = "estudiantePrimero", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@JsonManagedReference
+    private List<Propuesta> propuestasPrimero;
+
+    @OneToMany(mappedBy = "estudianteSegundo", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@JsonManagedReference
+    private List<Propuesta> propuestasSegundo;
+
+    @OneToMany(mappedBy = "estudianteTercero", cascade = CascadeType.ALL, orphanRemoval = true)
+   // @JsonManagedReference
+    private List<Propuesta> propuestasTercero;
+
 
 }
