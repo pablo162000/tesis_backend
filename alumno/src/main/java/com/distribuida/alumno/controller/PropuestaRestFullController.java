@@ -1,11 +1,15 @@
 package com.distribuida.alumno.controller;
 
 
+import com.distribuida.alumno.repository.modelo.Estudiante;
 import com.distribuida.alumno.service.IPropuestaService;
+import com.distribuida.alumno.service.dto.PropuestaDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -26,6 +30,17 @@ public class PropuestaRestFullController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Boolean.FALSE); // Retorna un HTTP 400 con false si falló
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PropuestaDTO>> obtenerPropuestas() {
+
+        List<PropuestaDTO> propuestas = this.propuestaService.buscarTodaspropuestas();
+
+        System.out.println(propuestas); // Para depuración
+
+        return ResponseEntity.ok(propuestas);
+
     }
 
 }

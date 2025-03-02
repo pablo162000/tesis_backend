@@ -70,4 +70,12 @@ public class PropuestaServiceImpl implements IPropuestaService {
         }
 
     }
+
+    @Override
+    public List<PropuestaDTO> buscarTodaspropuestas() {
+        List<Propuesta> propuestas = this.propuestaRepository.finall();
+
+        // Convertir la lista de Usuario a una lista de UsuarioDTO
+        return this.converter.toDTOList(propuestas);
+    }
 }

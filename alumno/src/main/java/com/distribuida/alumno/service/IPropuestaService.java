@@ -14,4 +14,6 @@ public interface IPropuestaService {
     public List<PropuestaDTO> buscarPorIdEstudiante(Integer idEstudiante);
 
     public Boolean validarPropuesta(Integer idPropuesta, Boolean estadoValidacion);
+
+    public List<PropuestaDTO> buscarTodaspropuestas();
 }

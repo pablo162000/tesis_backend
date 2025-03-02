@@ -105,47 +105,35 @@ public class EstudianteRestFullController {
             return ResponseEntity.badRequest().body("El correo del estudiante principal debe tener el dominio @uce.edu.ec.");
         }
 
-        if (correoEstudianteSegundo != null) {
-            if (!this.estudianteService.esCorreoValido(correoEstudianteSegundo)) {
-                return ResponseEntity.badRequest().body("El correo del segundo estudiante debe tener el dominio @uce.edu.ec.");
-            }
-            if (correoEstudiantePrimero.equalsIgnoreCase(correoEstudianteSegundo)) {
-                return ResponseEntity.badRequest().body("El correo del estudiante principal no puede ser igual al del segundo estudiante.");
-            }
+        if (correoEstudianteSegundo != null && !this.estudianteService.esCorreoValido(correoEstudianteSegundo)) {
+            return ResponseEntity.badRequest().body("El correo del segundo estudiante debe tener el dominio @uce.edu.ec.");
         }
 
-        if (correoEstudianteTercero != null) {
-            if (!this.estudianteService.esCorreoValido(correoEstudianteTercero)) {
-                return ResponseEntity.badRequest().body("El correo del tercer estudiante debe tener el dominio @uce.edu.ec.");
-            }
-            if (correoEstudiantePrimero.equalsIgnoreCase(correoEstudianteTercero)) {
-                return ResponseEntity.badRequest().body("El correo del estudiante principal no puede ser igual al del tercer estudiante.");
-            }
+        if (correoEstudianteTercero != null && !this.estudianteService.esCorreoValido(correoEstudianteTercero)) {
+            return ResponseEntity.badRequest().body("El correo del tercer estudiante debe tener el dominio @uce.edu.ec.");
         }
 
-        if (correoEstudianteSegundo != null && correoEstudianteTercero != null && correoEstudianteSegundo.equalsIgnoreCase(correoEstudianteTercero)) {
-            return ResponseEntity.badRequest().body("Los correos electrónicos de los estudiantes opcionales no pueden ser iguales.");
+        // Validar que los correos no se repitan
+        if ((correoEstudianteSegundo != null && correoEstudiantePrimero.equalsIgnoreCase(correoEstudianteSegundo)) ||
+                (correoEstudianteTercero != null && correoEstudiantePrimero.equalsIgnoreCase(correoEstudianteTercero)) ||
+                (correoEstudianteSegundo != null && correoEstudianteTercero != null && correoEstudianteSegundo.equalsIgnoreCase(correoEstudianteTercero))) {
+            return ResponseEntity.badRequest().body("Los correos de los estudiantes deben ser únicos.");
         }
 
         // 4. Validar que los estudiantes son de diferentes carreras usando loginRestClient
+        UsuarioDTO usuarioPrimero = this.loginRestClient.existeUsuarioPorCorreo(correoEstudiantePrimero);
+        if (usuarioPrimero == null) {
+            return ResponseEntity.badRequest().body("El estudiante principal con correo " + correoEstudiantePrimero + " no existe.");
+        }
+        logger.info("Estudiante principal: Correo: {}, ID Carrera: {}", correoEstudiantePrimero, usuarioPrimero.getIDCarrera());
 
-        UsuarioDTO usuarioPrimero = null;
         UsuarioDTO usuarioSegundo = null;
         if (correoEstudianteSegundo != null) {
             usuarioSegundo = this.loginRestClient.existeUsuarioPorCorreo(correoEstudianteSegundo);
-            usuarioPrimero = this.loginRestClient.existeUsuarioPorCorreo(correoEstudiantePrimero);
             if (usuarioSegundo == null) {
                 return ResponseEntity.badRequest().body("El segundo estudiante con correo " + correoEstudianteSegundo + " no existe.");
             }
-            // Verificar que el segundo estudiante pertenece a una carrera diferente
-            Estudiante estudianteSegundo = this.estudianteService.buscarPorIdUsuario(usuarioSegundo.getId());
-            if (estudianteSegundo == null) {
-                return ResponseEntity.badRequest().body("El segundo estudiante no existe.");
-            }
-
-            if (usuarioPrimero.getIDCarrera().equals(usuarioSegundo.getIDCarrera())) {
-                return ResponseEntity.badRequest().body("El segundo estudiante debe pertenecer a una carrera diferente.");
-            }
+            logger.info("Segundo estudiante: Correo: {}, ID Carrera: {}", correoEstudianteSegundo, usuarioSegundo.getIDCarrera());
         }
 
         UsuarioDTO usuarioTercero = null;
@@ -154,14 +142,20 @@ public class EstudianteRestFullController {
             if (usuarioTercero == null) {
                 return ResponseEntity.badRequest().body("El tercer estudiante con correo " + correoEstudianteTercero + " no existe.");
             }
-            // Verificar que el tercer estudiante pertenece a una carrera diferente
-            Estudiante estudianteTercero = this.estudianteService.buscarPorIdUsuario(usuarioTercero.getId());
-            if (estudianteTercero == null) {
-                return ResponseEntity.badRequest().body("El tercer estudiante no existe.");
-            }
-            if (usuarioPrimero.getIDCarrera().equals(usuarioTercero.getIDCarrera())) {
-                return ResponseEntity.badRequest().body("El tercer estudiante debe pertenecer a una carrera diferente.");
-            }
+            logger.info("Tercer estudiante: Correo: {}, ID Carrera: {}", correoEstudianteTercero, usuarioTercero.getIDCarrera());
+        }
+
+// Validar que los estudiantes sean de carreras diferentes
+        if (usuarioSegundo != null && usuarioPrimero.getIDCarrera().equals(usuarioSegundo.getIDCarrera())) {
+            return ResponseEntity.badRequest().body("El segundo estudiante debe pertenecer a una carrera diferente.");
+        }
+
+        if (usuarioTercero != null && usuarioPrimero.getIDCarrera().equals(usuarioTercero.getIDCarrera())) {
+            return ResponseEntity.badRequest().body("El tercer estudiante debe pertenecer a una carrera diferente.");
+        }
+
+        if (usuarioSegundo != null && usuarioTercero != null && usuarioSegundo.getIDCarrera().equals(usuarioTercero.getIDCarrera())) {
+            return ResponseEntity.badRequest().body("El segundo y tercer estudiante deben pertenecer a carreras diferentes.");
         }
 
         // 5. Guardar el archivo
@@ -173,15 +167,9 @@ public class EstudianteRestFullController {
         // 6. Construir la propuesta
         Propuesta propuesta = Propuesta.builder()
                 .tema(tema)
-                .primerEstudiante(estudiantePrimero)  // Estudiante obligatorio
-                .segundoEstudiante(
-                        usuarioSegundo != null && usuarioSegundo.getId() != null
-                                ? this.estudianteService.buscarPorIdUsuario(usuarioSegundo.getId())
-                                : null)  // Opcional
-                .tercerEstudiante(
-                        usuarioTercero != null && usuarioTercero.getId() != null
-                                ? this.estudianteService.buscarPorIdUsuario(usuarioTercero.getId())
-                                : null)  // Opcional
+                .primerEstudiante(estudiantePrimero)
+                .segundoEstudiante(usuarioSegundo != null ? this.estudianteService.buscarPorIdUsuario(usuarioSegundo.getId()) : null)
+                .tercerEstudiante(usuarioTercero != null ? this.estudianteService.buscarPorIdUsuario(usuarioTercero.getId()) : null)
                 .archivoPropuesta(ar)
                 .idDocenteTutor(iDDocenteTutor)
                 .observacion("")
