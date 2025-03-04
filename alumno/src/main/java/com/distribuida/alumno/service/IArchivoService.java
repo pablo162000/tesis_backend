@@ -8,6 +8,6 @@ import java.io.IOException;
 
 public interface IArchivoService {
 
-    public Archivo guardar(MultipartFile file, Integer idUsuario)throws IOException;
+    public Archivo guardar(MultipartFile file, Integer idUsuario, String rol)throws IOException;
 
 }

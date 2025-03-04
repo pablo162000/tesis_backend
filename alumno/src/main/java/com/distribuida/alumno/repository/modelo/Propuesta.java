@@ -31,7 +31,7 @@ public class Propuesta {
     private Estudiante segundoEstudiante;
 
     @ManyToOne
-    @JoinColumn(name = "prop_id_terver_estu", referencedColumnName = "estu_id")
+    @JoinColumn(name = "prop_id_tercer_estu", referencedColumnName = "estu_id")
     //@JsonBackReference
     private Estudiante tercerEstudiante;
 
@@ -58,6 +58,13 @@ public class Propuesta {
 
     @Column(name = "prop_id_estu_creacion", nullable = false)
     private Integer idEstuCreacion;
+
+    @ManyToOne
+    @JoinColumn(name = "prop_id_archivo_designacion_revisores", referencedColumnName = "archivo_id", nullable = true)
+    private Archivo archivoDesignacionRevisores;  // Relación con la entidad Archivo
+
+    @Column(name = "prop_fecha_designacion_revisores", nullable = true)
+    private LocalDateTime fechaDesignacionRevisores;
 
     // Guardar solo el ID del docente revisor
     @Column(name = "prop_id_docente_primero_revisor", nullable = true)
@@ -88,13 +95,17 @@ public class Propuesta {
     private Archivo archivoRubricaSegundoRevisor;  // Relación con la entidad Archivo
 
     @Column(name = "prop_estado_aprobacion", nullable = false)
-    private Boolean estadoAprobación;
+    private Boolean estadoAprobacion;
 
     @Column(name = "prop_fecha_aprobacion", nullable = true)
     private LocalDateTime fechaAprobacion;
 
     @Column(name = "prop_fecha_envio", nullable = true)
     private LocalDateTime fechaEnvio;
+
+    @ManyToOne
+    @JoinColumn(name = "prop_id_archivo_designacion_tutor", referencedColumnName = "archivo_id", nullable = true)
+    private Archivo archivoDesignacionTutor;  // Relación con la entidad Archivo
 
 
 }

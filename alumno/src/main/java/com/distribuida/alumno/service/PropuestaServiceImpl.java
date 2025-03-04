@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class PropuestaServiceImpl implements IPropuestaService {
@@ -24,9 +25,27 @@ public class PropuestaServiceImpl implements IPropuestaService {
         return this.propuestaRepository.crear(propuesta);
     }
 
+
+
     @Override
-    public Propuesta buscar(Integer id) {
-        return null;
+    public Propuesta buscarPorId(Integer id) {
+
+        try {
+            if (id == null || id <= 0) {
+                throw new IllegalArgumentException("El ID proporcionado no es válido.");
+            }
+
+            Propuesta propuesta = this.propuestaRepository.buscarPorId(id);
+
+            if (propuesta == null) {
+                throw new NoSuchElementException("No se encontró una propuesta con el ID: " + id);
+            }
+
+            return propuesta;
+        } catch (Exception e) {
+            e.printStackTrace(); // Se recomienda usar un logger en lugar de esto
+            return null; // O lanzar una excepción personalizada según el caso
+        }
     }
 
     @Override
@@ -72,10 +91,56 @@ public class PropuestaServiceImpl implements IPropuestaService {
     }
 
     @Override
+    public Boolean asignarRevisor(Integer idPropuesta, Integer idDocente, String tipoRevisor) {
+        try {
+            // Validar entrada
+            if (idPropuesta == null || idDocente == null || tipoRevisor == null || tipoRevisor.trim().isEmpty()) {
+                throw new IllegalArgumentException("Los parámetros no pueden ser nulos o vacíos.");
+            }
+
+            // Obtener la propuesta por ID
+            Propuesta propuestaExistente = propuestaRepository.buscarPorId(idPropuesta);
+
+            if (propuestaExistente == null) {
+                throw new NoSuchElementException("No se encontró una propuesta con el ID: " + idPropuesta);
+            }
+
+            // Validar que el docente no sea asignado como primer y segundo revisor a la vez
+            if (("primer".equals(tipoRevisor) && idDocente.equals(propuestaExistente.getIdDocenteSegundoRevisor())) ||
+                    ("segundo".equals(tipoRevisor) && idDocente.equals(propuestaExistente.getIdDocentePrimerRevisor()))) {
+                throw new IllegalStateException("El mismo docente no puede ser asignado como primer y segundo revisor.");
+            }
+
+            // Asignar el docente según el tipo de revisor
+            boolean cambioRealizado = false;
+            if ("primer".equals(tipoRevisor) && !idDocente.equals(propuestaExistente.getIdDocentePrimerRevisor())) {
+                propuestaExistente.setIdDocentePrimerRevisor(idDocente);
+                cambioRealizado = true;
+            } else if ("segundo".equals(tipoRevisor) && !idDocente.equals(propuestaExistente.getIdDocenteSegundoRevisor())) {
+                propuestaExistente.setIdDocenteSegundoRevisor(idDocente);
+                cambioRealizado = true;
+            }
+
+            // Si hubo cambios, actualizar la base de datos
+            return cambioRealizado && propuestaRepository.update(propuestaExistente);
+
+        } catch (Exception e) {
+            e.printStackTrace(); // Se recomienda usar un logger en producción
+            return false;
+        }
+    }
+
+
+    @Override
     public List<PropuestaDTO> buscarTodaspropuestas() {
         List<Propuesta> propuestas = this.propuestaRepository.finall();
 
         // Convertir la lista de Usuario a una lista de UsuarioDTO
         return this.converter.toDTOList(propuestas);
+    }
+
+    @Override
+    public Boolean actualizar(Propuesta propuesta) {
+        return this.propuestaRepository.update(propuesta);
     }
 }

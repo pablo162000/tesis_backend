@@ -1,5 +1,6 @@
 package com.distribuida.alumno.service.dto;
 
+import com.distribuida.alumno.repository.modelo.Archivo;
 import com.distribuida.alumno.repository.modelo.EstadoValidacion;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,8 @@ public class PropuestaDTO {
     private String observacion;
     private EstadoValidacion validacion;
     private String periodo;
+    private Integer idArchivoDesignacionRevisores;
+    private LocalDateTime fechaDesignacionRevisores;
     private Integer idDocenteTutor;
     private Integer idDocentePrimerRevisor;
     private Double notaPrimerRevisor;
@@ -32,7 +35,8 @@ public class PropuestaDTO {
     private Double notaSegundoRevisor;
     private LocalDateTime fechaSegundoRevisor;
     private Integer archivoRubricaSegundoRevisor;
-    private Boolean estadoAprobación;
+    private Boolean estadoAprobacion;
     private Integer idEstuCreacion;
     private LocalDateTime fechaEnvio;
+    private Integer idArchivoDesignacionTutor;
 }

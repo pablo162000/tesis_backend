@@ -82,6 +82,8 @@ public class Converter {
                 .validacion(dto.getValidacion())
                 .periodo(dto.getPeriodo())
                 .idDocenteTutor(dto.getIdDocenteTutor())
+                .archivoDesignacionRevisores(this.archivoRepository.buscarPorId(dto.getIdArchivoDesignacionRevisores()))
+                .fechaDesignacionRevisores(dto.getFechaDesignacionRevisores())
                 .idDocentePrimerRevisor(dto.getIdDocentePrimerRevisor())
                 .notaPrimerRevisor(dto.getNotaPrimerRevisor())
                 .fechaPrimerRevisor(dto.getFechaPrimerRevisor())
@@ -90,9 +92,10 @@ public class Converter {
                 .notaSegundoRevisor(dto.getNotaSegundoRevisor())
                 .fechaSegundoRevisor(dto.getFechaSegundoRevisor())
                 .archivoRubricaSegundoRevisor(this.archivoRepository.buscarPorId(dto.getArchivoRubricaSegundoRevisor()))
-                .estadoAprobación(dto.getEstadoAprobación())
+                .estadoAprobacion(dto.getEstadoAprobacion())
                 .idEstuCreacion(dto.getIdEstuCreacion())
                 .fechaEnvio(dto.getFechaEnvio())
+                .archivoDesignacionTutor(this.archivoRepository.buscarPorId(dto.getIdArchivoDesignacionTutor()))
                 .build();
     }
 
@@ -111,6 +114,8 @@ public class Converter {
                 .observacion(propuesta.getObservacion())
                 .validacion(propuesta.getValidacion())
                 .periodo(propuesta.getPeriodo())
+                .idArchivoDesignacionRevisores(propuesta.getArchivoDesignacionRevisores() != null ? propuesta.getArchivoDesignacionRevisores().getId() : null)
+                .fechaDesignacionRevisores(propuesta.getFechaDesignacionRevisores() != null ? propuesta.getFechaDesignacionRevisores() : null)
                 .idDocenteTutor(propuesta.getIdDocenteTutor() != null ? propuesta.getIdDocenteTutor() : null)
                 .idDocentePrimerRevisor(propuesta.getIdDocentePrimerRevisor() != null ? propuesta.getIdDocentePrimerRevisor() : null)
                 .notaPrimerRevisor(propuesta.getNotaPrimerRevisor())
@@ -120,9 +125,10 @@ public class Converter {
                 .notaSegundoRevisor(propuesta.getNotaSegundoRevisor())
                 .fechaSegundoRevisor(propuesta.getFechaSegundoRevisor())
                 .archivoRubricaSegundoRevisor(propuesta.getArchivoRubricaSegundoRevisor() != null ? propuesta.getArchivoRubricaSegundoRevisor().getId() : null)
-                .estadoAprobación(propuesta.getEstadoAprobación())
+                .estadoAprobacion(propuesta.getEstadoAprobacion())
                 .idEstuCreacion(propuesta.getIdEstuCreacion() != null ? propuesta.getIdEstuCreacion() : null)
                 .fechaEnvio(propuesta.getFechaEnvio())
+                .idArchivoDesignacionTutor(propuesta.getArchivoDesignacionTutor() != null ? propuesta.getArchivoDesignacionTutor().getId() : null)
                 .build();
     }
 

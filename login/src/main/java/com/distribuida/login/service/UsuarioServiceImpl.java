@@ -2,7 +2,6 @@ package com.distribuida.login.service;
 
 import com.distribuida.login.repository.IUsuarioRepository;
 import com.distribuida.login.repository.modelo.Usuario;
-import com.distribuida.login.service.dto.IUsuarioMapper;
 import com.distribuida.login.service.dto.UsuarioDTO;
 import com.distribuida.login.service.dto.utils.Converter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +35,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
         List<Usuario> usuarios = usuarioRepository.findAllWithRol("estudiante");
 
         // Convertir la lista de Usuario a una lista de UsuarioDTO
-        return this.converter.toDTOList(usuarios);
+        return this.converter.toUsuarioDTOList(usuarios);
     }
+
 }
