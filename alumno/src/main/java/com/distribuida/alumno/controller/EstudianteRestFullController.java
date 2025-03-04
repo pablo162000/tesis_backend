@@ -132,16 +132,16 @@ public class EstudianteRestFullController {
 
         // 4. Validar que los estudiantes son de diferentes carreras usando loginRestClient
         UsuarioDTO usuarioPrimero = this.loginRestClient.existeUsuarioPorCorreo(correoEstudiantePrimero);
-        if (usuarioPrimero == null) {
-            return ResponseEntity.badRequest().body("El estudiante principal con correo " + correoEstudiantePrimero + " no existe.");
+        if (usuarioPrimero == null || !usuarioPrimero.getActivo() || !"estudiante".equals(usuarioPrimero.getRol())) {
+            return ResponseEntity.badRequest().body("El estudiante principal con correo " + correoEstudiantePrimero + " no existe, no está activo o no tiene rol de estudiante.");
         }
         logger.info("Estudiante principal: Correo: {}, ID Carrera: {}", correoEstudiantePrimero, usuarioPrimero.getIDCarrera());
 
         UsuarioDTO usuarioSegundo = null;
         if (correoEstudianteSegundo != null) {
             usuarioSegundo = this.loginRestClient.existeUsuarioPorCorreo(correoEstudianteSegundo);
-            if (usuarioSegundo == null) {
-                return ResponseEntity.badRequest().body("El segundo estudiante con correo " + correoEstudianteSegundo + " no existe.");
+            if (usuarioSegundo == null || !usuarioSegundo.getActivo() || !"estudiante".equals(usuarioSegundo.getRol())) {
+                return ResponseEntity.badRequest().body("El segundo estudiante con correo " + correoEstudianteSegundo + " no existe, no está activo o no tiene rol de estudiante.");
             }
             logger.info("Segundo estudiante: Correo: {}, ID Carrera: {}", correoEstudianteSegundo, usuarioSegundo.getIDCarrera());
         }
@@ -149,13 +149,13 @@ public class EstudianteRestFullController {
         UsuarioDTO usuarioTercero = null;
         if (correoEstudianteTercero != null) {
             usuarioTercero = this.loginRestClient.existeUsuarioPorCorreo(correoEstudianteTercero);
-            if (usuarioTercero == null) {
-                return ResponseEntity.badRequest().body("El tercer estudiante con correo " + correoEstudianteTercero + " no existe.");
+            if (usuarioTercero == null || !usuarioTercero.getActivo() || !"estudiante".equals(usuarioTercero.getRol())) {
+                return ResponseEntity.badRequest().body("El tercer estudiante con correo " + correoEstudianteTercero + " no existe, no está activo o no tiene rol de estudiante.");
             }
             logger.info("Tercer estudiante: Correo: {}, ID Carrera: {}", correoEstudianteTercero, usuarioTercero.getIDCarrera());
         }
 
-// Validar que los estudiantes sean de carreras diferentes
+        // Validar que los estudiantes sean de carreras diferentes
         if (usuarioSegundo != null && usuarioPrimero.getIDCarrera().equals(usuarioSegundo.getIDCarrera())) {
             return ResponseEntity.badRequest().body("El segundo estudiante debe pertenecer a una carrera diferente.");
         }
@@ -169,7 +169,7 @@ public class EstudianteRestFullController {
         }
 
         // 5. Guardar el archivo
-        Archivo ar = archivoService.guardar(archivo, idEstuCreacion);
+        Archivo ar = archivoService.guardar(archivo, idEstuCreacion, "estudiante");
         if (ar == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar el archivo.");
         }
@@ -187,7 +187,7 @@ public class EstudianteRestFullController {
                 .periodo("2024")
                 .idEstuCreacion(estudiantePrimero.getId())
                 .fechaEnvio(LocalDateTime.now())
-                .estadoAprobación(Boolean.FALSE)
+                .estadoAprobacion(Boolean.FALSE)
                 .build();
 
         // 7. Guardar la propuesta en base de datos

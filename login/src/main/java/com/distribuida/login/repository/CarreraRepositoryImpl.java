@@ -3,9 +3,13 @@ package com.distribuida.login.repository;
 import com.distribuida.login.repository.modelo.Carrera;
 import com.distribuida.login.repository.modelo.Usuario;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 @Transactional
@@ -22,7 +26,7 @@ public class CarreraRepositoryImpl implements ICarreraRepository{
     }
 
     @Override
-    public Carrera buscarPorId(int id) {
+    public Carrera findById(int id) {
         try {
             return this.entityManager.find(Carrera.class, id);
         } catch (Exception e) {
@@ -30,6 +34,22 @@ public class CarreraRepositoryImpl implements ICarreraRepository{
             System.err.println("Error al buscar el carrera con ID: " + id);
             e.printStackTrace();
             return null; // O puedes lanzar una excepción personalizada
+        }
+    }
+
+    @Override
+    public List<Carrera> findAll() {
+        try {
+
+            TypedQuery<Carrera> myQuery = this.entityManager.createQuery(
+                    "SELECT c FROM Carrera c ",
+                    Carrera.class
+            );
+
+            return myQuery.getResultList();
+
+        } catch (NoResultException e) {
+            return null; // Si no hay resultados, retornar null
         }
     }
 }

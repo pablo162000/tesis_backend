@@ -7,11 +7,10 @@ import com.distribuida.login.repository.modelo.AuthResponse;
 import com.distribuida.login.repository.modelo.LoginRequest;
 import com.distribuida.login.repository.modelo.RegistroRequest;
 import com.distribuida.login.repository.modelo.Usuario;
+import com.distribuida.login.service.dto.DocenteDTO;
 import com.distribuida.login.service.dto.EstudianteDTO;
-import com.distribuida.login.service.dto.IUsuarioMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,8 +34,6 @@ public class AuthServicelmpl implements IAuthService {
     @Autowired
     private ICarreraRepository carreraRepository;
 
-    @Autowired
-    private IUsuarioMapper usuarioMapper;
 
     @Transactional
     public Boolean registroEstudiante(RegistroRequest registroRequest) {
@@ -75,8 +72,8 @@ public class AuthServicelmpl implements IAuthService {
                     .password(this.encriptionService.encriptPass(registroRequest.getPassword()))
                     .fechaCreacion(LocalDateTime.now())
                     .rol("estudiante")
-                    .carrera(this.carreraRepository.buscarPorId(registroRequest.getIdCarrera()))
-                    .activo(false)
+                    .carrera(this.carreraRepository.findById(registroRequest.getIdCarrera()))
+                    .activo(Boolean.FALSE)
                     .build();
 
             Usuario usuarioGuardado = this.usuarioRepository.insertar(usuario);
@@ -201,5 +198,71 @@ public class AuthServicelmpl implements IAuthService {
     @Override
     public boolean esCorreoValido(String correo) {
         return correo != null && correo.toLowerCase().endsWith("@uce.edu.ec");
+    }
+
+    @Override
+    public DocenteDTO registroDocente(RegistroRequest registroRequest) {
+        if (registroRequest == null ||
+                registroRequest.getCorreo() == null || registroRequest.getCorreo().isEmpty() ||
+                registroRequest.getPassword() == null || registroRequest.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("Los datos del registro son inválidos");
+        }
+
+        if (!esCorreoValido(registroRequest.getCorreo())) {
+            throw new IllegalArgumentException("El correo proporcionado no es válido");
+        }
+
+        if (this.usuarioRepository.existeUsuarioConEmail(registroRequest.getCorreo())) {
+            throw new IllegalArgumentException("Ya existe un usuario registrado con este correo");
+        }
+
+        try {
+
+            /*
+                        EstudianteDTO estu = null;
+
+            try {
+                estu = this.estudianteRestClient.obtenerEstudiantePorCedula(registroRequest.getCedula());
+            } catch (Exception e) {
+                // Log de la excepción si es necesario y manejar la falta de datos
+                System.out.println("Error al buscar estudiante por cédula: " + e.getMessage());
+            }
+
+            // Si el estudiante ya existe, lanzar conflicto
+            if (estu != null) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada.");
+            }
+*/
+
+
+            // Crear usuario
+            Usuario usuario = Usuario.builder()
+                    .correo(registroRequest.getCorreo())
+                    .password(this.encriptionService.encriptPass(registroRequest.getPassword()))
+                    .fechaCreacion(LocalDateTime.now())
+                    .rol("docente")
+                    .carrera(this.carreraRepository.findById(registroRequest.getIdCarrera()))
+                    .activo(Boolean.FALSE)
+                    .build();
+
+            Usuario usuarioGuardado = this.usuarioRepository.insertar(usuario);
+            if (usuarioGuardado == null || usuarioGuardado.getId() == null) {
+                throw new RuntimeException("Error al guardar el usuario Docente");
+            }
+
+            // retornar
+            return DocenteDTO.builder()
+                    .primerNombre(registroRequest.getPrimerNombre())
+                    .segundoNombre(registroRequest.getSegundoNombre())
+                    .primerApellido(registroRequest.getPrimerApellido())
+                    .segundoApellido(registroRequest.getSegundoApellido())
+                    .cedula(registroRequest.getCedula())
+                    .celular(registroRequest.getCelular())
+                    .idUsuario(usuarioGuardado.getId())
+                    .build();
+
+        } catch (Exception ex) {
+            throw new RuntimeException("Error en el proceso de registro del docente", ex);
+        }
     }
 }

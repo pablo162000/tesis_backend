@@ -12,4 +12,5 @@ public interface IUsuarioService {
     public UsuarioDTO buscarPorEmail(String email);
     public List<UsuarioDTO> buscarTodosUsuaiosEstudiante();
 
+
 }

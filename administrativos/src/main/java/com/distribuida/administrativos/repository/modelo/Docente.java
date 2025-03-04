@@ -40,12 +40,5 @@ public class Docente {
     @Column(name = "docen_id_usuario") // Este es el nombre de la columna que actúa como clave foránea
     private Integer idUsuario;
 
-    /*
-    @ManyToOne
-    @JoinColumn(name = "usua_carr_id", referencedColumnName = "carr_id")
-    @ToString.Exclude
-    private Carrera carrera; // Relación muchos a uno con Carrera
 
-
-     */
 }
