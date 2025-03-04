@@ -7,6 +7,8 @@ public interface IEstudianteService {
     public Estudiante insertar(Estudiante estudiante);
     //public Estudiante existeConEmail(String correo) ;
     public Estudiante buscarPorId(Integer id);
+    public Estudiante buscarPorCedula(String cedula);
+
     public Estudiante buscarPorIdUsuario(Integer iDUsuario);
     public boolean esCorreoValido(String correo);
 }

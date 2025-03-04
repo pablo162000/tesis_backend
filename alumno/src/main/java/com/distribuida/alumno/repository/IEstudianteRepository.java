@@ -8,7 +8,7 @@ public interface IEstudianteRepository {
     public Estudiante findByIdUsuario (Integer idUsuario);
     public Estudiante existeEstudiante (String correo);
     public Estudiante findById (Integer id);
-
+    public Estudiante findByCedulaUsuario(String cedula);
 
 
     }

@@ -17,10 +17,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
-public class AuthServicelmpl implements IAuthService{
+public class AuthServicelmpl implements IAuthService {
 
     @Autowired
     private EstudianteRestClient estudianteRestClient;
@@ -37,6 +38,7 @@ public class AuthServicelmpl implements IAuthService{
     @Autowired
     private IUsuarioMapper usuarioMapper;
 
+    @Transactional
     public Boolean registroEstudiante(RegistroRequest registroRequest) {
         if (registroRequest == null ||
                 registroRequest.getCorreo() == null || registroRequest.getCorreo().isEmpty() ||
@@ -45,14 +47,28 @@ public class AuthServicelmpl implements IAuthService{
         }
 
         if (!esCorreoValido(registroRequest.getCorreo())) {
-            return false; // Correo inválido
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo no es válido.");
         }
 
         if (this.usuarioRepository.existeUsuarioConEmail(registroRequest.getCorreo())) {
-            return false; // Usuario ya registrado
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El correo ya está registrado.");
         }
 
+
         try {
+
+            EstudianteDTO estu = null;
+            try {
+                estu = this.estudianteRestClient.obtenerEstudiantePorCedula(registroRequest.getCedula());
+            } catch (Exception e) {
+                // Log de la excepción si es necesario y manejar la falta de datos
+                System.out.println("Error al buscar estudiante por cédula: " + e.getMessage());
+            }
+
+            // Si el estudiante ya existe, lanzar conflicto
+            if (estu != null) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada.");
+            }
             // Crear usuario
             Usuario usuario = Usuario.builder()
                     .correo(registroRequest.getCorreo())
@@ -89,8 +105,14 @@ public class AuthServicelmpl implements IAuthService{
                 throw new RuntimeException("Error al crear el estudiante en el microservicio.");
             }
 
+        } catch (ResponseStatusException ex) {
+            // Si es una ResponseStatusException, se vuelve a lanzar para que Spring maneje el error
+            throw ex;
+
         } catch (Exception ex) {
             ex.printStackTrace();
+            System.out.println("Datos enviados al servicio REST: " + ex);
+
             return false; // Fallo en el proceso
         }
     }
@@ -115,7 +137,7 @@ public class AuthServicelmpl implements IAuthService{
 
         if ("estudiante".equals(rol)) {
 
-            if (usua.getActivo() != null && usua.getActivo().equals(Boolean.TRUE)){
+            if (usua.getActivo() != null && usua.getActivo().equals(Boolean.TRUE)) {
 
                 // Verificar si el estudiante está asociado correctamente
                 EstudianteDTO estu = this.estudianteRestClient.obtenerEstudiantePorIdUsuario(usua.getId());

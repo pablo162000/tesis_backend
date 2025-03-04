@@ -34,6 +34,8 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
         }
     }
 
+
+
     @Override
     public Usuario buscarPorEmail(String email) {
         Usuario usua = null;

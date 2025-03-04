@@ -19,4 +19,8 @@ public interface EstudianteRestClient {
     EstudianteDTO obtenerEstudiantePorIdUsuario(@PathVariable("id") Integer id);
 
 
+    @GetMapping("/cedula/{cedula}")  // Ruta para consultar un Usuario por su ID
+    EstudianteDTO obtenerEstudiantePorCedula(@PathVariable("cedula") String cedula);
+
+
 }

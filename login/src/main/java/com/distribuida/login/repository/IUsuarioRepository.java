@@ -8,6 +8,7 @@ public interface IUsuarioRepository {
 
     public Usuario insertar(Usuario usuarios);
     public boolean existeUsuarioConEmail(String email) ;
+
     public Usuario buscarPorEmail(String email);
     public Usuario buscarPorId(int id);
     public Boolean activarUsuario(Integer id);
