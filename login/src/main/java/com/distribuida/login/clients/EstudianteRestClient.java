@@ -19,4 +19,8 @@ public interface EstudianteRestClient {
     @GetMapping("/existe")
     Boolean existencia(@RequestParam String cedula) ;
 
+    @GetMapping("/cedula/{cedula}")  // Ruta para consultar un Usuario por su ID
+    EstudianteDTO obtenerEstudiantePorCedula(@PathVariable("cedula") String cedula);
+
+
 }

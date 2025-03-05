@@ -83,6 +83,17 @@ public class EstudianteRestFullController {
         }
         return ResponseEntity.ok(estudianteMapper.toDTO(estudiante));
     }
+
+    @GetMapping("/cedula/{cedula}")
+    public ResponseEntity<EstudianteDTO> obtenerEstudiantePorCedula(@PathVariable String cedula) {
+        Estudiante estudiante = estudianteService.buscarPorCedula(cedula);
+        if (estudiante == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(estudianteMapper.toDTO(estudiante));
+    }
+
+
     @PostMapping(value = "/propuesta", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> cargarPropuesta(@RequestParam("tema") String tema,
                                                   @RequestParam("idEstuCreacion") Integer idEstuCreacion,

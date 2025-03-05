@@ -24,6 +24,11 @@ public class EstudianteServiceImpl implements IEstudianteService {
     }
 
     @Override
+    public Estudiante buscarPorCedula(String cedula) {
+         return this.estudianteRepository.findByCedulaUsuario(cedula);
+    }
+
+    @Override
     public Estudiante buscarPorIdUsuario(Integer iDUsuario) {
         return this.estudianteRepository.findByIdUsuario(iDUsuario);
     }

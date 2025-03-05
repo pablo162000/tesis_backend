@@ -10,6 +10,7 @@ public interface IEstudianteRepository {
     public Estudiante findById (Integer id);
     public Estudiante findByCedula(String cedula);
 
+    public Estudiante findByCedulaUsuario(String cedula);
 
 
     }
