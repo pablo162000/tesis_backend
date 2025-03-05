@@ -38,7 +38,7 @@ public class Usuario {
     private Boolean activo;
 
     @ManyToOne
-    @JoinColumn(name = "usua_carr_id", referencedColumnName = "carr_id")
+    @JoinColumn(name = "usua_carr_id", referencedColumnName = "carr_id", nullable = false)
     @ToString.Exclude
     private Carrera carrera; // Relación muchos a uno con Carrera
 

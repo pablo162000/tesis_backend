@@ -8,7 +8,7 @@ public interface ICarreraRepository {
 
 
     public Carrera insertar(Carrera carrera);
-    public Carrera findById(int id);
+    public Carrera findById(Integer id);
     public List<Carrera> findAll();
 
 }

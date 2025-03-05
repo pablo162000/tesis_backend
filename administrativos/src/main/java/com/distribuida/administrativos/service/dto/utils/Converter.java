@@ -22,6 +22,7 @@ public class Converter {
         }
 
         return Docente.builder()
+                .id(dto.getId())
                 .primerNombre(dto.getPrimerNombre())
                 .segundoNombre(dto.getSegundoNombre())
                 .primerApellido(dto.getPrimerApellido())
@@ -38,6 +39,7 @@ public class Converter {
         }
 
         return DocenteDTO.builder()
+                .id(docente.getId())
                 .primerNombre(docente.getPrimerNombre())
                 .segundoNombre(docente.getSegundoNombre())
                 .primerApellido(docente.getPrimerApellido())

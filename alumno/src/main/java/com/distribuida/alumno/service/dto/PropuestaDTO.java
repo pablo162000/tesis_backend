@@ -31,10 +31,12 @@ public class PropuestaDTO {
     private Double notaPrimerRevisor;
     private LocalDateTime fechaPrimerRevisor;
     private Integer archivoRubricaPrimerRevisor;
+    private String observacionDocentePrimerRevisor;
     private Integer idDocenteSegundoRevisor;
     private Double notaSegundoRevisor;
     private LocalDateTime fechaSegundoRevisor;
     private Integer archivoRubricaSegundoRevisor;
+    private String observacionDocenteSegundoRevisor;
     private Boolean estadoAprobacion;
     private Integer idEstuCreacion;
     private LocalDateTime fechaEnvio;

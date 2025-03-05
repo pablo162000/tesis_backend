@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DocenteDTO {
 
+    private Integer id;
     private String primerNombre;
     private String segundoNombre;
     private String primerApellido;

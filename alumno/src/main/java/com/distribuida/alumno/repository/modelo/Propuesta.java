@@ -76,6 +76,9 @@ public class Propuesta {
     @Column(name = "prop_fecha_docente_primero_revisor", nullable = true)
     private LocalDateTime fechaPrimerRevisor;
 
+    @Column(name = "prop_observacion_docente_primero_revisor", nullable = true)
+    private String observacionDocentePrimerRevisor;
+
     @ManyToOne
     @JoinColumn(name = "prop_id_archivo_rubrica_primero_revisor", referencedColumnName = "archivo_id", nullable = true)
     private Archivo archivoRubricaPrimerRevisor;  // Relación con la entidad Archivo
@@ -93,6 +96,9 @@ public class Propuesta {
     @ManyToOne
     @JoinColumn(name = "prop_id_archivo_rubrica_segundo_revisor", referencedColumnName = "archivo_id", nullable = true)
     private Archivo archivoRubricaSegundoRevisor;  // Relación con la entidad Archivo
+
+    @Column(name = "prop_observacion_docente_segundo_revisor", nullable = true)
+    private String observacionDocenteSegundoRevisor;
 
     @Column(name = "prop_estado_aprobacion", nullable = false)
     private Boolean estadoAprobacion;

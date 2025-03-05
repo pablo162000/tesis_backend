@@ -2,13 +2,13 @@ package com.distribuida.login.controller;
 
 import com.distribuida.login.service.IUsuarioService;
 import com.distribuida.login.service.dto.UsuarioDTO;
-import com.distribuida.login.service.dto.utils.Converter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 
 @RestController
@@ -18,6 +18,7 @@ public class UsuarioRestController {
 
     @Autowired
     private IUsuarioService usuarioService;
+
 
 
     @PutMapping("/{id}/activar")
@@ -64,6 +65,38 @@ public class UsuarioRestController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();  // Devolver 404 si no se encuentra
         }
 
+    }
+
+
+    @PutMapping("/activardocente")
+    public ResponseEntity<String>  primerIngresoDocente(@RequestParam("correo") String correo,
+                                                         @RequestParam("password") String password) {
+
+// Validaciones de entrada
+        if (correo == null || correo.isBlank()) {
+            return ResponseEntity.badRequest().body("El correo del docente no puede estar vacío.");
+        }
+
+        if (password == null || password.isBlank()) {
+            return ResponseEntity.badRequest().body("La nueva contraseña no puede estar vacía.");
+        }
+
+        // Buscar usuario por correo
+        UsuarioDTO usuarioDTO = this.usuarioService.buscarPorEmail(correo);
+
+        if (usuarioDTO == null) {
+            return ResponseEntity.badRequest().body("No se encontró un docente con ese correo.");
+        }
+
+        // Verificar si es su primer ingreso (usuario inactivo)
+        if (Boolean.TRUE.equals(usuarioDTO.getActivo())) {
+            return ResponseEntity.badRequest().body("El docente ya ha activado su cuenta.");
+        }
+
+        // Actualizar contraseña y activar docente
+        this.usuarioService.actualizarContrasena(correo, password);
+
+        return ResponseEntity.ok("Contraseña actualizada. Ahora puede ingresar al sistema.");
     }
 
 }

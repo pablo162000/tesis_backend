@@ -82,6 +82,14 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
     }
 
     @Override
+    public Usuario actualizar(Usuario usuario) {
+
+        this.entityManager.merge(usuario);
+        return usuario;
+    }
+
+
+    @Override
     public List<Usuario> findAllWithRol(String rol) {
         try {
 

@@ -19,9 +19,11 @@ public class AuthRestFullController {
     @Autowired
     private IAuthService authService;
 
+
     @PostMapping("/registro")
     public ResponseEntity<Boolean> registroUsuario(@RequestBody RegistroRequest registroRequest) {
-        Boolean exito = authService.registroEstudiante(registroRequest); // Aquí obtenemos el valor de éxito
+        Boolean exito = this.authService.registroEstudiante(registroRequest); // Aquí obtenemos el valor de éxito
+
 
         // Verificamos si el valor es true
         if (Boolean.TRUE.equals(exito)) {
@@ -33,7 +35,7 @@ public class AuthRestFullController {
 
     @PostMapping("/registro/docente")
     public ResponseEntity<?> registroUsuarioDocente(@RequestBody RegistroRequest registroRequest) {
-        DocenteDTO docenteDTO = authService.registroDocente(registroRequest); // Aquí obtenemos el valor de éxito
+        DocenteDTO docenteDTO = this.authService.registroDocente(registroRequest); // Aquí obtenemos el valor de éxito
 
         // Verificamos si el valor es true
         if (docenteDTO!=null) {
@@ -47,7 +49,7 @@ public class AuthRestFullController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
-        AuthResponse response = authService.loginUsuario(loginRequest);
+        AuthResponse response = this.authService.loginUsuario(loginRequest);
         return ResponseEntity.ok(response);
     }
 

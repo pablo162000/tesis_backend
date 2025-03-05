@@ -1,5 +1,6 @@
 package com.distribuida.login.service;
 
+import com.distribuida.login.clients.AdministrativoRestClient;
 import com.distribuida.login.clients.EstudianteRestClient;
 import com.distribuida.login.repository.ICarreraRepository;
 import com.distribuida.login.repository.IUsuarioRepository;
@@ -25,6 +26,9 @@ public class AuthServicelmpl implements IAuthService{
     private EstudianteRestClient estudianteRestClient;
 
     @Autowired
+    private AdministrativoRestClient administrativoRestClient;
+
+    @Autowired
     private IUsuarioRepository usuarioRepository;
 
     @Autowired
@@ -38,7 +42,8 @@ public class AuthServicelmpl implements IAuthService{
     public Boolean registroEstudiante(RegistroRequest registroRequest) {
         if (registroRequest == null ||
                 registroRequest.getCorreo() == null || registroRequest.getCorreo().isEmpty() ||
-                registroRequest.getPassword() == null || registroRequest.getPassword().isEmpty()) {
+                registroRequest.getPassword() == null || registroRequest.getPassword().isEmpty()||
+                registroRequest.getIdCarrera() == null ) {
             return false; // Datos inválidos, no se procesa
         }
 
@@ -78,6 +83,7 @@ public class AuthServicelmpl implements IAuthService{
                     .build();
 
             System.out.println("Datos enviados al servicio REST: " + estudianteDTO);
+
 
             // Llamar al servicio REST para registrar al estudiante
             Boolean estudianteCreado = this.estudianteRestClient.crearEstudiante(estudianteDTO);
@@ -137,6 +143,30 @@ public class AuthServicelmpl implements IAuthService{
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Estudiante no activado.");
 
         } else if ("docente".equals(rol)) {
+
+            if (usua.getActivo() != null && usua.getActivo().equals(Boolean.TRUE)){
+
+                // Verificar si el estudiante está asociado correctamente
+                DocenteDTO docente = this.administrativoRestClient.obtenerDocente(usua.getId());
+                if (docente == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante no encontrado.");
+                }
+
+                return AuthResponse.builder()
+                        .id(docente.getId())
+                        .primerNombre(docente.getPrimerNombre())
+                        .segundoNombre(docente.getSegundoNombre())
+                        .primerApellido(docente.getPrimerApellido())
+                        .segundoApellido(docente.getSegundoApellido())
+                        .rol(usua.getRol())
+                        .idUsuario(usua.getId())
+                        .nombreCarrera(usua.getCarrera().getNombre())
+                        .activo(usua.getActivo())
+                        .build();
+            }
+
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Estudiante no activado.");
+
             // Lógica de manejo de docentes si está disponible
         /*
         Docentes doc = this.docentesRepository.findByIdUsuario(usua.getId());

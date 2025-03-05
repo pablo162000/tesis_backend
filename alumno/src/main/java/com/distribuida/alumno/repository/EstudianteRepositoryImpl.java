@@ -58,4 +58,24 @@ public class EstudianteRepositoryImpl implements IEstudianteRepository {
         }
     }
 
+    @Override
+    public Estudiante findByCedula(String cedula) {
+        Estudiante estu = null;
+        try {
+            System.out.println("ingresa en repository");
+            TypedQuery<Estudiante> myQuery = this.entityManager.createQuery(
+                    "SELECT e FROM Estudiante e WHERE e.cedula = :cedula",
+                    Estudiante.class
+            );
+            estu = myQuery.setParameter("cedula", cedula).getSingleResult();
+
+            System.out.println(estu);
+            return  estu;
+        } catch (NoResultException e) {
+
+            return null;
+
+        }
+    }
+
 }

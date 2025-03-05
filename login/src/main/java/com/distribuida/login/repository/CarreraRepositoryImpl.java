@@ -26,7 +26,7 @@ public class CarreraRepositoryImpl implements ICarreraRepository{
     }
 
     @Override
-    public Carrera findById(int id) {
+    public Carrera findById(Integer id) {
         try {
             return this.entityManager.find(Carrera.class, id);
         } catch (Exception e) {

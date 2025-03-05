@@ -8,4 +8,5 @@ public interface IDocenteRepository {
 
     public Docente findById(Integer id);
 
+    public Docente findByCedula(String cedula);
 }

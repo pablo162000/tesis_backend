@@ -11,6 +11,6 @@ public interface IUsuarioService {
     public Boolean activarCuenta(Integer id) ;
     public UsuarioDTO buscarPorEmail(String email);
     public List<UsuarioDTO> buscarTodosUsuaiosEstudiante();
-
+    public Boolean actualizarContrasena(String correo, String contrasena);
 
 }

@@ -9,4 +9,6 @@ public interface IDocenteService {
     public Boolean guardarDocente (RegistroRequest registroRequest);
 
     public DocenteDTO buscarPorId (Integer id);
+
+    public Boolean existeEstudiante(String cedula);
 }

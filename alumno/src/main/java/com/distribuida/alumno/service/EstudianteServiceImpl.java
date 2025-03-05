@@ -28,7 +28,13 @@ public class EstudianteServiceImpl implements IEstudianteService {
         return this.estudianteRepository.findByIdUsuario(iDUsuario);
     }
     @Override
-    public boolean esCorreoValido(String correo) {
+    public Boolean esCorreoValido(String correo) {
         return correo != null && correo.toLowerCase().endsWith("@uce.edu.ec");
+    }
+
+    @Override
+    public Boolean existeEstudiante(String ceduula) {
+        Estudiante estudiante = this.estudianteRepository.findByCedula(ceduula);
+        return estudiante != null; // Si el estudiante existe, devuelve true; si es null, devuelve false
     }
 }

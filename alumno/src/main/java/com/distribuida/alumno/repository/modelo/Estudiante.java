@@ -14,7 +14,6 @@ import java.util.List;
 @ToString(exclude = {"propuestasPrimero", "propuestasSegundo", "propuestasTercero"})
 @Table(name = "estudiante",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"estu_correo"}),
                 @UniqueConstraint(columnNames = {"estu_cedula"})
         })
 public class Estudiante {

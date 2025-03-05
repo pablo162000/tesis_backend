@@ -15,6 +15,9 @@ public class UsuarioServiceImpl implements IUsuarioService {
     @Autowired
     private IUsuarioRepository usuarioRepository;
 
+    @Autowired
+    private IEncriptionService encriptionService;
+
 
     @Autowired
     private Converter converter;
@@ -36,6 +39,28 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
         // Convertir la lista de Usuario a una lista de UsuarioDTO
         return this.converter.toUsuarioDTOList(usuarios);
+    }
+
+    @Override
+    public Boolean actualizarContrasena(String correo, String contrasena) {
+
+        try {
+            Usuario usuario = this.usuarioRepository.buscarPorEmail(correo);
+
+            if (usuario == null) {
+                return false; // Usuario no encontrado
+            }
+
+            usuario.setPassword(this.encriptionService.encriptPass(contrasena));
+            usuario.setActivo(Boolean.TRUE);
+            usuarioRepository.actualizar(usuario); // Guardar cambios
+
+            return true; // Contraseña actualizada exitosamente
+        } catch (Exception e) {
+            e.printStackTrace(); // Log del error
+            return false; // Error al actualizar la contraseña
+        }
+
     }
 
 }

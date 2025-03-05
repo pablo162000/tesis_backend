@@ -10,7 +10,10 @@ import lombok.*;
 @Builder
 @Entity
 @ToString
-@Table(name = "docente")
+@Table(name = "docente",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"docen_cedula"})
+        })
 public class Docente {
 
     @Id

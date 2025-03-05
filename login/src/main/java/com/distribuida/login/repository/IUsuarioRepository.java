@@ -11,7 +11,7 @@ public interface IUsuarioRepository {
     public Usuario buscarPorEmail(String email);
     public Usuario buscarPorId(int id);
     public Boolean activarUsuario(Integer id);
-
+    public Usuario actualizar(Usuario usuario);
     public List<Usuario> findAllWithRol(String rol);
 
 }

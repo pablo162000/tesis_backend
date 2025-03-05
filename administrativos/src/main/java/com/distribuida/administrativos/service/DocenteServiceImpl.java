@@ -18,6 +18,7 @@ public class DocenteServiceImpl implements IDocenteService{
     @Autowired
     private IDocenteRepository docenteRepository;
 
+
     @Autowired
     private Converter converter;
 
@@ -31,6 +32,10 @@ public class DocenteServiceImpl implements IDocenteService{
 
         if (registroLogin == null) {
             return false; // Datos inválidos, no se procesa
+        }
+
+        if (existeEstudiante(registroLogin.getCedula())) {
+            return Boolean.FALSE; // Retorna un conflicto si ya existe
         }
 
         try {
@@ -69,4 +74,11 @@ public class DocenteServiceImpl implements IDocenteService{
             return null; // O lanzar una excepción personalizada según el caso
         }
     }
+
+    @Override
+    public Boolean existeEstudiante(String ceduula) {
+        Docente docente = this.docenteRepository.findByCedula(ceduula);
+        return docente != null; // Si el estudiante existe, devuelve true; si es null, devuelve false
+    }
+
 }
