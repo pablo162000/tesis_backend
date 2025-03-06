@@ -16,4 +16,6 @@ public interface IUsuarioRepository {
     public List<Usuario> findAllWithRol(String rol);
 
     public List<Usuario> findEstudianteByEstado(Boolean activo, String rol);
+
+    public Boolean activarDesactivarUsuario(Integer id, Boolean accion);
 }

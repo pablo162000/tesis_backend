@@ -73,9 +73,6 @@ public class AuthServicelmpl implements IAuthService {
             } catch (FeignException.Conflict ex) {
                 // Captura conflicto cuando el estudiante ya existe
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en estudiante.");
-            } catch (Exception e) {
-                // Captura cualquier otra excepción general
-                System.out.println("Error al buscar estudiante por cédula: " + e.getMessage());
             }
 
 // Si el estudiante ya existe, lanzar conflicto
@@ -89,9 +86,6 @@ public class AuthServicelmpl implements IAuthService {
             } catch (FeignException.Conflict ex) {
                 // Captura conflicto cuando el docente ya existe
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en docente.");
-            } catch (Exception e) {
-                // Captura cualquier otra excepción general
-                System.out.println("Error al buscar docente por cédula: " + e.getMessage());
             }
 
 // Si el docente ya existe, lanzar conflicto

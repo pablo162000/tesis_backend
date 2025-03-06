@@ -15,4 +15,6 @@ public interface IUsuarioService {
 
     public List<UsuarioDTO> buscarEstudiantePorEstado(Boolean activo);
 
+    public Boolean activarDesactivarCuenta(Integer id,Boolean accion);
+
 }

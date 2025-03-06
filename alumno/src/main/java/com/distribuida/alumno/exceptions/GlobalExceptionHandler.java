@@ -42,9 +42,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<Map<String, Object>> handleMissingParams(MissingServletRequestParameterException ex) {
+    public ResponseEntity<Map<String, Object>> handleMissingParams(MissingServletRequestParameterException ex,  HttpServletRequest request) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("path", "/API/tesis/alumno/propuesta/calificacion");
+        errorResponse.put("path", request.getRequestURI());
         errorResponse.put("error", "Bad Request");
         errorResponse.put("message", "El parámetro '" + ex.getParameterName() + "' es obligatorio.");
         errorResponse.put("timestamp", LocalDateTime.now());

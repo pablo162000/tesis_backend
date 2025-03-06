@@ -1,4 +1,7 @@
 package com.distribuida.login.exceptions;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,13 +17,27 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<Map<String, Object>> handleResponseStatusException(ResponseStatusException ex) {
+    public ResponseEntity<Map<String, Object>> handleResponseStatusException(
+            ResponseStatusException ex, HttpServletRequest request) {
+
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
         response.put("status", ex.getStatusCode().value());
-        response.put("error", ex.getReason()); // Aquí sí se devuelve el mensaje personalizado
-        response.put("path", "/API/tesis/auth/registro"); // Opcional: lo puedes obtener dinámicamente
+        response.put("error", ex.getReason()); // Mensaje de error personalizado
+        response.put("path", request.getRequestURI()); // Ruta dinámica
 
         return new ResponseEntity<>(response, ex.getStatusCode());
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingParams(MissingServletRequestParameterException ex,  HttpServletRequest request) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("path", request.getRequestURI());
+        errorResponse.put("error", "Bad Request");
+        errorResponse.put("message", "El parámetro '" + ex.getParameterName() + "' es obligatorio.");
+        errorResponse.put("timestamp", LocalDateTime.now());
+        errorResponse.put("status", 400);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 }

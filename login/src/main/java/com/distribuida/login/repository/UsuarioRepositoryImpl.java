@@ -125,6 +125,25 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
             return Collections.emptyList(); // Retornar una lista vacía en lugar de null
         }
     }
+
+    @Override
+    public Boolean activarDesactivarUsuario(Integer id, Boolean accion) {
+        try {
+            Usuario usuarioExistente = this.entityManager.find(Usuario.class, id);
+
+            if (usuarioExistente != null) {
+                usuarioExistente.setActivo(accion); // Actualiza el estado
+                this.entityManager.merge(usuarioExistente); // Guarda los cambios
+                return true;
+            } else {
+                return false; // No se encontró la propuesta con el ID dado
+            }
+        } catch (Exception e) {
+            //logger.error("Error al activar usuario con ID " + usuarios.getId(), e);
+            e.printStackTrace();
+            return false; // En caso de error, se retorna false
+        }
+    }
 }
 
 

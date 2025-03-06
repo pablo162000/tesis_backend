@@ -5,7 +5,9 @@ import com.distribuida.login.repository.modelo.Usuario;
 import com.distribuida.login.service.dto.UsuarioDTO;
 import com.distribuida.login.service.dto.utils.Converter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -75,6 +77,25 @@ public class UsuarioServiceImpl implements IUsuarioService {
         List<Usuario> usuarios = this.usuarioRepository.findEstudianteByEstado(activo, "estudiante");
 
         return this.converter.toUsuarioDTOList(usuarios);
+    }
+
+    @Override
+    public Boolean activarDesactivarCuenta(Integer id, Boolean accion) {
+
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID del usuario no puede ser nulo.");
+        }
+
+        if (accion == null ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La acción de activación o desactivación no puede ser nula.");
+        }
+
+        Usuario usuario = this.usuarioRepository.buscarPorId(id);
+        if (usuario == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado.");
+        }
+
+        return this.usuarioRepository.activarDesactivarUsuario(id, accion);
     }
 
 }
