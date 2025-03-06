@@ -11,6 +11,8 @@ import com.distribuida.login.repository.modelo.Usuario;
 import com.distribuida.login.service.dto.DocenteDTO;
 import com.distribuida.login.service.dto.EstudianteDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import feign.FeignException;
+import feign.FeignException.Conflict;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -43,8 +45,8 @@ public class AuthServicelmpl implements IAuthService {
     public Boolean registroEstudiante(RegistroRequest registroRequest) {
         if (registroRequest == null ||
                 registroRequest.getCorreo() == null || registroRequest.getCorreo().isEmpty() ||
-                registroRequest.getPassword() == null || registroRequest.getPassword().isEmpty()||
-                registroRequest.getIdCarrera() == null ) {
+                registroRequest.getPassword() == null || registroRequest.getPassword().isEmpty() ||
+                registroRequest.getIdCarrera() == null) {
             return false; // Datos inválidos, no se procesa
         }
 
@@ -58,7 +60,7 @@ public class AuthServicelmpl implements IAuthService {
 
 
         try {
-
+/*
             EstudianteDTO estu = null;
             try {
                 estu = this.estudianteRestClient.obtenerEstudiantePorCedula(registroRequest.getCedula());
@@ -71,6 +73,7 @@ public class AuthServicelmpl implements IAuthService {
             if (estu != null) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada.");
             }
+            */
             // Crear usuario
             Usuario usuario = Usuario.builder()
                     .correo(registroRequest.getCorreo())
@@ -112,6 +115,8 @@ public class AuthServicelmpl implements IAuthService {
             // Si es una ResponseStatusException, se vuelve a lanzar para que Spring maneje el error
             throw ex;
 
+        } catch (FeignException.Conflict ex) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en el sistema.");
         } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("Datos enviados al servicio REST: " + ex);
@@ -165,7 +170,7 @@ public class AuthServicelmpl implements IAuthService {
 
         } else if ("docente".equals(rol)) {
 
-            if (usua.getActivo() != null && usua.getActivo().equals(Boolean.TRUE)){
+            if (usua.getActivo() != null && usua.getActivo().equals(Boolean.TRUE)) {
 
                 // Verificar si el estudiante está asociado correctamente
                 DocenteDTO docente = this.administrativoRestClient.obtenerDocente(usua.getId());
