@@ -2,6 +2,8 @@ package com.distribuida.alumno.service;
 
 import com.distribuida.alumno.repository.modelo.Estudiante;
 
+import java.util.List;
+
 public interface IEstudianteService {
 
     public Estudiante insertar(Estudiante estudiante);
@@ -13,4 +15,6 @@ public interface IEstudianteService {
     public Boolean esCorreoValido(String correo);
 
     public Boolean existeEstudiante(String ceduula);
+
+
 }

@@ -13,4 +13,6 @@ public interface IUsuarioService {
     public List<UsuarioDTO> buscarTodosUsuaiosEstudiante();
     public Boolean actualizarContrasena(String correo, String contrasena);
 
+    public List<UsuarioDTO> buscarEstudiantePorEstado(Boolean activo);
+
 }

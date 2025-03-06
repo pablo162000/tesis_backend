@@ -41,4 +41,5 @@ public class PropuestaDTO {
     private Integer idEstuCreacion;
     private LocalDateTime fechaEnvio;
     private Integer idArchivoDesignacionTutor;
+    private Integer idDocenteDirectorCarrera;
 }

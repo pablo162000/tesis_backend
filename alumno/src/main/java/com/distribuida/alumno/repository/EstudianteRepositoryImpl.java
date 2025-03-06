@@ -1,12 +1,15 @@
 package com.distribuida.alumno.repository;
 
 import com.distribuida.alumno.repository.modelo.Estudiante;
+import com.distribuida.alumno.repository.modelo.Propuesta;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 
 @Repository
@@ -62,6 +65,8 @@ public class EstudianteRepositoryImpl implements IEstudianteRepository {
 
         }
     }
+
+
 
 
     @Override

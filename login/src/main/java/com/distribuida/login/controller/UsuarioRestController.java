@@ -1,11 +1,13 @@
 package com.distribuida.login.controller;
 
+import com.distribuida.login.repository.modelo.Usuario;
 import com.distribuida.login.service.IUsuarioService;
 import com.distribuida.login.service.dto.UsuarioDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Objects;
@@ -21,15 +23,14 @@ public class UsuarioRestController {
 
 
 
-    @PutMapping("/{id}/activar")
+    @PutMapping("/activar/{id}")
     public ResponseEntity<Boolean>  activarUsuario(@PathVariable Integer id) {
-
         Boolean exito = this.usuarioService.activarCuenta(id);
 
         if (Boolean.TRUE.equals(exito)) {
-            return ResponseEntity.ok(Boolean.TRUE); // Retorna un HTTP 200 con true si fue exitoso
+            return ResponseEntity.ok(true); // Retorna HTTP 200 con true si fue exitoso
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Boolean.FALSE); // Retorna un HTTP 400 con false si falló
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo activar la cuenta. Verifique que el ID del usuario sea correcto.");
         }
     }
 
@@ -97,6 +98,18 @@ public class UsuarioRestController {
         this.usuarioService.actualizarContrasena(correo, password);
 
         return ResponseEntity.ok("Contraseña actualizada. Ahora puede ingresar al sistema.");
+    }
+
+
+    @GetMapping("/estudiantes/activacion")
+    public ResponseEntity<List<UsuarioDTO>> obtenerEstudiantesPorEstado(@RequestParam("estado") Boolean estado) {
+        List<UsuarioDTO> estudiantes = usuarioService.buscarEstudiantePorEstado(estado);
+
+        if (estudiantes.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(estudiantes);
     }
 
 }

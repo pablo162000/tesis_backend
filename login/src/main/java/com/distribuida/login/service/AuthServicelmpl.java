@@ -4,18 +4,20 @@ import com.distribuida.login.clients.AdministrativoRestClient;
 import com.distribuida.login.clients.EstudianteRestClient;
 import com.distribuida.login.repository.ICarreraRepository;
 import com.distribuida.login.repository.IUsuarioRepository;
-import com.distribuida.login.repository.modelo.AuthResponse;
-import com.distribuida.login.repository.modelo.LoginRequest;
-import com.distribuida.login.repository.modelo.RegistroRequest;
-import com.distribuida.login.repository.modelo.Usuario;
+import com.distribuida.login.repository.modelo.*;
 import com.distribuida.login.service.dto.DocenteDTO;
 import com.distribuida.login.service.dto.EstudianteDTO;
+import com.distribuida.login.service.dto.UsuarioDTO;
+import com.distribuida.login.service.dto.utils.Converter;
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,14 +40,20 @@ public class AuthServicelmpl implements IAuthService {
     @Autowired
     private ICarreraRepository carreraRepository;
 
+    @Autowired
+    private Converter converter;
+
 
     @Transactional
+    @Override
     public Boolean registroEstudiante(RegistroRequest registroRequest) {
-        if (registroRequest == null ||
-                registroRequest.getCorreo() == null || registroRequest.getCorreo().isEmpty() ||
-                registroRequest.getPassword() == null || registroRequest.getPassword().isEmpty()||
-                registroRequest.getIdCarrera() == null ) {
-            return false; // Datos inválidos, no se procesa
+
+        if (Objects.isNull(registroRequest) ||
+                Objects.isNull(registroRequest.getCorreo()) || registroRequest.getCorreo().isEmpty() ||
+                Objects.isNull(registroRequest.getPassword()) || registroRequest.getPassword().isEmpty() ||
+                Objects.isNull(registroRequest.getIdCarrera())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Los datos del registro son inválidos. Verifique correo, contraseña e ID de carrera.");
         }
 
         if (!esCorreoValido(registroRequest.getCorreo())) {
@@ -59,18 +67,45 @@ public class AuthServicelmpl implements IAuthService {
 
         try {
 
-            EstudianteDTO estu = null;
+            Boolean existeEstudiante = null;
             try {
-                estu = this.estudianteRestClient.obtenerEstudiantePorCedula(registroRequest.getCedula());
+                existeEstudiante = this.estudianteRestClient.existencia(registroRequest.getCedula());
+            } catch (FeignException.Conflict ex) {
+                // Captura conflicto cuando el estudiante ya existe
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en estudiante.");
             } catch (Exception e) {
-                // Log de la excepción si es necesario y manejar la falta de datos
+                // Captura cualquier otra excepción general
                 System.out.println("Error al buscar estudiante por cédula: " + e.getMessage());
             }
 
-            // Si el estudiante ya existe, lanzar conflicto
-            if (estu != null) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada.");
+// Si el estudiante ya existe, lanzar conflicto
+            if (Boolean.TRUE.equals(existeEstudiante)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en estudiante.");
             }
+
+            Boolean existeDocente = null;
+            try {
+                existeDocente = this.administrativoRestClient.existencia(registroRequest.getCedula());
+            } catch (FeignException.Conflict ex) {
+                // Captura conflicto cuando el docente ya existe
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en docente.");
+            } catch (Exception e) {
+                // Captura cualquier otra excepción general
+                System.out.println("Error al buscar docente por cédula: " + e.getMessage());
+            }
+
+// Si el docente ya existe, lanzar conflicto
+            if (Boolean.TRUE.equals(existeDocente)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en docente.");
+            }
+
+            Integer  idCarrera= this.carreraRepository.findById(registroRequest.getIdCarrera()).getId();
+
+
+            if (Objects.isNull(idCarrera)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La carrera seleccionada no existe o no se seleccionó.");
+            }
+
             // Crear usuario
             Usuario usuario = Usuario.builder()
                     .correo(registroRequest.getCorreo())
@@ -231,41 +266,29 @@ public class AuthServicelmpl implements IAuthService {
     }
 
     @Override
+    @Transactional
     public DocenteDTO registroDocente(RegistroRequest registroRequest) {
+        // Verificación de datos nulos o vacíos
         if (registroRequest == null ||
                 registroRequest.getCorreo() == null || registroRequest.getCorreo().isEmpty() ||
                 registroRequest.getPassword() == null || registroRequest.getPassword().isEmpty()) {
-            throw new IllegalArgumentException("Los datos del registro son inválidos");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Los datos del registro son inválidos.");
         }
 
+        // Validación del correo electrónico
         if (!esCorreoValido(registroRequest.getCorreo())) {
-            throw new IllegalArgumentException("El correo proporcionado no es válido");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo proporcionado no es válido.");
         }
 
+        // Verificación si ya existe un usuario con el correo
         if (this.usuarioRepository.existeUsuarioConEmail(registroRequest.getCorreo())) {
-            throw new IllegalArgumentException("Ya existe un usuario registrado con este correo");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe un usuario registrado con este correo.");
         }
 
         try {
 
-            /*
-                        EstudianteDTO estu = null;
 
-            try {
-                estu = this.estudianteRestClient.obtenerEstudiantePorCedula(registroRequest.getCedula());
-            } catch (Exception e) {
-                // Log de la excepción si es necesario y manejar la falta de datos
-                System.out.println("Error al buscar estudiante por cédula: " + e.getMessage());
-            }
-
-            // Si el estudiante ya existe, lanzar conflicto
-            if (estu != null) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada.");
-            }
-*/
-
-
-            // Crear usuario
+            // Crear usuario docente
             Usuario usuario = Usuario.builder()
                     .correo(registroRequest.getCorreo())
                     .password(this.encriptionService.encriptPass(registroRequest.getPassword()))
@@ -275,12 +298,13 @@ public class AuthServicelmpl implements IAuthService {
                     .activo(Boolean.FALSE)
                     .build();
 
+            // Guardar el usuario
             Usuario usuarioGuardado = this.usuarioRepository.insertar(usuario);
             if (usuarioGuardado == null || usuarioGuardado.getId() == null) {
-                throw new RuntimeException("Error al guardar el usuario Docente");
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar el usuario Docente.");
             }
 
-            // retornar
+            // Crear y devolver el DTO del docente
             return DocenteDTO.builder()
                     .primerNombre(registroRequest.getPrimerNombre())
                     .segundoNombre(registroRequest.getSegundoNombre())
@@ -292,7 +316,8 @@ public class AuthServicelmpl implements IAuthService {
                     .build();
 
         } catch (Exception ex) {
-            throw new RuntimeException("Error en el proceso de registro del docente", ex);
+            // Manejar cualquier otro error inesperado
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el proceso de registro del docente", ex);
         }
     }
 }

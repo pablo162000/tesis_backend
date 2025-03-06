@@ -20,6 +20,8 @@ public class SecretariaRestController {
     @PostMapping("/docente")
     public ResponseEntity<Boolean> registroUsuarioDocente(@RequestBody RegistroRequest registroRequest){
 
+
+
         Boolean resultado = this.docenteService.guardarDocente(registroRequest);
 
         if (Boolean.TRUE.equals(resultado)) {

@@ -1,5 +1,6 @@
 package com.distribuida.alumno.repository;
 
+import com.distribuida.alumno.repository.modelo.EstadoValidacion;
 import com.distribuida.alumno.repository.modelo.Propuesta;
 
 import java.util.List;
@@ -12,8 +13,7 @@ public interface IPropuestaRepository {
     public Boolean update(Propuesta propuesta);
 
     public List<Propuesta> finall();
-
-
+    public List<Propuesta> findPropuestasBy(Integer idEstudiante, EstadoValidacion estadoValidacion1, EstadoValidacion estadoValidacion2);
     public List<Propuesta> buscarPorApellidoEstudiante(String apellido);
     public List<Propuesta> buscarPorPeriodo(String periodo);
     public List<Propuesta> buscarPorEstado(String estado);

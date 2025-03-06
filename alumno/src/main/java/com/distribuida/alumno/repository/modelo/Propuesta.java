@@ -109,6 +109,10 @@ public class Propuesta {
     @Column(name = "prop_fecha_envio", nullable = true)
     private LocalDateTime fechaEnvio;
 
+    // Guardar solo el ID del docente revisor
+    @Column(name = "prop_id_docente_director_carrera", nullable = true)
+    private Integer idDocenteDirectorCarrera;
+
     @ManyToOne
     @JoinColumn(name = "prop_id_archivo_designacion_tutor", referencedColumnName = "archivo_id", nullable = true)
     private Archivo archivoDesignacionTutor;  // Relación con la entidad Archivo

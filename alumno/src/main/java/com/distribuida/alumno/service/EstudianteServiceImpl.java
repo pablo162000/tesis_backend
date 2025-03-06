@@ -5,12 +5,15 @@ import com.distribuida.alumno.repository.modelo.Estudiante;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 public class EstudianteServiceImpl implements IEstudianteService {
 
     @Autowired
     private IEstudianteRepository estudianteRepository;
+
 
     @Override
     public Estudiante insertar(Estudiante estudiante) {
@@ -42,4 +45,6 @@ public class EstudianteServiceImpl implements IEstudianteService {
         Estudiante estudiante = this.estudianteRepository.findByCedula(ceduula);
         return estudiante != null; // Si el estudiante existe, devuelve true; si es null, devuelve false
     }
+
+
 }

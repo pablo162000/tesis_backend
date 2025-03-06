@@ -34,9 +34,7 @@ public class DocenteServiceImpl implements IDocenteService{
             return false; // Datos inválidos, no se procesa
         }
 
-        if (existeEstudiante(registroLogin.getCedula())) {
-            return Boolean.FALSE; // Retorna un conflicto si ya existe
-        }
+
 
         try {
             // Convertir DTO a entidad
@@ -76,9 +74,15 @@ public class DocenteServiceImpl implements IDocenteService{
     }
 
     @Override
-    public Boolean existeEstudiante(String ceduula) {
+    public Boolean existeDocente(String ceduula) {
         Docente docente = this.docenteRepository.findByCedula(ceduula);
-        return docente != null; // Si el estudiante existe, devuelve true; si es null, devuelve false
+
+        if (docente == null) {
+
+            return Boolean.FALSE;
+        }
+
+        return Boolean.TRUE;
     }
 
 }
