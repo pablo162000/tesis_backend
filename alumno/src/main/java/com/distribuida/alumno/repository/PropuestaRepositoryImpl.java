@@ -9,6 +9,7 @@ import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 
 @Transactional
@@ -38,7 +39,6 @@ public class PropuestaRepositoryImpl implements IPropuestaRepository {
             );
             prop = myQuery.setParameter("id", id).getSingleResult();
 
-            System.out.println(prop);
             return  prop;
         } catch (NoResultException e) {
 
@@ -104,6 +104,31 @@ public class PropuestaRepositoryImpl implements IPropuestaRepository {
             return null; // Si no hay resultados, retornar null
         }
     }
+
+    @Override
+    public List<Propuesta> findPropuestasBy(Integer idEstudiante, EstadoValidacion estadoValidacion1, EstadoValidacion estadoValidacion2) {
+        try {
+            TypedQuery<Propuesta> myQuery = this.entityManager.createQuery(
+                    "SELECT p FROM Propuesta p " +
+                            "WHERE (p.primerEstudiante.id = :idEstudiante " +
+                            "OR p.segundoEstudiante.id = :idEstudiante " +
+                            "OR p.tercerEstudiante.id = :idEstudiante) " +
+                            "AND p.estadoAprobacion = false " +
+                            "AND (p.validacion = :estadoValidacion1 OR p.validacion = :estadoValidacion2)", // Agregado OR para validación
+                    Propuesta.class
+            );
+
+            return myQuery
+                    .setParameter("idEstudiante", idEstudiante)
+                    .setParameter("estadoValidacion1", estadoValidacion1)
+                    .setParameter("estadoValidacion2", estadoValidacion2)
+                    .getResultList();
+
+        } catch (NoResultException e) {
+            return Collections.emptyList(); // Retorna una lista vacía en lugar de null
+        }
+    }
+
 
     @Override
     public List<Propuesta> buscarPorApellidoEstudiante(String apellido) {

@@ -2,6 +2,8 @@ package com.distribuida.alumno.repository;
 
 import com.distribuida.alumno.repository.modelo.Estudiante;
 
+import java.util.List;
+
 public interface IEstudianteRepository {
 
     public Estudiante insertar(Estudiante estudiantes);
@@ -11,6 +13,7 @@ public interface IEstudianteRepository {
     public Estudiante findByCedula(String cedula);
 
     public Estudiante findByCedulaUsuario(String cedula);
+
 
 
     }

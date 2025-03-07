@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "administrativoRestClient", url = "http://localhost:5050/API/tesis/administrativo")
+@FeignClient(name = "administrativoRestClient", url = "http://localhost:5051/API/tesis/administrativo")
 public interface AdministrativoRestClient {
 
 

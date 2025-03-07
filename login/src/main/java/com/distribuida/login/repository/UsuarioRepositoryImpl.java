@@ -8,6 +8,7 @@ import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -105,6 +106,23 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
 
         } catch (NoResultException e) {
             return null; // Si no hay resultados, retornar null
+        }
+    }
+
+    @Override
+    public List<Usuario> findEstudianteByEstado(Boolean activo, String rol) {
+        try {
+            TypedQuery<Usuario> myQuery = this.entityManager.createQuery(
+                    "SELECT u FROM Usuario u WHERE u.rol = :rol AND u.activo = :activo",
+                    Usuario.class
+            );
+
+            return myQuery.setParameter("activo", activo)
+                    .setParameter("rol", rol)
+                    .getResultList();
+
+        } catch (NoResultException e) {
+            return Collections.emptyList(); // Retornar una lista vacía en lugar de null
         }
     }
 }

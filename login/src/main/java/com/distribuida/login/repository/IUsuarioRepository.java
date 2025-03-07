@@ -15,4 +15,5 @@ public interface IUsuarioRepository {
     public Usuario actualizar(Usuario usuario);
     public List<Usuario> findAllWithRol(String rol);
 
+    public List<Usuario> findEstudianteByEstado(Boolean activo, String rol);
 }

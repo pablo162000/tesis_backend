@@ -11,4 +11,5 @@ public interface ICarreraRepository {
     public Carrera findById(Integer id);
     public List<Carrera> findAll();
 
+
 }

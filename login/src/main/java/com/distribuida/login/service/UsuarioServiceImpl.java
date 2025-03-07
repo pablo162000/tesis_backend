@@ -63,4 +63,18 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     }
 
+    @Override
+    public List<UsuarioDTO> buscarEstudiantePorEstado(Boolean activo) {
+        // Asegurar que activo sea un valor booleano explícito
+        if (Boolean.TRUE.equals(activo)) {
+            activo = Boolean.TRUE;
+        } else if (Boolean.FALSE.equals(activo)) {
+            activo = Boolean.FALSE;
+        }
+
+        List<Usuario> usuarios = this.usuarioRepository.findEstudianteByEstado(activo, "estudiante");
+
+        return this.converter.toUsuarioDTOList(usuarios);
+    }
+
 }

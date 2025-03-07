@@ -98,6 +98,7 @@ public class Converter {
                 .idEstuCreacion(dto.getIdEstuCreacion())
                 .fechaEnvio(dto.getFechaEnvio())
                 .archivoDesignacionTutor(this.archivoRepository.buscarPorId(dto.getIdArchivoDesignacionTutor()))
+                .idDocenteDirectorCarrera(dto.getIdDocenteDirectorCarrera())
                 .build();
     }
 
@@ -133,6 +134,7 @@ public class Converter {
                 .idEstuCreacion(propuesta.getIdEstuCreacion() != null ? propuesta.getIdEstuCreacion() : null)
                 .fechaEnvio(propuesta.getFechaEnvio())
                 .idArchivoDesignacionTutor(propuesta.getArchivoDesignacionTutor() != null ? propuesta.getArchivoDesignacionTutor().getId() : null)
+                .idDocenteDirectorCarrera(propuesta.getIdDocenteDirectorCarrera() != null ? propuesta.getIdDocenteDirectorCarrera() : null)
                 .build();
     }
 

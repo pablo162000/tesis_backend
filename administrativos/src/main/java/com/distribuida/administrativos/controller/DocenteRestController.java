@@ -36,16 +36,9 @@ public class DocenteRestController {
     @GetMapping("/existe")
     public ResponseEntity<Boolean> existencia(@RequestParam String cedula) {
 
-        // Verifica si el docente con la cédula proporcionada existe
-        Boolean exito = this.docenteService.existeEstudiante(cedula);
+        boolean existe = docenteService.existeDocente(cedula);
 
-        // Si el docente existe, retorna true con un estado 200 OK
-        if (Boolean.TRUE.equals(exito)) {
-            return ResponseEntity.ok(true);
-        }
-
-        // Si el docente no existe, retorna false con un estado 404 Not Found
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
+        return ResponseEntity.ok(existe);
     }
 
 }
