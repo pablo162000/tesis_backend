@@ -285,9 +285,30 @@ public class PropuestaServiceImpl implements IPropuestaService {
     }
 
     @Override
-    public String aprobarPropuesta(Integer idPropuesta, Integer idDirector, String observaciones, MultipartFile archivo) throws IOException {
+    public String aprobarPropuesta(Integer idPropuesta, Integer idDirector, String observaciones, Integer idTutor ,MultipartFile archivo) throws IOException {
+
+
+
         if (Objects.isNull(idPropuesta)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID de la propuesta no puede ser nulo.");
+        }
+
+        if (Objects.isNull(idTutor)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID del tutor no puede ser nulo.");
+        }
+
+
+        try {
+            DocenteDTO docenteExistente = this.administrativoRestClient.obtenerDocente(idTutor);
+
+            if (docenteExistente == null) {
+                // Si el docente es null (aunque Feign debería lanzarlo como excepción), lanzar una excepción HTTP Not Found
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró un docente con el ID: " + idTutor);
+            }
+
+        } catch (FeignException.NotFound e) {
+
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró un docente tutor con el ID: " + idTutor);
         }
 
         Propuesta propuesta = propuestaRepository.buscarPorId(idPropuesta);
@@ -296,6 +317,11 @@ public class PropuestaServiceImpl implements IPropuestaService {
         }
         if (archivo == null || archivo.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se ha seleccionado ningún archivo.");
+        }
+
+        String contentType = archivo.getContentType();
+        if (contentType == null || !contentType.equals("application/pdf")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Solo se permiten archivos en formato PDF.");
         }
 
         if (Objects.isNull(propuesta.getNotaPrimerRevisor())) {
@@ -313,17 +339,23 @@ public class PropuestaServiceImpl implements IPropuestaService {
                     "El promedio simple de las calificaciones es menor a 11, se obtuvo: " + notaFinal);
         }
 
-        // Guardar el archivo
-        Archivo archivoGuardado = archivoService.guardar(archivo, idDirector, "administrativo");
+        // Solo asigna el tutor si aún no ha sido asignado
+        if (Objects.isNull(propuesta.getIdDocenteTutor())) {
+            propuesta.setIdDocenteTutor(idTutor);
+        }
 
-        // Actualizar la propuesta
+        // Guardar el archivo y actualizar la propuesta
+        Archivo archivoGuardado = archivoService.guardar(archivo, idDirector, "administrativo");
         propuesta.setEstadoAprobacion(Boolean.TRUE);
         propuesta.setFechaAprobacion(LocalDateTime.now());
         propuesta.setArchivoDesignacionTutor(archivoGuardado);
         propuesta.setObservacion(observaciones);
+
         this.propuestaRepository.update(propuesta);
 
         return "Aprobación registrada correctamente.";
+
+
     }
 
     private Integer obtenerIdRevisor(Propuesta propuesta, String tipoRevisor) {

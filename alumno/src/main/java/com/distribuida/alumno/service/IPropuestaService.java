@@ -29,7 +29,7 @@ public interface IPropuestaService {
 
     public String calificarPropuesta(Integer idPropuesta, Double nota, String tipoRevisor, String observaciones, MultipartFile archivo) throws IOException;
 
-    public String aprobarPropuesta(Integer idPropuesta, Integer idDirector, String observaciones,MultipartFile archivo) throws IOException ;
+    public String aprobarPropuesta(Integer idPropuesta, Integer idDirector, String observaciones, Integer idTutor,MultipartFile archivo) throws IOException ;
 
     }
 

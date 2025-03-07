@@ -2,13 +2,18 @@ package com.distribuida.administrativos.service;
 
 import com.distribuida.administrativos.clients.LoginRestClient;
 import com.distribuida.administrativos.repository.IDocenteRepository;
+import com.distribuida.administrativos.repository.IVistaDocenteRepository;
 import com.distribuida.administrativos.repository.modelo.Docente;
 import com.distribuida.administrativos.repository.modelo.RegistroRequest;
+import com.distribuida.administrativos.repository.modelo.VistaDocente;
 import com.distribuida.administrativos.service.dto.DocenteDTO;
 import com.distribuida.administrativos.service.dto.utils.Converter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 
@@ -24,6 +29,9 @@ public class DocenteServiceImpl implements IDocenteService{
 
     @Autowired
     private LoginRestClient loginRestClient;
+
+    @Autowired
+    private IVistaDocenteRepository vistaDocenteRepository;
 
     @Override
     public Boolean guardarDocente(RegistroRequest registroRequest) {
@@ -83,6 +91,31 @@ public class DocenteServiceImpl implements IDocenteService{
         }
 
         return Boolean.TRUE;
+    }
+
+    @Override
+    public VistaDocente buscarViewDocentePorId(Integer id) {
+        if (id == null || id <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID debe ser un número positivo");
+        }
+        return this.vistaDocenteRepository.findById(id);
+    }
+
+    @Override
+    public List<VistaDocente> buscarTodosViewDocente() {
+        return this.vistaDocenteRepository.findAll();
+    }
+
+    @Override
+    public List<VistaDocente> buscarViewDocentePorEstado(Boolean activo) {
+        if (activo == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El estado no puede ser nulo");
+        }
+        List<VistaDocente> docentes = this.vistaDocenteRepository.findByEstado(activo);
+        if (docentes.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron docentes con el estado: " + activo);
+        }
+        return docentes;
     }
 
 }

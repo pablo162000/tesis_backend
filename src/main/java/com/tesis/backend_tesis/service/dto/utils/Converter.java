@@ -97,7 +97,7 @@ public class Converter {
 
         return estudiante;
     }
-
+/*
     public UsuarioDTO toDTOSimple(Usuarios usuarios) {
         if (usuarios == null) {
             return null; // Si el usuario es null, retornamos null
@@ -122,6 +122,8 @@ public class Converter {
         return usuarioDTO;
     }
 
+
+ */
     public Usuarios toEntity(UsuarioDTO usuarioDTO) {
         if (usuarioDTO == null) {
             return null; // Si el DTO es null, retornamos null
