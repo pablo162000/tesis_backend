@@ -143,9 +143,10 @@ public class PropuestaRestFullController {
     public ResponseEntity<String> aproobacion (@RequestParam("idPropuesta") Integer idPropuesta,
                                                @RequestParam("idDirector") Integer idDirector,
                                                @RequestParam("observaciones") String observaciones,
+                                               @RequestParam("idTutor") Integer idTutor,
                                                @RequestParam("file") MultipartFile archivo) throws IOException {
 
-        String mensaje = propuestaService.aprobarPropuesta(idPropuesta, idDirector,observaciones , archivo);
+        String mensaje = propuestaService.aprobarPropuesta(idPropuesta, idDirector,observaciones ,idTutor, archivo);
         return ResponseEntity.ok(mensaje);
 
         }

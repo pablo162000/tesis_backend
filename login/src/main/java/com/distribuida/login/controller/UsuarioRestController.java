@@ -101,7 +101,7 @@ public class UsuarioRestController {
     }
 
 
-    @GetMapping("/estudiantes/activacion")
+    @GetMapping("/estudiantes/estado/activacion")
     public ResponseEntity<List<UsuarioDTO>> obtenerEstudiantesPorEstado(@RequestParam("estado") Boolean estado) {
         List<UsuarioDTO> estudiantes = usuarioService.buscarEstudiantePorEstado(estado);
 
@@ -111,5 +111,19 @@ public class UsuarioRestController {
 
         return ResponseEntity.ok(estudiantes);
     }
+
+    @PutMapping("/activardesactivar")
+    public ResponseEntity<Boolean>  activarDesactivarUsuario(@RequestParam("id") Integer id,
+                                                             @RequestParam("accion") Boolean accion) {
+
+        Boolean exito = this.usuarioService.activarDesactivarCuenta(id,accion );
+
+        if (Boolean.TRUE.equals(exito)) {
+            return ResponseEntity.ok(true); // Retorna HTTP 200 con true si fue exitoso
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo activar la cuenta. Verifique que el ID del usuario sea correcto.");
+        }
+    }
+
 
 }
