@@ -1,6 +1,5 @@
 package com.distribuida.administrativos.controller;
 
-
 import com.distribuida.administrativos.repository.modelo.RegistroRequest;
 import com.distribuida.administrativos.repository.modelo.VistaDocente;
 import com.distribuida.administrativos.repository.modelo.VistaEstudiante;
@@ -72,6 +71,17 @@ public class SecretariaRestController {
     @PostMapping("/docente")
     public ResponseEntity<Boolean> registroUsuarioDocente(@RequestBody RegistroRequest registroRequest){
         Boolean resultado = this.docenteService.guardarDocente(registroRequest);
+<<<<<<< HEAD
+
+        if (Boolean.TRUE.equals(resultado)) {
+            return ResponseEntity.ok(Boolean.TRUE);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Boolean.FALSE);
+        }
+    }
+
+=======
+>>>>>>> 25c81195c19043fd0821fa977f099ce20c322b1d
 
         if (Boolean.TRUE.equals(resultado)) {
             return ResponseEntity.ok(Boolean.TRUE);
@@ -81,5 +91,15 @@ public class SecretariaRestController {
     }
 
 
+    @PostMapping("/docente")
+    public ResponseEntity<Boolean> registroUsuarioDocente(@RequestBody RegistroRequest registroRequest) {
+        Boolean resultado = this.docenteService.guardarDocente(registroRequest);
+
+        if (Boolean.TRUE.equals(resultado)) {
+            return ResponseEntity.ok(Boolean.TRUE);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Boolean.FALSE);
+        }
+    }
 
 }

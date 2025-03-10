@@ -13,6 +13,8 @@ import com.distribuida.login.service.dto.EstudianteDTO;
 import com.distribuida.login.service.dto.utils.Converter;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
+import feign.FeignException;
+import feign.FeignException.Conflict;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.stereotype.Service;
@@ -73,6 +75,7 @@ public class AuthServicelmpl implements IAuthService {
 
         try {
 
+
             Boolean existeEstudiante = null;
             try {
                 existeEstudiante = this.estudianteRestClient.existencia(registroRequest.getCedula());
@@ -85,6 +88,8 @@ public class AuthServicelmpl implements IAuthService {
             if (Boolean.TRUE.equals(existeEstudiante)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en estudiante.");
             }
+
+
 
             Boolean existeDocente = null;
             try {
@@ -223,7 +228,7 @@ public class AuthServicelmpl implements IAuthService {
 
         } else if ("docente".equals(rol)) {
 
-            if (usua.getActivo() != null && usua.getActivo().equals(Boolean.TRUE)){
+            if (usua.getActivo() != null && usua.getActivo().equals(Boolean.TRUE)) {
 
                 // Verificar si el estudiante está asociado correctamente
                 DocenteDTO docente = this.administrativoRestClient.obtenerDocente(usua.getId());
