@@ -1,25 +1,31 @@
 package com.distribuida.alumno.service;
 
 import com.distribuida.alumno.clients.AdministrativoRestClient;
+import com.distribuida.alumno.clients.CorreoRestClient;
+import com.distribuida.alumno.clients.LoginRestClient;
 import com.distribuida.alumno.repository.IPropuestaRepository;
+import com.distribuida.alumno.repository.IVistaPropuestaRepository;
 import com.distribuida.alumno.repository.modelo.Archivo;
 import com.distribuida.alumno.repository.modelo.EstadoValidacion;
 import com.distribuida.alumno.repository.modelo.Propuesta;
+import com.distribuida.alumno.repository.modelo.VistaPropuesta;
 import com.distribuida.alumno.service.dto.DocenteDTO;
 import com.distribuida.alumno.service.dto.PropuestaDTO;
+import com.distribuida.alumno.service.dto.UsuarioDTO;
 import com.distribuida.alumno.service.dto.utils.Converter;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -36,6 +42,20 @@ public class PropuestaServiceImpl implements IPropuestaService {
 
     @Autowired
     private IArchivoService archivoService;
+
+    @Autowired
+    private IEstudianteService estudianteService;
+
+    @Autowired
+    private CorreoRestClient correoRestClient;
+
+    @Autowired
+    private LoginRestClient loginRestClient;
+
+    @Autowired
+    private IVistaPropuestaRepository vistaPropuestaRepository;
+
+
 
     @Override
     public Propuesta guardar(Propuesta propuesta) {
@@ -73,8 +93,12 @@ public class PropuestaServiceImpl implements IPropuestaService {
         return this.converter.toDTOList(propuestas);  // Usar el mapper inyectado
     }
 
+    @Transactional
     @Override
-    public Boolean validarPropuesta(Integer idPropuesta, Integer idDocenteDirector,Boolean estadoValidacion){
+    public Boolean validarPropuesta(Integer idPropuesta,
+                                    Integer idDocenteDirector,
+                                    Boolean estadoValidacion,
+                                    String obsercvaciones){
         // Verificar si el parámetro estadoValidacion es nulo
         if (estadoValidacion == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La respuesta de validación no puede ser nula.");
@@ -105,6 +129,86 @@ public class PropuestaServiceImpl implements IPropuestaService {
         // Actualizar el estado de validación
         propuestaExistente.setValidacion(estadoValidacion ? EstadoValidacion.VALIDADO : EstadoValidacion.NO_VALIDADO);
         propuestaExistente.setIdDocenteDirectorCarrera(idDocenteDirector);
+        propuestaExistente.setObservacion(obsercvaciones);
+
+        if (propuestaExistente.getValidacion().equals(EstadoValidacion.NO_VALIDADO)){
+
+
+
+            Integer idPrimerEstudiante = propuestaExistente.getPrimerEstudiante().getIdUsuario();
+
+            UsuarioDTO primerEstudianteDTO =  this.loginRestClient.obtenerEstudiantePorId(idPrimerEstudiante).getBody();
+
+            UsuarioDTO segundoEstudianteDTO=null;
+            String segundoEstudiante = null;
+            String segundoCorreo = null;
+            if (propuestaExistente.getSegundoEstudiante()!=null) {
+                segundoEstudianteDTO=  this.loginRestClient.obtenerEstudiantePorId(propuestaExistente.getSegundoEstudiante().getIdUsuario()).getBody();
+
+
+                segundoEstudiante =
+                        propuestaExistente.getSegundoEstudiante().getPrimerApellido()+ " "+ propuestaExistente.getSegundoEstudiante().getPrimerNombre();
+
+                segundoCorreo = segundoEstudianteDTO.getCorreo();
+
+            }
+
+
+            UsuarioDTO tercerEstudianteDTO = null;
+            String tercerEstudiante = null;
+            String tercerCorreo = null;
+            if (propuestaExistente.getTercerEstudiante()!=null) {
+
+                tercerEstudianteDTO=  this.loginRestClient.obtenerEstudiantePorId(propuestaExistente.getTercerEstudiante().getIdUsuario()).getBody();
+
+
+                tercerEstudiante =
+                        propuestaExistente.getTercerEstudiante().getPrimerApellido()+ " "+ propuestaExistente.getTercerEstudiante().getPrimerNombre();
+
+                tercerCorreo = tercerEstudianteDTO.getCorreo();
+            }
+
+
+            List<String> posiblesNombres = new ArrayList<String>();
+
+            List<String> ccEmails = new ArrayList<>();
+            Stream.of(segundoCorreo, tercerCorreo)
+                    .filter(Objects::nonNull) // Filtra solo los que no son null
+                    .forEach(ccEmails::add);
+
+
+
+            String primerEstudiante =
+                    propuestaExistente.getPrimerEstudiante().getPrimerApellido()+ " "+ propuestaExistente.getPrimerEstudiante().getPrimerNombre();
+
+
+            posiblesNombres.add(primerEstudiante);
+            posiblesNombres.add(segundoEstudiante);
+            posiblesNombres.add(tercerEstudiante);
+
+            String nombres = obtenerNombresEstudiantes(posiblesNombres);
+
+            System.out.println(nombres);
+            System.out.println(ccEmails);
+
+
+            try {
+                this.correoRestClient.notificacionNegacionTema(
+                        primerEstudianteDTO.getCorreo(),
+                        ccEmails,
+                        nombres,
+                        propuestaExistente.getTema()
+                        ,"fing.direccion.computacion@uce.edu.ec"
+                        , propuestaExistente.getObservacion()
+                        );
+
+
+            } catch (Exception e) {
+
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo.");
+            }
+
+        }
 
         // Guardar los cambios
         return this.propuestaRepository.update(propuestaExistente);
@@ -358,6 +462,58 @@ public class PropuestaServiceImpl implements IPropuestaService {
 
     }
 
+    @Override
+    public VistaPropuesta buscarViewPropuestaPorId(Integer id) {
+        if (id == null || id <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID debe ser un número positivo");
+        }
+        return this.vistaPropuestaRepository.findById(id);
+
+    }
+
+    @Override
+    public List<VistaPropuesta> buscarTodosViewPropuesta() {
+        List<VistaPropuesta> propeustas= this.vistaPropuestaRepository.findAll();
+
+        if (propeustas.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron propuestas");
+        }
+        return propeustas;
+    }
+
+    @Override
+    public List<VistaPropuesta> buscarViewPropuestaPorValidacion(Integer respuesta) {
+        List<VistaPropuesta> propeustas = new ArrayList<>();
+
+        if (respuesta == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "asigne alún valor");
+
+        }
+
+        if (respuesta.equals(0) || respuesta.equals(1)) {
+            return this.vistaPropuestaRepository.findByEstadoValidacion(EstadoValidacion.NO_REVISADO);
+        }
+
+        if (respuesta.equals(2)) {
+            return this.vistaPropuestaRepository.findByEstadoValidacion(EstadoValidacion.VALIDADO);
+        }
+
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron propeustas con ese tipo de validacion ");
+
+    }
+
+    @Override
+    public List<VistaPropuesta> buscarViewPropuestaPorAprobacion(Boolean estado) {
+        if (estado == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El estado no puede ser nulo");
+        }
+        List<VistaPropuesta> propeustas = this.vistaPropuestaRepository.findByEstadoAprobacion(estado);
+        if (propeustas.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron docentes con el estado: " + estado);
+        }
+        return propeustas;
+    }
+
     private Integer obtenerIdRevisor(Propuesta propuesta, String tipoRevisor) {
         if ("primer".equalsIgnoreCase(tipoRevisor)) {
             return propuesta.getIdDocentePrimerRevisor();
@@ -379,6 +535,28 @@ public class PropuestaServiceImpl implements IPropuestaService {
             propuesta.setFechaSegundoRevisor(fechaActual);
             propuesta.setArchivoRubricaSegundoRevisor(archivoGuardado);
             propuesta.setObservacionDocenteSegundoRevisor(observaciones);
+        }
+    }
+
+
+
+    public String obtenerNombresEstudiantes(List<String> posiblesNombres) {
+        // Filtrar nombres nulos o vacíos
+        List<String> nombresValidos = posiblesNombres.stream()
+                .filter(nombre -> nombre != null && !nombre.trim().isEmpty())
+                .collect(Collectors.toList());
+
+        return formatearListaConY(nombresValidos);
+    }
+
+    private String formatearListaConY(List<String> elementos) {
+        if (elementos.isEmpty()) {
+            return "";
+        } else if (elementos.size() == 1) {
+            return elementos.get(0);
+        } else {
+            return String.join(", ", elementos.subList(0, elementos.size() - 1)) +
+                    " y " + elementos.get(elementos.size() - 1);
         }
     }
 

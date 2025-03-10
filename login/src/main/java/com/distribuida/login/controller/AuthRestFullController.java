@@ -1,13 +1,16 @@
 package com.distribuida.login.controller;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.distribuida.login.clients.AdministrativoRestClient;
+import com.distribuida.login.clients.CorreoRestClient;
 import com.distribuida.login.clients.EstudianteRestClient;
 import com.distribuida.login.repository.modelo.AuthResponse;
 import com.distribuida.login.repository.modelo.LoginRequest;
 import com.distribuida.login.repository.modelo.RegistroRequest;
+import com.distribuida.login.security.JwUtil;
 import com.distribuida.login.service.IAuthService;
 import com.distribuida.login.service.dto.DocenteDTO;
-import feign.FeignException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,11 +41,39 @@ public class AuthRestFullController {
 
         // Verificamos si el valor es true
         if (Boolean.TRUE.equals(exito)) {
+
             return ResponseEntity.ok(Boolean.TRUE); // Retorna un HTTP 200 con true si fue exitoso
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Boolean.FALSE); // Retorna un HTTP 400 con false si falló
         }
     }
+
+    @GetMapping("/validacion-correo/{token}")
+    public ResponseEntity<String> validarCorreo(@PathVariable String token) {
+        try {
+            // Verifica el token JWT
+            DecodedJWT decodedJWT = JwUtil.verifyToken(token);
+            if (decodedJWT != null) {
+                String correo = decodedJWT.getSubject(); // Se obtiene el correo desde el token
+
+                // Actualiza el estado del correo en la base de datos (esto lo debes implementar en tu servicio)
+                Boolean validacionExitosa = this.authService.validarCorreo(correo);
+                if (validacionExitosa) {
+
+
+                    return ResponseEntity.ok("Correo validado con éxito");
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al validar el correo");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token inválido o expirado");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar el token");
+        }
+    }
+
+
 
     @PostMapping("/registro/docente")
     public ResponseEntity<?> registroUsuarioDocente(@RequestBody RegistroRequest registroRequest) {

@@ -1,6 +1,7 @@
 package com.distribuida.alumno.service;
 
 import com.distribuida.alumno.repository.modelo.Propuesta;
+import com.distribuida.alumno.repository.modelo.VistaPropuesta;
 import com.distribuida.alumno.service.dto.PropuestaDTO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,7 +16,7 @@ public interface IPropuestaService {
 
     public List<PropuestaDTO> buscarPorIdEstudiante(Integer idEstudiante);
 
-    public Boolean validarPropuesta(Integer idPropuesta, Integer idDocenteDirector, Boolean estadoValidacion);
+    public Boolean validarPropuesta(Integer idPropuesta, Integer idDocenteDirector, Boolean estadoValidacion, String obsercvaciones);
 
     public Boolean asignarRevisor(Integer idPropuesta, Integer idDocente, String tipooRevisor);
 
@@ -31,5 +32,13 @@ public interface IPropuestaService {
 
     public String aprobarPropuesta(Integer idPropuesta, Integer idDirector, String observaciones, Integer idTutor,MultipartFile archivo) throws IOException ;
 
-    }
+    public VistaPropuesta buscarViewPropuestaPorId(Integer id);
+    public List<VistaPropuesta> buscarTodosViewPropuesta();
+    public List<VistaPropuesta> buscarViewPropuestaPorValidacion(Integer respuesta);
+    public List<VistaPropuesta> buscarViewPropuestaPorAprobacion(Boolean estado);
+
+
+
+
+}
 

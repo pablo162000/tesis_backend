@@ -23,4 +23,7 @@ public interface EstudianteRestClient {
     EstudianteDTO obtenerEstudiantePorCedula(@PathVariable("cedula") String cedula);
 
 
+    @PostMapping("/eliminar/{idUsuario}")
+    void eliminarRegistro(@PathVariable Integer idUsuario);
+
 }

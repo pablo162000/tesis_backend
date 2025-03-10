@@ -37,6 +37,9 @@ public class Usuario {
     @Column(name = "usua_activo")
     private Boolean activo;
 
+    @Column(name = "usua_correo_valido")
+    private Boolean correoValido;
+
     @ManyToOne
     @JoinColumn(name = "usua_carr_id", referencedColumnName = "carr_id", nullable = false)
     @ToString.Exclude

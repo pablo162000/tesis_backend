@@ -15,6 +15,9 @@ public interface IUsuarioService {
 
     public List<UsuarioDTO> buscarEstudiantePorEstado(Boolean activo);
 
+    public UsuarioDTO buscarPorId(Integer id);
+
     public Boolean activarDesactivarCuenta(Integer id,Boolean accion);
 
+    public void eliminarUsuariosNoVerificados();
 }

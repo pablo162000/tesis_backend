@@ -1,6 +1,8 @@
 package com.distribuida.alumno.controller;
 
+import com.distribuida.alumno.bucket.IBucket;
 import com.distribuida.alumno.clients.AdministrativoRestClient;
+import com.distribuida.alumno.clients.CorreoRestClient;
 import com.distribuida.alumno.clients.LoginRestClient;
 import com.distribuida.alumno.repository.IEstudianteRepository;
 import com.distribuida.alumno.repository.modelo.Archivo;
@@ -13,21 +15,27 @@ import com.distribuida.alumno.service.IPropuestaService;
 import com.distribuida.alumno.service.dto.EstudianteDTO;
 import com.distribuida.alumno.service.dto.IEstudianteMapper;
 import com.distribuida.alumno.service.dto.UsuarioDTO;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 
+import java.io.InputStream;
 import java.time.LocalDateTime;
 
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @RestController
@@ -56,6 +64,13 @@ public class EstudianteRestFullController {
 
     @Autowired
     private AdministrativoRestClient administrativoRestClient;
+
+    @Autowired
+    private CorreoRestClient correoRestClient;
+
+    @Autowired
+    private IBucket bucketDataSource;
+
 
     @PostMapping("/crear")
     public ResponseEntity<Boolean> guardarEstudiante(@RequestBody EstudianteDTO estudianteDTO) {
@@ -98,7 +113,7 @@ public class EstudianteRestFullController {
         return ResponseEntity.ok(estudianteMapper.toDTO(estudiante));
     }
 
-
+    @Transactional
     @PostMapping(value = "/propuesta", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> cargarPropuesta(@RequestParam("tema") String tema,
                                                   @RequestParam("idEstuCreacion") Integer idEstuCreacion,
@@ -123,17 +138,14 @@ public class EstudianteRestFullController {
         }
 
         // 2. Obtener el estudiante principal (obligatorio)
-        Estudiante estudiantePrimero = this.estudianteService.buscarPorId(idEstuCreacion);
+
+        Estudiante estudiantePrimero= null;
         try {
-
-            logger.info("Respuesta del idEstuCreacion: " + estudiantePrimero);
-            System.out.println("Estudiante obtenido: " + estudiantePrimero);
-
-            if (estudiantePrimero == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El estudiante principal no existe.");
-            }
+            estudiantePrimero = this.estudianteService.buscarPorId(idEstuCreacion);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El estudiante principal no existe.");
         } catch (Exception e) {
-            logger.error("Error al obtener el estudiante con ID {}: {}", idEstuCreacion, e.getMessage(), e);
+            logger.error("Error inesperado al obtener el estudiante con ID {}: {}", idEstuCreacion, e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno al buscar el estudiante principal.");
         }
 
@@ -185,43 +197,49 @@ public class EstudianteRestFullController {
             logger.info("Tercer estudiante: Correo: {}, ID Carrera: {}", correoEstudianteTercero, usuarioTercero.getIDCarrera());
         }
 
-        // Validar que los estudiantes sean de carreras diferentes
-        if (usuarioSegundo != null && usuarioPrimero.getIDCarrera().equals(usuarioSegundo.getIDCarrera())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El segundo estudiante debe pertenecer a una carrera diferente.");
+
+        if (usuarioPrimero != null) {
+            estudiantePrimero = this.estudianteService.buscarPorIdUsuario(usuarioPrimero.getId());
+            if (estudiantePrimero != null && !this.propuestaService.puedeEnviarPropuestas(estudiantePrimero.getId())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El primer estudiante tiene propuestas vigentes.");
+            }
         }
 
-        if (usuarioTercero != null && usuarioPrimero.getIDCarrera().equals(usuarioTercero.getIDCarrera())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El tercer estudiante debe pertenecer a una carrera diferente.");
+        Estudiante estudianteSegundo = null;
+        String nombreSegundo = "";
+        if (usuarioSegundo != null) {
+            estudianteSegundo = this.estudianteService.buscarPorIdUsuario(usuarioSegundo.getId());
+            if (estudianteSegundo != null && !this.propuestaService.puedeEnviarPropuestas(estudianteSegundo.getId())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El segundo estudiante tiene propuestas vigentes.");
+            } else if (estudianteSegundo != null) {
+                // Recuperar el nombre completo del segundo estudiante
+                nombreSegundo = estudianteSegundo.getPrimerNombre() + " " + estudianteSegundo.getPrimerApellido();
+            } else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El segundo estudiante no fue encontrado.");
+            }
         }
 
-        if (usuarioSegundo != null && usuarioTercero != null && usuarioSegundo.getIDCarrera().equals(usuarioTercero.getIDCarrera())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El segundo y tercer estudiante deben pertenecer a carreras diferentes.");
-        }
-
-
-        if(!this.propuestaService.puedeEnviarPropuestas(estudiantePrimero.getId())){
-
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El primer estuidante tiene propuestas vigentes.");
-
-        }
-
-        if(!this.propuestaService.puedeEnviarPropuestas(this.estudianteService.buscarPorIdUsuario(usuarioSegundo.getId()).getId())){
-
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El segundo estuidante tiene propuestas vigentes.");
-
-        }
-
-        if(!this.propuestaService.puedeEnviarPropuestas(this.estudianteService.buscarPorIdUsuario(usuarioSegundo.getId()).getId())){
-
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El tercer estuidante tiene propuestas vigentes.");
-
+        Estudiante estudianteTercero = null;
+        String nombreTercero = "";
+        if (usuarioTercero != null) {
+            estudianteTercero = this.estudianteService.buscarPorIdUsuario(usuarioTercero.getId());
+            if (estudianteTercero != null && !this.propuestaService.puedeEnviarPropuestas(estudianteTercero.getId())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El tercer estudiante tiene propuestas vigentes.");
+            } else if (estudianteTercero != null) {
+                // Recuperar el nombre completo del tercer estudiante
+                nombreTercero = estudianteTercero.getPrimerNombre() + " " + estudianteTercero.getPrimerApellido();
+            } else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El tercer estudiante no fue encontrado.");
+            }
         }
 
 
 
+
+        Integer idDocenteTutor = null;
         if (iDDocenteTutor != null) {
             try {
-                iDDocenteTutor = this.administrativoRestClient.obtenerDocente(iDDocenteTutor).getId();
+                idDocenteTutor = this.administrativoRestClient.obtenerDocente(iDDocenteTutor).getId();
             } catch (Exception e) {
                 logger.error("No se pudo obtener el docente con ID {}: {}", iDDocenteTutor, e.getMessage(), e);
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El docente tutor no existe.");
@@ -246,7 +264,7 @@ public class EstudianteRestFullController {
                 .segundoEstudiante(usuarioSegundo != null ? this.estudianteService.buscarPorIdUsuario(usuarioSegundo.getId()) : null)
                 .tercerEstudiante(usuarioTercero != null ? this.estudianteService.buscarPorIdUsuario(usuarioTercero.getId()) : null)
                 .archivoPropuesta(ar)
-                .idDocenteTutor(iDDocenteTutor!= null ?this.administrativoRestClient.obtenerDocente(iDDocenteTutor).getId() : null)
+                .idDocenteTutor(iDDocenteTutor!= null ? idDocenteTutor : null)
                 .observacion("")
                 .validacion(EstadoValidacion.NO_REVISADO)
                 .periodo("2024")
@@ -259,9 +277,37 @@ public class EstudianteRestFullController {
         this.propuestaService.guardar(propuesta);
         logger.info("La propuesta se ha guardado correctamente: {}", propuesta);
 
+        List<String> ccEmails = new ArrayList<>();
+        Stream.of(correoEstudianteSegundo, correoEstudianteTercero)
+                .filter(Objects::nonNull) // Filtra solo los que no son null
+                .forEach(ccEmails::add);
+
+
+
+        String nombresSecundarios = Stream.of(nombreSegundo, nombreTercero)
+                .filter(Objects::nonNull)  // Filtra solo los que no son null
+                .collect(Collectors.joining(" y "));
+
+        String nombrePrincipal = estudiantePrimero.getPrimerNombre() + " " + estudiantePrimero.getPrimerApellido() + ", ";
+
+        String nombres = nombrePrincipal.concat(nombresSecundarios);
+
+
+
+
+
+        try {
+            this.correoRestClient.enviareachivo(correoEstudiantePrimero, ccEmails, nombres, tema, "fing.direccion.computacion@uce.edu.ec", archivo);
+            logger.info("Correo enviado exitosamente a {}", correoEstudiantePrimero);
+        } catch (Exception e) {
+            logger.error("Error al enviar correo: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo.");
+        }
         // 8. Respuesta exitosa
         return ResponseEntity.ok("Propuesta cargada exitosamente: " + ar.getNombre());
     }
+
+
 
 
 // no va
@@ -284,5 +330,17 @@ public class EstudianteRestFullController {
         // Si el docente no existe, retorna false con un estado 404 Not Found
         return ResponseEntity.ok(existe);
     }
+
+    @PostMapping("/eliminar/{idUsuario}")
+    public void eliminarRegistro(@PathVariable Integer idUsuario) {
+
+        this.estudianteRepository.delete(idUsuario);
+    }
+
+    @GetMapping("/download/{fileName}")
+    public ResponseEntity<InputStreamResource> downloadFile(@PathVariable String fileName) throws IOException {
+        return this.bucketDataSource.downloadFile(fileName);
+    }
+
 
 }

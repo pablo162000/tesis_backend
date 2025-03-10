@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignación de Revisión de Propuesta</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e3f2fd;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .email-container {
+            background-color: #ffffff;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 600px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #eda231;
+
+        }
+        .header {
+            text-align: center;
+            color: #eda231;
+        }
+        .button {
+            background-color: #eda231;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .button:hover {
+            background-color: #d6973b;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #757575;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="header">
+        <h1>📄 Asignación de Revisión</h1>
+    </div>
+    <div class="content">
+        <p>Estimado/os ${nombreEstudiante},</p>
+        <p>Se les ha asignado uns de las dos nota propuesta de titulación:</p>
+
+        <p><strong>Estudiante/s:</strong> ${nombreEstudiante}</p>
+        <p><strong>Tema:</strong> ${temaPropuesta}</p>
+        <p><strong>Revisor:</strong> ${nombreRevisor}</p>
+
+
+        <p>Para acceder al documento, por favor ingrese al siguiente enlace:</p>
+
+        <a href="${linkRevision}" class="button">Acceder al sistema</a>
+
+        <p>En caso de dudas o consultas, no dude en ponerse en contacto con la coordinación académica.</p>
+
+        <p>Agradecemos su colaboración en este proceso.</p>
+    </div>
+    <div class="footer">
+        <p>Atentamente,<br>Dirección de Carrera</p>
+        <p>📧 Contacto: ${correoDireccion}</p>
+    </div>
+</div>
+</body>
+</html>

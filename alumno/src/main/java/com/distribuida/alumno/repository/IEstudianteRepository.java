@@ -14,6 +14,8 @@ public interface IEstudianteRepository {
 
     public Estudiante findByCedulaUsuario(String cedula);
 
+    public Boolean delete(Integer idUsuario);
 
 
-    }
+
+}
