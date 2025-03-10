@@ -14,6 +14,7 @@ public class VistaDocente {
 
     @Id
     private Integer usuaId;
+    private Integer docenId;
     private Boolean usuaActivo;
     private String usuaCorreo;
     private String usuaFechaCreacion;
