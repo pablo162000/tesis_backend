@@ -66,7 +66,27 @@ public class EstudianteRepositoryImpl implements IEstudianteRepository {
         }
     }
 
+    @Override
+    public Boolean delete(Integer idUsuario) {
+        try {
+            // Crear la consulta de eliminación
+            String query = "DELETE FROM Estudiante e WHERE e.idUsuario = :idUsuario";
+            int deletedCount = this.entityManager.createQuery(query)
+                    .setParameter("idUsuario", idUsuario)
+                    .executeUpdate();
 
+            // Verificar si se eliminó algún registro
+            if (deletedCount > 0) {
+                System.out.println("ESTUDIANTE ELIMINADO POR FALTA DE VERIFICACION");
+                return Boolean.TRUE;
+            } else {
+                return Boolean.FALSE;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Boolean.FALSE; // Manejo de excepciones, por ejemplo, si hay algún error en la consulta
+        }
+    }
 
 
     @Override

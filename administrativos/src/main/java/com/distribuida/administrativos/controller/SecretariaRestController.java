@@ -1,6 +1,7 @@
 package com.distribuida.administrativos.controller;
 import com.distribuida.administrativos.repository.modelo.RegistroRequest;
 
+import com.distribuida.administrativos.repository.modelo.RegistroRequest;
 import com.distribuida.administrativos.repository.modelo.VistaDocente;
 import com.distribuida.administrativos.repository.modelo.VistaEstudiante;
 import com.distribuida.administrativos.service.IDocenteService;
@@ -66,6 +67,17 @@ public class SecretariaRestController {
     public ResponseEntity<List<VistaEstudiante>> buscarViewEstudiantePorEstado(@PathVariable Boolean activo) {
         List<VistaEstudiante> estudiantes = this.estudianteService.buscarViewDocentePorEstado(activo);
         return ResponseEntity.ok(estudiantes);
+    }
+
+    @PostMapping("/docente")
+    public ResponseEntity<Boolean> registroUsuarioDocente(@RequestBody RegistroRequest registroRequest){
+        Boolean resultado = this.docenteService.guardarDocente(registroRequest);
+
+        if (Boolean.TRUE.equals(resultado)) {
+            return ResponseEntity.ok(Boolean.TRUE);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Boolean.FALSE);
+        }
     }
 
 

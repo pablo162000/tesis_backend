@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Negación de Propuesta</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e3f2fd;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .email-container {
+            background-color: #ffffff;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 600px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #d32f2f;
+        }
+        .header {
+            text-align: center;
+            color: #d32f2f;
+        }
+        .header h1 {
+            margin-bottom: 10px;
+        }
+        .content {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-top: 20px;
+        }
+        .content blockquote {
+            background: #ffcdd2;
+            padding: 10px;
+            border-left: 4px solid #d32f2f;
+            font-style: italic;
+        }
+        .button {
+            background-color: #1976d2;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .button:hover {
+            background-color: #0d47a1;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #757575;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="header">
+        <h1>🚫 Rechazo de Propuesta</h1>
+    </div>
+    <div class="content">
+        <p>Estimado/a <strong>${nombreEstudiante}</strong>,</p>
+
+        <p>Después de una revisión con respecto al tema, le informamos que su propuesta de titulación:</p>
+
+        <blockquote><strong>${tema}</strong></blockquote>
+
+        <p>ha sido <strong>rechazada</strong> debido a los siguientes motivos:</p>
+
+        <p> ${observaciones} </p>
+
+        <p>Entendemos que este resultado puede ser desalentador, pero queremos alentarlo/a a realizar las correcciones necesarias y presentar nuevamente su propuesta.</p>
+
+        <p>Si necesita mayor orientación sobre los cambios requeridos, puede comunicarse con la Dirección de Carrera o con su tutor académico.</p>
+
+
+        <p>Le agradecemos su esfuerzo y dedicación en este proceso.</p>
+    </div>
+    <div class="footer">
+        <p>Atentamente,<br>Dirección de Carrera</p>
+        <p>📧 Contacto: ${correoDireccion}</p>
+    </div>
+</div>
+</body>
+</html>

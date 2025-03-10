@@ -1,13 +1,11 @@
 package com.distribuida.login.repository;
 
 import com.distribuida.login.repository.modelo.Usuario;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -53,7 +51,7 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
     }
 
     @Override
-    public Usuario buscarPorId(int id) {
+    public Usuario buscarPorId(Integer id) {
         try {
             return this.entityManager.find(Usuario.class, id);
         } catch (Exception e) {
@@ -144,6 +142,49 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
             return false; // En caso de error, se retorna false
         }
     }
+
+    @Override
+    public Boolean deleteUsuario(Integer id) {
+        try {
+            // Crear la consulta de eliminación
+            String query = "DELETE FROM Usuario u WHERE u.id =:id";
+            int deletedCount = this.entityManager.createQuery(query)
+                    .setParameter("id", id)
+                    .executeUpdate();
+
+            // Verificar si se eliminó algún registro
+            if (deletedCount > 0) {
+                System.out.println("usuario ELIMINADO POR FALTA DE VERIFICACION");
+                return Boolean.TRUE;
+            } else {
+                return Boolean.FALSE;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Boolean.FALSE; // Manejo de excepciones, por ejemplo, si hay algún error en la consulta
+        }
+    }
+
+    @Override
+    public List<Usuario> findUsuariosNoVerificadosAntesDe() {
+        try {
+            // Aquí calculas la fecha límite (puedes sumarle minutos o cualquier otra unidad)
+
+            // Consulta para obtener los usuarios que no han verificado su correo y cuyo registro es antes de la fecha límite calculada
+            String query = "SELECT u FROM Usuario u WHERE u.correoValido = false";
+            Query q = entityManager.createQuery(query);
+             // Pasar la fecha límite calculada como parámetro
+
+            return q.getResultList();  // Devuelve la lista de usuarios que cumplen la condición
+        } catch (NoResultException e) {
+            return Collections.emptyList();  // Si no se encuentran usuarios, retorna una lista vacía
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();  // Manejo de otros errores, retorna una lista vacía
+        }
+    }
+
+
 }
 
 

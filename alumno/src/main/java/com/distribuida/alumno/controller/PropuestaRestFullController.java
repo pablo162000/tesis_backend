@@ -1,6 +1,7 @@
 package com.distribuida.alumno.controller;
 
 
+import com.distribuida.alumno.repository.modelo.VistaPropuesta;
 import com.distribuida.alumno.service.IArchivoService;
 import com.distribuida.alumno.service.IPropuestaService;
 import com.distribuida.alumno.service.dto.PropuestaDTO;
@@ -32,10 +33,17 @@ public class PropuestaRestFullController {
 
 
 
-    @PutMapping("/{idPropuesta}/validar")
-    public ResponseEntity<Boolean> validarPropuesta(@PathVariable Integer idPropuesta,  @RequestParam("idDocenteDirector")  Integer idDocenteDirector,@RequestParam("respuesta") Boolean respuesta ) {
+    @PutMapping("/validar")
+    public ResponseEntity<Boolean> validarPropuesta(@RequestParam("idPropuesta") Integer idPropuesta,
+                                                    @RequestParam("idDocenteDirector")  Integer idDocenteDirector,
+                                                    @RequestParam("respuesta") Boolean respuesta,
+                                                    @RequestParam(value="observaciones", required = false) String observaciones) {
 
-        Boolean exito = this.propuestaService.validarPropuesta(idPropuesta, idDocenteDirector ,respuesta);
+
+        Boolean exito = this.propuestaService.validarPropuesta(idPropuesta,
+                                    idDocenteDirector,
+                                    respuesta,
+                                    observaciones);
 
         if (Boolean.TRUE.equals(exito)) {
             return ResponseEntity.ok(Boolean.TRUE); // Retorna un HTTP 200 con true si fue exitoso
@@ -151,5 +159,33 @@ public class PropuestaRestFullController {
 
         }
 
+    // Buscar una propuesta por ID
+    @GetMapping("/vistapropuesta/{id}")
+    public ResponseEntity<VistaPropuesta> buscarViewPropuestaPorId(@PathVariable Integer id) {
+        VistaPropuesta docente = this.propuestaService.buscarViewPropuestaPorId(id);
+        return ResponseEntity.ok(docente);
+    }
+
+    // Obtener todos los docentes
+    @GetMapping("/vistapropuesta")
+    public ResponseEntity<List<VistaPropuesta>> obtenerTodosViewPropuesta() {
+        List<VistaPropuesta> propuestass = this.propuestaService.buscarTodosViewPropuesta();
+        return propuestass.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(propuestass);
+
+    }
+
+    // Buscar docentes por estado
+    @GetMapping("/vistapropuesta/estadoaprobacion/{estado}")
+    public ResponseEntity<List<VistaPropuesta>> buscarViewPropuestaPorAprobacion(@PathVariable Boolean estado) {
+        List<VistaPropuesta> propuestass = this.propuestaService.buscarViewPropuestaPorAprobacion(estado);
+        return ResponseEntity.ok(propuestass);
+    }
+
+    // Buscar docentes por estado (activo/inactivo)
+    @GetMapping("/vistapropuesta/estadovalidacion/{estado}")
+    public ResponseEntity<List<VistaPropuesta>> buscarViewPropuestaPorValidacion(@PathVariable Integer estado) {
+        List<VistaPropuesta> propuestass = this.propuestaService.buscarViewPropuestaPorValidacion(estado);
+        return ResponseEntity.ok(propuestass);
+    }
 
     }

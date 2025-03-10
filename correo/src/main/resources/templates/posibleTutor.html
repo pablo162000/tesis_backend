@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificación Tutor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e3f2fd;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .email-container {
+            background-color: #ffffff;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 600px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #1976d2;
+        }
+        .header {
+            text-align: center;
+            color: #1976d2;
+        }
+        .header h1 {
+            margin-bottom: 10px;
+        }
+        .content {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-top: 20px;
+        }
+        .content blockquote {
+            background: #bbdefb;
+            padding: 10px;
+            border-left: 4px solid #1976d2;
+            font-style: italic;
+        }
+        .button {
+            background-color: #1976d2;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .button:hover {
+            background-color: #0d47a1;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #757575;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="header">
+        <h1>📚 Posible Tutor de Titulación</h1>
+    </div>
+    <div class="content">
+        <p>Estimado/a Profesor/a <strong>${nombreTutor}</strong>,</p>
+        <p>Nos complace informarle que ha sido propuesto/a como tutor/a de titulación para el trabajo presentado por el/la estudiante <strong>${nombreEstudiante}</strong>.</p>
+
+        <p>El tema de la propuesta es el siguiente:</p>
+
+        <blockquote><strong>${tema}</strong></blockquote>
+
+        <p>Su experiencia y conocimientos en el área serán clave para guiar al estudiante en el desarrollo de su trabajo de titulación.</p>
+
+        <p>Le solicitamos que revise los detalles de la propuesta y nos confirme si acepta esta asignación. Si tiene alguna observación o no puede asumir la tutoría, le agradeceríamos que nos lo comunique a la brevedad posible.</p>
+
+        <p>Puede acceder al sistema para revisar la propuesta y registrar su respuesta en el siguiente enlace:</p>
+
+        <a href="${linkSistema}" class="button">Revisar propuesta y aceptar tutoría</a>
+
+        <p>Ante cualquier duda, estamos a su disposición para brindarle apoyo.</p>
+    </div>
+    <div class="footer">
+        <p>Atentamente,<br>Dirección de Carrera</p>
+        <p>📧 Contacto: ${correoDireccion}</p>
+    </div>
+</div>
+</body>
+</html>

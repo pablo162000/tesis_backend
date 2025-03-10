@@ -10,5 +10,6 @@ public interface IAuthService {
     public AuthResponse loginUsuario(LoginRequest loginRequest);
     public boolean esCorreoValido(String correo);
     public DocenteDTO registroDocente(RegistroRequest registroRequest);
+    public Boolean validarCorreo(String correo);
 
 }

@@ -1,20 +1,22 @@
 package com.distribuida.login.service;
 
 import com.distribuida.login.clients.AdministrativoRestClient;
+import com.distribuida.login.clients.CorreoRestClient;
 import com.distribuida.login.clients.EstudianteRestClient;
 import com.distribuida.login.repository.ICarreraRepository;
 import com.distribuida.login.repository.IUsuarioRepository;
 import com.distribuida.login.repository.modelo.*;
+import com.distribuida.login.security.JwUtil;
 import com.distribuida.login.service.dto.DocenteDTO;
 import com.distribuida.login.service.dto.EstudianteDTO;
-import com.distribuida.login.service.dto.UsuarioDTO;
+
 import com.distribuida.login.service.dto.utils.Converter;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import feign.FeignException;
 import feign.FeignException.Conflict;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -43,11 +45,15 @@ public class AuthServicelmpl implements IAuthService {
     private ICarreraRepository carreraRepository;
 
     @Autowired
+    private CorreoRestClient correoRestClient;
+
+    @Autowired
     private Converter converter;
 
 
-    @Override
+
     @Transactional
+    @Override
     public Boolean registroEstudiante(RegistroRequest registroRequest) {
 
         if (Objects.isNull(registroRequest) ||
@@ -112,6 +118,7 @@ public class AuthServicelmpl implements IAuthService {
                     .fechaCreacion(LocalDateTime.now())
                     .rol("estudiante")
                     .carrera(this.carreraRepository.findById(registroRequest.getIdCarrera()))
+                    .correoValido(Boolean.FALSE)
                     .activo(Boolean.FALSE)
                     .build();
 
@@ -137,10 +144,25 @@ public class AuthServicelmpl implements IAuthService {
             // Llamar al servicio REST para registrar al estudiante
             Boolean estudianteCreado = this.estudianteRestClient.crearEstudiante(estudianteDTO);
             if (Boolean.TRUE.equals(estudianteCreado)) {
+
+                String usuarioCreado = registroRequest.getPrimerNombre() + " " + registroRequest.getPrimerApellido();
+                String correo = registroRequest.getCorreo();
+
+                String token = JwUtil.generateToken(correo);
+
+                String enlace = "http://localhost:8080/API/tesis/auth/validacion-correo/"+token;
+
+                try {
+                    this.correoRestClient.registrarUsuario(usuarioCreado, correo, enlace);
+                } catch (Exception e) {
+                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo de validación.");
+                }
+
                 return true; // Éxito en ambas inserciones
             } else {
                 throw new RuntimeException("Error al crear el estudiante en el microservicio.");
             }
+
 
         } catch (ResponseStatusException ex) {
             // Si es una ResponseStatusException, se vuelve a lanzar para que Spring maneje el error
@@ -152,6 +174,7 @@ public class AuthServicelmpl implements IAuthService {
 
             return false; // Fallo en el proceso
         }
+
     }
 
     @Override
@@ -174,25 +197,31 @@ public class AuthServicelmpl implements IAuthService {
 
         if ("estudiante".equals(rol)) {
 
-            if (usua.getActivo() != null && usua.getActivo().equals(Boolean.TRUE)) {
+            if (usua.getActivo() != null && usua.getActivo().equals(Boolean.TRUE) ) {
 
-                // Verificar si el estudiante está asociado correctamente
-                EstudianteDTO estu = this.estudianteRestClient.obtenerEstudiantePorIdUsuario(usua.getId());
-                if (estu == null) {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante no encontrado.");
+                if(usua.getCorreoValido()!=null && usua.getCorreoValido().equals(Boolean.TRUE)){
+                    // Verificar si el estudiante está asociado correctamente
+                    EstudianteDTO estu = this.estudianteRestClient.obtenerEstudiantePorIdUsuario(usua.getId());
+                    if (estu == null) {
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante no encontrado.");
+                    }
+
+                    return AuthResponse.builder()
+                            .id(estu.getId())
+                            .primerNombre(estu.getPrimerNombre())
+                            .segundoNombre(estu.getSegundoNombre())
+                            .primerApellido(estu.getPrimerApellido())
+                            .segundoApellido(estu.getSegundoApellido())
+                            .rol(usua.getRol())
+                            .idUsuario(usua.getId())
+                            .nombreCarrera(usua.getCarrera().getNombre())
+                            .activo(usua.getActivo())
+                            .build();
+
                 }
 
-                return AuthResponse.builder()
-                        .id(estu.getId())
-                        .primerNombre(estu.getPrimerNombre())
-                        .segundoNombre(estu.getSegundoNombre())
-                        .primerApellido(estu.getPrimerApellido())
-                        .segundoApellido(estu.getSegundoApellido())
-                        .rol(usua.getRol())
-                        .idUsuario(usua.getId())
-                        .nombreCarrera(usua.getCarrera().getNombre())
-                        .activo(usua.getActivo())
-                        .build();
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El correo del estudiante no esta validado.");
+
             }
 
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Estudiante no activado.");
@@ -318,5 +347,24 @@ public class AuthServicelmpl implements IAuthService {
             // Manejar cualquier otro error inesperado
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el proceso de registro del docente", ex);
         }
+    }
+
+    @Override
+    @Transactional
+    public Boolean validarCorreo(String correo) {
+
+        Usuario usuario=this.usuarioRepository.buscarPorEmail(correo);
+
+        if (usuario != null) {
+
+            usuario.setCorreoValido(Boolean.TRUE);
+
+            this.usuarioRepository.actualizar(usuario);
+
+            return Boolean.TRUE;
+        }
+
+        return Boolean.FALSE;
+
     }
 }

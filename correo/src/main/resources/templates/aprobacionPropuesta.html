@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuesta Aprobada</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e3f2fd;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .email-container {
+            background-color: #ffffff;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 600px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #1565c0; /* Agregado filo azul a la izquierda */
+        }
+        .header {
+            text-align: center;
+            color: #1565c0;
+        }
+        .header h1 {
+            margin-bottom: 15px;
+        }
+        .content {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-top: 20px;
+        }
+        .content blockquote {
+            background-color: #bbdefb;
+            padding: 10px;
+            border-left: 4px solid #1565c0;
+            font-style: italic;
+            margin: 20px 0;
+        }
+        .button {
+            background-color: #1565c0;
+            color: white;
+            padding: 12px 25px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 25px;
+        }
+        .button:hover {
+            background-color: #0d47a1;
+        }
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #757575;
+            margin-top: 25px;
+        }
+        .footer p {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="header">
+        <h1>✅ ¡Propuesta Aprobada!</h1>
+    </div>
+    <div class="content">
+        <p>Estimado/os <strong>${nombreEstudiante}</strong>,</p>
+        <p>Nos complace informarle que su propuesta de titulación titulada:</p>
+
+        <blockquote><strong>${tema}</strong></blockquote>
+
+        <p>ha sido <strong>aprobada</strong> por la Dirección de Carrera. ¡Enhorabuena!</p>
+
+        <p>A partir de este momento, tiene luz verde para comenzar con el desarrollo de su trabajo de titulación. Este es un paso importante hacia la finalización de su carrera, y sabemos que lo hará de manera exitosa.</p>
+
+        <p>El siguiente paso será coordinar con su tutor/a, <strong>${nombreTutor}</strong>, para establecer un plan de trabajo detallado. Juntos podrán definir los objetivos y plazos necesarios para cumplir con los hitos académicos establecidos.</p>
+
+        <p>Para consultar los detalles de su propuesta aprobada y cualquier observación adicional, puede acceder a la plataforma a través del siguiente enlace:</p>
+
+        <a href="${linkSeguimiento}" class="button">Acceder al sistema</a>
+
+        <p>Le deseamos mucho éxito en este nuevo capítulo de su formación. No dude en ponerse en contacto con nosotros si tiene alguna duda o necesita orientación adicional.</p>
+    </div>
+    <div class="footer">
+        <p>Atentamente,<br>Dirección de Carrera</p>
+        <p>📧 Si tiene preguntas, contáctenos: ${correoDireccion}</p>
+    </div>
+</div>
+</body>
+</html>

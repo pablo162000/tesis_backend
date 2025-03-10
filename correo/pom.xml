@@ -74,6 +74,13 @@
             <artifactId>spring-boot-starter-freemarker</artifactId>
         </dependency>
 
+        <!-- AWS SDK for S3 -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>2.20.110</version>  <!-- Usa una versión estable -->
+        </dependency>
+
     </dependencies>
 
     <build>

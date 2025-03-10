@@ -40,14 +40,12 @@ public class UsuarioRestController {
         // Llamar al servicio que verifica si el usuario existe por su ID
         UsuarioDTO usuarioDTO = this.usuarioService.buscarPorEmail(correo);
 
-        System.out.println(correo);
-
         if (usuarioDTO != null) {
-            // Convertir la entidad Usuario a UsuarioDTO usando el mapper
-            return ResponseEntity.ok(usuarioDTO);  // Devolver el DTO con un código HTTP 200 OK
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();  // Devolver 404 si no se encuentra
+
+            return ResponseEntity.ok(usuarioDTO);
         }
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     }
 
@@ -125,5 +123,17 @@ public class UsuarioRestController {
         }
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<UsuarioDTO> obtenerEstudiantePorId(@PathVariable Integer id) {
+
+        UsuarioDTO usuarioDTO = this.usuarioService.buscarPorId(id);
+
+        if (usuarioDTO != null) {
+            return ResponseEntity.ok(usuarioDTO);
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+    }
 
 }
