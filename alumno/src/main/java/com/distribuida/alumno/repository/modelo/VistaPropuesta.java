@@ -26,7 +26,7 @@ public class VistaPropuesta {
     private EstadoValidacion validacion;
 
     @Column(name = "prop_estado_aprobacion")
-    private String estadoAprobacion;
+    private Boolean estadoAprobacion;
 
     @Column(name = "prop_fecha_aprobacion")
     private LocalDateTime fechaAprobacion;

@@ -169,23 +169,23 @@ public class PropuestaRestFullController {
     // Obtener todos los docentes
     @GetMapping("/vistapropuesta")
     public ResponseEntity<List<VistaPropuesta>> obtenerTodosViewPropuesta() {
-        List<VistaPropuesta> docentes = this.propuestaService.buscarTodosViewPropuesta();
-        return docentes.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(docentes);
+        List<VistaPropuesta> propuestass = this.propuestaService.buscarTodosViewPropuesta();
+        return propuestass.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(propuestass);
 
     }
 
     // Buscar docentes por estado
     @GetMapping("/vistapropuesta/estadoaprobacion/{estado}")
     public ResponseEntity<List<VistaPropuesta>> buscarViewPropuestaPorAprobacion(@PathVariable Boolean estado) {
-        List<VistaPropuesta> docentes = this.propuestaService.buscarViewPropuestaPorAprobacion(estado);
-        return ResponseEntity.ok(docentes);
+        List<VistaPropuesta> propuestass = this.propuestaService.buscarViewPropuestaPorAprobacion(estado);
+        return ResponseEntity.ok(propuestass);
     }
 
     // Buscar docentes por estado (activo/inactivo)
     @GetMapping("/vistapropuesta/estadovalidacion/{estado}")
     public ResponseEntity<List<VistaPropuesta>> buscarViewPropuestaPorValidacion(@PathVariable Integer estado) {
-        List<VistaPropuesta> docentes = this.propuestaService.buscarViewPropuestaPorValidacion(estado);
-        return ResponseEntity.ok(docentes);
+        List<VistaPropuesta> propuestass = this.propuestaService.buscarViewPropuestaPorValidacion(estado);
+        return ResponseEntity.ok(propuestass);
     }
 
     }
