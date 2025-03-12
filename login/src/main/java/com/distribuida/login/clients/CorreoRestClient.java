@@ -9,7 +9,11 @@ public interface CorreoRestClient {
 
 
     @PostMapping("/correo/registro")
-    String registrarUsuario(@RequestParam String usuario, @RequestParam String correo,  @RequestParam String enlaceVerificaion);
+    String registrarUsuario(@RequestParam String usuario,
+                            @RequestParam String correo,
+                            @RequestParam String enlaceVerificaion,
+                            @RequestParam String correoDireccion,
+                            @RequestParam String tipoUsuario);
 
 
 }

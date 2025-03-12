@@ -68,32 +68,10 @@ public class SecretariaRestController {
         return ResponseEntity.ok(estudiantes);
     }
 
-    @PostMapping("/docente")
-    public ResponseEntity<Boolean> registroUsuarioDocente(@RequestBody RegistroRequest registroRequest){
-        Boolean resultado = this.docenteService.guardarDocente(registroRequest);
-<<<<<<< HEAD
-
-        if (Boolean.TRUE.equals(resultado)) {
-            return ResponseEntity.ok(Boolean.TRUE);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Boolean.FALSE);
-        }
-    }
-
-=======
->>>>>>> 25c81195c19043fd0821fa977f099ce20c322b1d
-
-        if (Boolean.TRUE.equals(resultado)) {
-            return ResponseEntity.ok(Boolean.TRUE);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Boolean.FALSE);
-        }
-    }
-
 
     @PostMapping("/docente")
     public ResponseEntity<Boolean> registroUsuarioDocente(@RequestBody RegistroRequest registroRequest) {
-        Boolean resultado = this.docenteService.guardarDocente(registroRequest);
+    Boolean resultado = this.docenteService.guardarDocente(registroRequest);
 
         if (Boolean.TRUE.equals(resultado)) {
             return ResponseEntity.ok(Boolean.TRUE);
@@ -101,5 +79,8 @@ public class SecretariaRestController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Boolean.FALSE);
         }
     }
+
+
+
 
 }

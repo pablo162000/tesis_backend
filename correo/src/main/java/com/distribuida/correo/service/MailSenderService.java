@@ -31,9 +31,17 @@ public class MailSenderService {
     @Autowired
     private FreeMarkerConfigurer freeMarkerConfigurer;
 
-    public void sendRegistrationEmail(String toEmail, String usuario, String enlaceACuenta, String enlaceSoporte, String enlacePrivacidad) throws MessagingException {
+    public void sendRegistrationEmail(String toEmail, String usuario, String enlaceACuenta,
+                                      String enlaceSoporte, String enlacePrivacidad, String correoDireccion, String tipoUsuario)
+            throws MessagingException {
+
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        // Seleccionar la plantilla: solo "estudiante" usa su plantilla, los demás van a "docente"
+        String templateName = tipoUsuario.equalsIgnoreCase("estudiante")
+                ? "registroUsuarioEstudiante.html"
+                : "registroUsuarioDocente.html";
 
         // Asignar los valores al modelo de la plantilla
         Map<String, Object> model = new HashMap<>();
@@ -41,12 +49,13 @@ public class MailSenderService {
         model.put("enlace_a_tu_cuenta", enlaceACuenta);
         model.put("enlace_soporte", enlaceSoporte);
         model.put("enlace_privacidad", enlacePrivacidad);
+        model.put("correoDireccion", correoDireccion);
 
         // Usar FreeMarker para llenar la plantilla
         try {
             StringWriter stringWriter = new StringWriter();
             freeMarkerConfigurer.getConfiguration()
-                    .getTemplate("registroUsuarioEstudiante.html") // Nombre de la plantilla
+                    .getTemplate(templateName) // Seleccionar la plantilla
                     .process(model, stringWriter);
 
             String htmlContent = stringWriter.toString();
@@ -62,6 +71,8 @@ public class MailSenderService {
             throw new MessagingException("Error al procesar la plantilla FreeMarker", e);
         }
     }
+
+
 
 
     public void sendMultipleUser(String toEmail, List<String> ccEmails, String estudiante,

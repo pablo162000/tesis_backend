@@ -157,13 +157,13 @@ public class PropuestaRestFullController {
         String mensaje = propuestaService.aprobarPropuesta(idPropuesta, idDirector,observaciones ,idTutor, archivo);
         return ResponseEntity.ok(mensaje);
 
-        }
+    }
 
     // Buscar una propuesta por ID
     @GetMapping("/vistapropuesta/{id}")
     public ResponseEntity<VistaPropuesta> buscarViewPropuestaPorId(@PathVariable Integer id) {
-        VistaPropuesta docente = this.propuestaService.buscarViewPropuestaPorId(id);
-        return ResponseEntity.ok(docente);
+            VistaPropuesta docente = this.propuestaService.buscarViewPropuestaPorId(id);
+            return ResponseEntity.ok(docente);
     }
 
     // Obtener todos los docentes
@@ -188,4 +188,10 @@ public class PropuestaRestFullController {
         return ResponseEntity.ok(propuestass);
     }
 
+    @GetMapping("/vistapropuesta/estudiante/{idestudiante}")
+    public ResponseEntity<List<VistaPropuesta>> buscarViewPropuestaPorIdEstudiante(@PathVariable Integer idestudiante) {
+        List<VistaPropuesta> propuestass = this.propuestaService.buscarViewPropuestaPorIdEstudiante(idestudiante);
+        return ResponseEntity.ok(propuestass);
     }
+
+}

@@ -37,6 +37,7 @@ public interface IPropuestaService {
     public List<VistaPropuesta> buscarViewPropuestaPorValidacion(Integer respuesta);
     public List<VistaPropuesta> buscarViewPropuestaPorAprobacion(Boolean estado);
 
+    public List<VistaPropuesta> buscarViewPropuestaPorIdEstudiante(Integer idEstudiante);
 
 
 

@@ -1,30 +1,24 @@
-package com.distribuida.login.repository.modelo;
-
+package com.distribuida.administrativos.service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AuthResponse implements Serializable {
+public class AdministrativoDTO {
 
-
-    private static final long serialVersionUID =1L;
 
     private Integer id;
     private String primerNombre;
     private String segundoNombre;
     private String primerApellido;
     private String segundoApellido;
-    private String correo;
-    private String rol;
+    private String cedula;
+    private String celular;
     private Integer idUsuario;
-    private Boolean activo;
-    private String nombreCarrera;
+
 }

@@ -1,14 +1,18 @@
 package com.distribuida.administrativos.service;
 
 import com.distribuida.administrativos.repository.modelo.Administrativo;
+import com.distribuida.administrativos.repository.modelo.RegistroAdministrativoRequest;
+import com.distribuida.administrativos.repository.modelo.RegistroRequest;
+import com.distribuida.administrativos.service.dto.AdministrativoDTO;
 
 public interface IAdministrativoService {
 
 
-    public Administrativo insertar(Administrativo administrativo);
+    public Boolean guardarAdministrativo(RegistroAdministrativoRequest RegistroAdministrativoRequest);
 
-    public Administrativo buscarPorIdUsuario(Integer iDUsuario);
+    public AdministrativoDTO buscarPorId(Integer iDU);
 
-    public Boolean activarCuentaEstudiante(Integer iDUsuarioEstudiante);
+    public AdministrativoDTO buscarPorIdUsuario(Integer idUsuario);
+
 
 }

@@ -6,9 +6,11 @@ import com.distribuida.login.clients.CorreoRestClient;
 import com.distribuida.login.clients.EstudianteRestClient;
 import com.distribuida.login.repository.modelo.AuthResponse;
 import com.distribuida.login.repository.modelo.LoginRequest;
+import com.distribuida.login.repository.modelo.RegistroAdministrativoRequest;
 import com.distribuida.login.repository.modelo.RegistroRequest;
 import com.distribuida.login.security.JwUtil;
 import com.distribuida.login.service.IAuthService;
+import com.distribuida.login.service.dto.AdministrativoDTO;
 import com.distribuida.login.service.dto.DocenteDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +50,7 @@ public class AuthRestFullController {
         }
     }
 
-    @GetMapping("/validacion-correo/{token}")
+    @PostMapping("/validacion-correo/{token}")
     public ResponseEntity<String> validarCorreo(@PathVariable String token) {
         try {
             // Verifica el token JWT
@@ -101,6 +103,62 @@ public class AuthRestFullController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Error en el registro del docente. Verifique los datos ingresados.");
         }
     }
+
+
+
+
+
+
+
+    @PutMapping("/validacion-correo-docente/")
+    public ResponseEntity<String> validarCorreoDocente(@RequestParam("token") String token, @RequestParam ("password") String password) {
+        try {
+
+            if (password == null) {
+
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password faltante");
+            }
+
+
+            // Verifica el token JWT
+            DecodedJWT decodedJWT = JwUtil.verifyToken(token);
+            if (decodedJWT != null) {
+                String correo = decodedJWT.getSubject(); // Se obtiene el correo desde el token
+
+                // Actualiza el estado del correo en la base de datos (esto lo debes implementar en tu servicio)
+                Boolean validacionExitosa = this.authService.validarCorreoDocente(correo,password);
+                if (validacionExitosa) {
+
+
+                    return ResponseEntity.ok("Correo validado con éxito");
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al validar el correo");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token inválido o expirado");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar el token");
+        }
+    }
+
+
+    @PostMapping("/registro/administrativo")
+    public ResponseEntity<?> registroUsuarioAdministrativo(@RequestBody RegistroAdministrativoRequest registroAdministrativoRequest) {
+
+
+        AdministrativoDTO administrativoDTo = this.authService.registroAdministrativo(registroAdministrativoRequest); // Registro del docente
+
+
+        if (administrativoDTo != null) {
+            return ResponseEntity.ok(administrativoDTo); // Retorna HTTP 200 si el registro es exitoso
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Error en el registro del adaministrastivo . Verifique los datos ingresados.");
+        }
+    }
+
+
+
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {

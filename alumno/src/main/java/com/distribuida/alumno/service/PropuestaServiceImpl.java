@@ -112,7 +112,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
         }
 
         try {
-            DocenteDTO docenteExistente = this.administrativoRestClient.obtenerDocente(idDocenteDirector);
+            DocenteDTO docenteExistente = this.administrativoRestClient.obtenerDocente(3);
 
             if (docenteExistente == null) {
                 // Si el docente es null (aunque Feign debería lanzarlo como excepción), lanzar una excepción HTTP Not Found
@@ -490,7 +490,11 @@ public class PropuestaServiceImpl implements IPropuestaService {
 
         }
 
-        if (respuesta.equals(0) || respuesta.equals(1)) {
+        if (respuesta.equals(0)) {
+            return this.vistaPropuestaRepository.findByEstadoValidacion(EstadoValidacion.NO_VALIDADO);
+        }
+
+        if (respuesta.equals(1)) {
             return this.vistaPropuestaRepository.findByEstadoValidacion(EstadoValidacion.NO_REVISADO);
         }
 
@@ -512,6 +516,16 @@ public class PropuestaServiceImpl implements IPropuestaService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron docentes con el estado: " + estado);
         }
         return propeustas;
+    }
+
+    @Override
+    public List<VistaPropuesta> buscarViewPropuestaPorIdEstudiante(Integer idEstudiante) {
+        List<VistaPropuesta> propeustas= new ArrayList<>();
+
+        if (idEstudiante == null || idEstudiante <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID debe ser un número positivo");
+        }
+        return this.vistaPropuestaRepository.findByIdEstudiante(idEstudiante);
     }
 
     private Integer obtenerIdRevisor(Propuesta propuesta, String tipoRevisor) {

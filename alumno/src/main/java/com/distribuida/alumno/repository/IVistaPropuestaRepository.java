@@ -12,6 +12,7 @@ public interface IVistaPropuestaRepository {
     public List<VistaPropuesta> findByEstadoValidacion(EstadoValidacion estadoValidacion);
     public List<VistaPropuesta> findByEstadoAprobacion(Boolean activo);
 
+    public List<VistaPropuesta> findByIdEstudiante(Integer idEstudiante);
 
 
 

@@ -2,6 +2,7 @@ package com.distribuida.alumno.repository;
 
 
 import com.distribuida.alumno.repository.modelo.EstadoValidacion;
+import com.distribuida.alumno.repository.modelo.Propuesta;
 import com.distribuida.alumno.repository.modelo.VistaPropuesta;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -83,6 +84,26 @@ public class VistaPropuestaRepositoryImpl  implements IVistaPropuestaRepository{
             System.err.println("Error al buscar propuestas por aprobación");
             e.printStackTrace();
             throw new RuntimeException("Error al buscar propuestas por aprobación", e);
+        }
+    }
+
+    @Override
+    public List<VistaPropuesta> findByIdEstudiante(Integer idEstudiante) {
+        try {
+
+            TypedQuery<VistaPropuesta> myQuery = this.entityManager.createQuery(
+                    "SELECT v FROM VistaPropuesta v " +
+                            "WHERE v.idPrimerEstudiante = :idEstudiante " +
+                            "OR v.idSegundoEstudiante = :idEstudiante " +
+                            "OR v.idTercerEstudiante = :idEstudiante",
+                    VistaPropuesta.class
+            );
+
+
+            return myQuery.setParameter("idEstudiante", idEstudiante).getResultList();
+
+        } catch (NoResultException e) {
+            return null; // Si no hay resultados, retornar null
         }
     }
 }

@@ -17,7 +17,7 @@ public class AdministrativoRepositoryImpl implements IAdministrativoRepository {
     private EntityManager entityManager;
 
     @Override
-    public Administrativo insertar(Administrativo administrativo) {
+    public Administrativo insertr(Administrativo administrativo) {
         this.entityManager.persist(administrativo);
         return administrativo;
     }
@@ -42,10 +42,6 @@ public class AdministrativoRepositoryImpl implements IAdministrativoRepository {
         }
     }
 
-    @Override
-    public Administrativo existeEstudiante(String correo) {
-        return null;
-    }
 
     @Override
     public Administrativo findById(Integer id) {

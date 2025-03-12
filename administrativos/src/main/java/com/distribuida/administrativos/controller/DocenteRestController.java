@@ -24,13 +24,13 @@ public class DocenteRestController {
     @Autowired
     private IDocenteService docenteService;
 
-    @GetMapping("/{idDocente}")
-    public ResponseEntity<DocenteDTO> obtenerDocente(@PathVariable Integer idDocente) {
+    @GetMapping("/{idUsuario}")
+    public ResponseEntity<DocenteDTO> obtenerDocentePorIdUsuario(@PathVariable Integer idUsuario) {
 
-        DocenteDTO docente = this.docenteService.buscarPorId(idDocente);
+        DocenteDTO docente = this.docenteService.buscarPorIdUsuario(idUsuario);
 
         if (docente == null) {
-            logger.warn("Docente con ID {} no encontrado", idDocente);
+            logger.warn("Docente con ID {} no encontrado", idUsuario);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 

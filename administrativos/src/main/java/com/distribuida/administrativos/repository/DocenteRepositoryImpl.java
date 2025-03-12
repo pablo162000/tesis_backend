@@ -35,6 +35,26 @@ public class DocenteRepositoryImpl implements IDocenteRepository {
     }
 
     @Override
+    public Docente findByIdUsuario(Integer idUsuario) {
+        Docente docente = null;
+        try {
+            System.out.println("ingresa en repository");
+            TypedQuery<Docente> myQuery = this.entityManager.createQuery(
+                    "SELECT d FROM Docente d WHERE d.idUsuario = :idUsuario",
+                    Docente.class
+            );
+            docente = myQuery.setParameter("idUsuario", idUsuario).getSingleResult();
+
+            System.out.println(docente);
+            return  docente;
+        } catch (NoResultException e) {
+
+            return null;
+
+        }
+    }
+
+    @Override
     public Docente findByCedula(String cedula) {
         Docente estu = null;
         try {

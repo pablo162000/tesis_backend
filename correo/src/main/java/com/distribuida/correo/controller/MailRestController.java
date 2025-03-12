@@ -23,7 +23,11 @@ public class MailRestController {
     private MailSenderService mailSenderService;
 
     @PostMapping("/registro")
-    public String registrarUsuario(@RequestParam String usuario, @RequestParam String correo, @RequestParam String enlaceVerificaion) throws MessagingException {
+    public String registrarUsuario(@RequestParam String usuario,
+                                   @RequestParam String correo,
+                                   @RequestParam String enlaceVerificaion,
+                                   @RequestParam String correoDireccion,
+                                   @RequestParam String tipoUsuario) throws MessagingException {
         // Lógica para registrar al usuario
 
         //String enlaceACuenta = "http://miapp.com/mi-cuenta";
@@ -31,7 +35,14 @@ public class MailRestController {
         String enlacePrivacidad = "http://miapp.com/privacidad";
 
         // Enviar el correo de bienvenida
-        mailSenderService.sendRegistrationEmail(correo, usuario, enlaceVerificaion, enlaceSoporte, enlacePrivacidad);
+        mailSenderService.sendRegistrationEmail(correo,
+                                                usuario,
+                                                enlaceVerificaion,
+                                                enlaceSoporte,
+                                                enlacePrivacidad,
+                                                correoDireccion,
+                                                tipoUsuario);
+
 
         return "registroExitoso"; // Redirige o muestra una página de éxito
     }

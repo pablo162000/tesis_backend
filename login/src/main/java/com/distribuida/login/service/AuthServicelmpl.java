@@ -7,6 +7,7 @@ import com.distribuida.login.repository.ICarreraRepository;
 import com.distribuida.login.repository.IUsuarioRepository;
 import com.distribuida.login.repository.modelo.*;
 import com.distribuida.login.security.JwUtil;
+import com.distribuida.login.service.dto.AdministrativoDTO;
 import com.distribuida.login.service.dto.DocenteDTO;
 import com.distribuida.login.service.dto.EstudianteDTO;
 
@@ -51,7 +52,6 @@ public class AuthServicelmpl implements IAuthService {
     private Converter converter;
 
 
-
     @Transactional
     @Override
     public Boolean registroEstudiante(RegistroRequest registroRequest) {
@@ -90,7 +90,6 @@ public class AuthServicelmpl implements IAuthService {
             }
 
 
-
             Boolean existeDocente = null;
             try {
                 existeDocente = this.administrativoRestClient.existencia(registroRequest.getCedula());
@@ -104,7 +103,7 @@ public class AuthServicelmpl implements IAuthService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en docente.");
             }
 
-            Integer  idCarrera= this.carreraRepository.findById(registroRequest.getIdCarrera()).getId();
+            Integer idCarrera = this.carreraRepository.findById(registroRequest.getIdCarrera()).getId();
 
 
             if (Objects.isNull(idCarrera)) {
@@ -150,10 +149,10 @@ public class AuthServicelmpl implements IAuthService {
 
                 String token = JwUtil.generateToken(correo);
 
-                String enlace = "http://localhost:8080/API/tesis/auth/validacion-correo/"+token;
+                String enlace = "http://localhost:8080/API/tesis/auth/validacion-correo/" + token;
 
                 try {
-                    this.correoRestClient.registrarUsuario(usuarioCreado, correo, enlace);
+                    this.correoRestClient.registrarUsuario(usuarioCreado, correo, enlace, "fing.direccion.computacion@uce.edu.ec", "estudiante");
                 } catch (Exception e) {
                     throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo de validación.");
                 }
@@ -197,9 +196,9 @@ public class AuthServicelmpl implements IAuthService {
 
         if ("estudiante".equals(rol)) {
 
-            if (usua.getActivo() != null && usua.getActivo().equals(Boolean.TRUE) ) {
+            if (usua.getActivo() != null && usua.getActivo().equals(Boolean.TRUE)) {
 
-                if(usua.getCorreoValido()!=null && usua.getCorreoValido().equals(Boolean.TRUE)){
+                if (usua.getCorreoValido() != null && usua.getCorreoValido().equals(Boolean.TRUE)) {
                     // Verificar si el estudiante está asociado correctamente
                     EstudianteDTO estu = this.estudianteRestClient.obtenerEstudiantePorIdUsuario(usua.getId());
                     if (estu == null) {
@@ -212,6 +211,7 @@ public class AuthServicelmpl implements IAuthService {
                             .segundoNombre(estu.getSegundoNombre())
                             .primerApellido(estu.getPrimerApellido())
                             .segundoApellido(estu.getSegundoApellido())
+                            .correo(usua.getCorreo())
                             .rol(usua.getRol())
                             .idUsuario(usua.getId())
                             .nombreCarrera(usua.getCarrera().getNombre())
@@ -230,42 +230,72 @@ public class AuthServicelmpl implements IAuthService {
 
             if (usua.getActivo() != null && usua.getActivo().equals(Boolean.TRUE)) {
 
-                // Verificar si el estudiante está asociado correctamente
-                DocenteDTO docente = this.administrativoRestClient.obtenerDocente(usua.getId());
-                if (docente == null) {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante no encontrado.");
-                }
+                if (usua.getCorreoValido() != null && usua.getCorreoValido().equals(Boolean.TRUE)) {
 
-                return AuthResponse.builder()
-                        .id(docente.getId())
-                        .primerNombre(docente.getPrimerNombre())
-                        .segundoNombre(docente.getSegundoNombre())
-                        .primerApellido(docente.getPrimerApellido())
-                        .segundoApellido(docente.getSegundoApellido())
-                        .rol(usua.getRol())
-                        .idUsuario(usua.getId())
-                        .nombreCarrera(usua.getCarrera().getNombre())
-                        .activo(usua.getActivo())
-                        .build();
+                    DocenteDTO docente = this.administrativoRestClient.obtenerDocentePorIdUsuario(usua.getId());
+                    if (docente == null) {
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Docente no encontrado.");
+                    }
+
+                    return AuthResponse.builder()
+                            .id(docente.getId())
+                            .primerNombre(docente.getPrimerNombre())
+                            .segundoNombre(docente.getSegundoNombre())
+                            .primerApellido(docente.getPrimerApellido())
+                            .segundoApellido(docente.getSegundoApellido())
+                            .correo(usua.getCorreo())
+                            .rol(usua.getRol())
+                            .idUsuario(usua.getId())
+                            .nombreCarrera(usua.getCarrera().getNombre())
+                            .activo(usua.getActivo())
+                            .build();
+
+                }
+                // Verificar si el estudiante está asociado correctamente
+
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Correo Docente no validado.");
+
+
             }
 
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Estudiante no activado.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Docente activado.");
 
-            // Lógica de manejo de docentes si está disponible
-        /*
-        Docentes doc = this.docentesRepository.findByIdUsuario(usua.getId());
-        return AuthResponse.builder()
-                .id(doc.getId())
-                .primerNombre(doc.getPrimerNombre())
-                .segundoNombre(doc.getSegundoNombre())
-                .primerApellido(doc.getPrimerApellido())
-                .segundoApellido(doc.getSegundoApellido())
-                .rol("docente")
-                .activo(true)
-                .build();
-         */
+        } else if ("direccion".equals(rol) || "secretaria".equals(rol)) {
 
-        } else if ("administrativo".equals(rol)) {
+
+            if (usua.getActivo() != null && usua.getActivo().equals(Boolean.TRUE)) {
+
+                if (usua.getCorreoValido() != null && usua.getCorreoValido().equals(Boolean.TRUE)) {
+
+                    AdministrativoDTO administrativoDTO = this.administrativoRestClient.obtenerAdministrativoPorIdUsuario(usua.getId());
+                    if (administrativoDTO == null) {
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante no encontrado.");
+                    }
+
+                    return AuthResponse.builder()
+                            .id(administrativoDTO.getId())
+                            .primerNombre(administrativoDTO.getPrimerNombre())
+                            .segundoNombre(administrativoDTO.getSegundoNombre())
+                            .primerApellido(administrativoDTO.getPrimerApellido())
+                            .segundoApellido(administrativoDTO.getSegundoApellido())
+                            .rol(usua.getRol())
+                            .idUsuario(usua.getId())
+                            .nombreCarrera(usua.getCarrera().getNombre())
+                            .activo(usua.getActivo())
+                            .build();
+
+                }
+                // Verificar si el estudiante está asociado correctamente
+
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Correo Direccion no validado.");
+
+
+            }
+
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Direccion activado.");
+
+
+
             // Lógica de manejo de administrativos si está disponible
         /*
         Administrativos admin = this.administrativosRepository.findByIdUsuario(usua.getId());
@@ -280,7 +310,7 @@ public class AuthServicelmpl implements IAuthService {
                 .build();
          */
 
-        } else if ("docente-administrativo".equals(rol)) {
+        } else if ("secretaria".equals(rol)) {
 
         }
 
@@ -332,6 +362,20 @@ public class AuthServicelmpl implements IAuthService {
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar el usuario Docente.");
             }
 
+            String usuarioCreado = registroRequest.getPrimerNombre() + " " + registroRequest.getPrimerApellido();
+            String correo = registroRequest.getCorreo();
+
+            String token = JwUtil.generateToken(correo);
+
+            String enlace = "http://localhost:8080/API/tesis/auth/validacion-correo/" + token;
+
+            try {
+                this.correoRestClient.registrarUsuario(usuarioCreado, correo, enlace, " fing.direccion.computacion@uce.edu.ec", "docente");
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo de validación.");
+            }
+
+
             // Crear y devolver el DTO del docente
             return DocenteDTO.builder()
                     .primerNombre(registroRequest.getPrimerNombre())
@@ -349,15 +393,119 @@ public class AuthServicelmpl implements IAuthService {
         }
     }
 
+
+    @Override
+    @Transactional
+    public AdministrativoDTO registroAdministrativo(RegistroAdministrativoRequest registroAdministrativoRequest) {
+        // Verificación de datos nulos o vacíos
+        if (registroAdministrativoRequest == null ||
+                registroAdministrativoRequest.getCorreo() == null || registroAdministrativoRequest.getCorreo().isEmpty() ||
+                registroAdministrativoRequest.getPassword() == null || registroAdministrativoRequest.getPassword().isEmpty() ||
+                registroAdministrativoRequest.getRol() == null || registroAdministrativoRequest.getRol().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Los datos del registro son inválidos.");
+        }
+
+        // Validación del correo electrónico
+        if (!esCorreoValido(registroAdministrativoRequest.getCorreo())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo proporcionado no es válido.");
+        }
+
+        // Verificación si ya existe un usuario con el correo
+        if (this.usuarioRepository.existeUsuarioConEmail(registroAdministrativoRequest.getCorreo())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe un usuario registrado con este correo.");
+        }
+
+        try {
+            // Crear usuario administrativo
+            Usuario usuario = Usuario.builder()
+                    .correo(registroAdministrativoRequest.getCorreo())
+                    .password("") // Se encripta la contraseña
+                    .fechaCreacion(LocalDateTime.now())
+                    .rol(registroAdministrativoRequest.getRol())
+                    .carrera(this.carreraRepository.findById(registroAdministrativoRequest.getIdCarrera()))
+                    .activo(Boolean.FALSE)
+                    .correoValido(Boolean.FALSE)
+                    .build();
+
+            // Guardar el usuario
+            Usuario usuarioGuardado = this.usuarioRepository.insertar(usuario);
+            if (usuarioGuardado == null || usuarioGuardado.getId() == null) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar el usuario administrativo.");
+            }
+
+            // Preparar datos para el envío del correo
+            String usuarioCreado = registroAdministrativoRequest.getPrimerNombre() + " " + registroAdministrativoRequest.getPrimerApellido();
+            String correo = registroAdministrativoRequest.getCorreo();
+
+            String token = JwUtil.generateToken(correo);
+            String enlace = "http://localhost:8080/API/tesis/auth/validacion-correo-docente/" + token;
+
+            System.out.println(enlace);
+
+            System.out.println(correo);
+
+            System.out.println(token);
+            // Intentar enviar el correo
+            try {
+                this.correoRestClient.registrarUsuario(usuarioCreado, correo, enlace, " fing.direccion.computacion@uce.edu.ec", "administrativo");
+            } catch (Exception e) {
+                // Registrar el error sin detener el flujo
+
+            }
+
+            // Crear y devolver el DTO del administrativo
+            return AdministrativoDTO.builder()
+                    .primerNombre(registroAdministrativoRequest.getPrimerNombre())
+                    .segundoNombre(registroAdministrativoRequest.getSegundoNombre())
+                    .primerApellido(registroAdministrativoRequest.getPrimerApellido())
+                    .segundoApellido(registroAdministrativoRequest.getSegundoApellido())
+                    .cedula(registroAdministrativoRequest.getCedula())
+                    .celular(registroAdministrativoRequest.getCelular())
+                    .idUsuario(usuarioGuardado.getId())
+                    .build();
+
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el proceso de registro del administrativo", ex);
+        }
+    }
+
+
     @Override
     @Transactional
     public Boolean validarCorreo(String correo) {
 
-        Usuario usuario=this.usuarioRepository.buscarPorEmail(correo);
+        Usuario usuario = this.usuarioRepository.buscarPorEmail(correo);
 
         if (usuario != null) {
 
             usuario.setCorreoValido(Boolean.TRUE);
+
+            this.usuarioRepository.actualizar(usuario);
+
+            return Boolean.TRUE;
+        }
+
+        return Boolean.FALSE;
+
+    }
+
+    @Override
+    @Transactional
+    public Boolean validarCorreoDocente(String correo, String password) {
+
+        Usuario usuario = this.usuarioRepository.buscarPorEmail(correo);
+        String passwordEncrypt = null;
+
+        if (password != null) {
+
+            passwordEncrypt = this.encriptionService.encriptPass(password);
+        }
+
+        if (usuario != null) {
+
+            usuario.setCorreoValido(Boolean.TRUE);
+            usuario.setActivo(Boolean.TRUE);
+            usuario.setPassword(passwordEncrypt);
 
             this.usuarioRepository.actualizar(usuario);
 

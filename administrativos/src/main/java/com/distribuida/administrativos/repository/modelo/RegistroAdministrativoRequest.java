@@ -1,5 +1,4 @@
-package com.distribuida.login.repository.modelo;
-
+package com.distribuida.administrativos.repository.modelo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,19 +11,29 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AuthResponse implements Serializable {
-
+public class RegistroAdministrativoRequest implements Serializable {
 
     private static final long serialVersionUID =1L;
 
-    private Integer id;
     private String primerNombre;
+
     private String segundoNombre;
+
     private String primerApellido;
+
     private String segundoApellido;
+
+    private String cedula;
+
+    private String celular;
+
     private String correo;
+
+    private String password;
+
+    private Integer idCarrera;
+
     private String rol;
-    private Integer idUsuario;
-    private Boolean activo;
-    private String nombreCarrera;
+
+
 }

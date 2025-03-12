@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "vista_propuestas") // Nombre de la vista en PostgreSQL
+@Table(name = "view_propuestas") // Nombre de la vista en PostgreSQL
 @Getter
 public class VistaPropuesta {
 
@@ -34,11 +34,21 @@ public class VistaPropuesta {
     @Column(name = "prop_periodo")
     private String periodo;
 
+    @Column(name = "prop_id_primer_estu")
+    private Integer idPrimerEstudiante;
+
     @Column(name = "primer_estudiante")
     private String primerEstudiante;
 
+    @Column(name = "prop_id_segundo_estu")
+    private Integer idSegundoEstudiante;
+
     @Column(name = "segundo_estudiante")
     private String segundoEstudiante;
+
+    @Column(name = "prop_id_tercer_estu")
+    private Integer idTercerEstudiante;
+
 
     @Column(name = "tercer_estudiante")
     private String tercerEstudiante;

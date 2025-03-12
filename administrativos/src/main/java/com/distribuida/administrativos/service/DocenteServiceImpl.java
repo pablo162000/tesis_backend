@@ -42,8 +42,6 @@ public class DocenteServiceImpl implements IDocenteService{
             return false; // Datos inválidos, no se procesa
         }
 
-
-
         try {
             // Convertir DTO a entidad
             Docente docente = this.converter.toEntity(registroLogin);
@@ -68,6 +66,27 @@ public class DocenteServiceImpl implements IDocenteService{
             }
 
             Docente docente = this.docenteRepository.findById(id);
+
+            if (docente == null) {
+                throw new NoSuchElementException("No se encontró una propuesta con el ID: " + id);
+            }
+            DocenteDTO docenteDTO = this.converter.toDTO(docente);
+
+            return docenteDTO;
+        } catch (Exception e) {
+            e.printStackTrace(); // Se recomienda usar un logger en lugar de esto
+            return null; // O lanzar una excepción personalizada según el caso
+        }
+    }
+
+    @Override
+    public DocenteDTO buscarPorIdUsuario(Integer id) {
+        try {
+            if (id == null || id <= 0) {
+                throw new IllegalArgumentException("El ID proporcionado no es válido.");
+            }
+
+            Docente docente = this.docenteRepository.findByIdUsuario(id);
 
             if (docente == null) {
                 throw new NoSuchElementException("No se encontró una propuesta con el ID: " + id);

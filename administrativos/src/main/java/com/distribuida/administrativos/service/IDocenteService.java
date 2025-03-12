@@ -12,6 +12,8 @@ public interface IDocenteService {
 
     public DocenteDTO buscarPorId(Integer id);
 
+    public DocenteDTO buscarPorIdUsuario(Integer id);
+
     public Boolean existeDocente(String cedula);
 
 

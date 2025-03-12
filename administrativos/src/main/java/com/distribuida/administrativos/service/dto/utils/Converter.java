@@ -1,7 +1,9 @@
 package com.distribuida.administrativos.service.dto.utils;
 
 import com.distribuida.administrativos.repository.IDocenteRepository;
+import com.distribuida.administrativos.repository.modelo.Administrativo;
 import com.distribuida.administrativos.repository.modelo.Docente;
+import com.distribuida.administrativos.service.dto.AdministrativoDTO;
 import com.distribuida.administrativos.service.dto.DocenteDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -50,11 +52,55 @@ public class Converter {
                 .build();
     }
 
-    public List<DocenteDTO> toDTOList(List<Docente> docentes) {
+    public List<DocenteDTO> toDocenteDTOList(List<Docente> docentes) {
         if (docentes == null || docentes.isEmpty()) {
             return Collections.emptyList();
         }
         return docentes.stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+
+
+    //-----------------------------------------------------------------
+    public Administrativo toEntity(AdministrativoDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        return Administrativo.builder()
+                .id(dto.getId())
+                .primerNombre(dto.getPrimerNombre())
+                .segundoNombre(dto.getSegundoNombre())
+                .primerApellido(dto.getPrimerApellido())
+                .segundoApellido(dto.getSegundoApellido())
+                .cedula(dto.getCedula())
+                .celular(dto.getCelular())
+                .idUsuario(dto.getIdUsuario())
+                .build();
+    }
+
+    public AdministrativoDTO toDTO(Administrativo administrativo) {
+        if (administrativo == null) {
+            return null;
+        }
+
+        return AdministrativoDTO.builder()
+                .id(administrativo.getId())
+                .primerNombre(administrativo.getPrimerNombre())
+                .segundoNombre(administrativo.getSegundoNombre())
+                .primerApellido(administrativo.getPrimerApellido())
+                .segundoApellido(administrativo.getSegundoApellido())
+                .cedula(administrativo.getCedula())
+                .celular(administrativo.getCelular())
+                .idUsuario(administrativo.getIdUsuario())
+                .build();
+    }
+
+    public List<AdministrativoDTO> toAdministrativoDTOList(List<Administrativo> administrativos) {
+        if (administrativos == null || administrativos.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return administrativos.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
 }

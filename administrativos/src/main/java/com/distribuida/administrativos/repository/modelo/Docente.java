@@ -34,7 +34,7 @@ public class Docente {
     @Column(name = "docen_segundo_apellido")
     private String segundoApellido;
 
-    @Column(name = "docen_cedula")
+    @Column(name = "docen_cedula", nullable = false)
     private String cedula;
 
     @Column(name = "docen_celular")
