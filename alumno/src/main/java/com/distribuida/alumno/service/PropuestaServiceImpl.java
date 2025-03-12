@@ -290,7 +290,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
     @Override
     public Boolean puedeEnviarPropuestas(Integer idEstudiante) {
 
-        List<Propuesta> propuestasValidas = propuestaRepository.findPropuestasBy(idEstudiante, EstadoValidacion.NO_REVISADO, EstadoValidacion.NO_VALIDADO);
+        List<Propuesta> propuestasValidas = propuestaRepository.findPropuestasBy(idEstudiante, EstadoValidacion.NO_REVISADO, EstadoValidacion.VALIDADO);
 
         // Si existen propuestas con estas condiciones, el estudiante no puede enviar una nueva propuesta
         return propuestasValidas.isEmpty();

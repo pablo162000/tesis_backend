@@ -50,8 +50,8 @@ public class AuthRestFullController {
         }
     }
 
-    @PostMapping("/validacion-correo/{token}")
-    public ResponseEntity<String> validarCorreo(@PathVariable String token) {
+    @GetMapping("/validacion-correo/{token}")
+    public ResponseEntity<Boolean> validarCorreo(@PathVariable String token) {
         try {
             // Verifica el token JWT
             DecodedJWT decodedJWT = JwUtil.verifyToken(token);
@@ -63,15 +63,15 @@ public class AuthRestFullController {
                 if (validacionExitosa) {
 
 
-                    return ResponseEntity.ok("Correo validado con éxito");
+                    return ResponseEntity.ok(Boolean.TRUE);
                 } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al validar el correo");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Boolean.FALSE);
                 }
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token inválido o expirado");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Boolean.FALSE);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar el token");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Boolean.FALSE);
         }
     }
 
@@ -111,12 +111,12 @@ public class AuthRestFullController {
 
 
     @PutMapping("/validacion-correo-docente/")
-    public ResponseEntity<String> validarCorreoDocente(@RequestParam("token") String token, @RequestParam ("password") String password) {
+    public ResponseEntity<Boolean> validarCorreoDocente(@RequestParam("token") String token, @RequestParam ("password") String password) {
         try {
 
             if (password == null) {
 
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password faltante");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Boolean.FALSE);
             }
 
 
@@ -130,15 +130,15 @@ public class AuthRestFullController {
                 if (validacionExitosa) {
 
 
-                    return ResponseEntity.ok("Correo validado con éxito");
+                    return ResponseEntity.ok(Boolean.TRUE);
                 } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al validar el correo");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Boolean.FALSE);
                 }
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token inválido o expirado");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Boolean.FALSE);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar el token");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Boolean.FALSE);
         }
     }
 

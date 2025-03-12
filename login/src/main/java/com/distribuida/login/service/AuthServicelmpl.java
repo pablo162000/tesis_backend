@@ -56,6 +56,7 @@ public class AuthServicelmpl implements IAuthService {
     @Override
     public Boolean registroEstudiante(RegistroRequest registroRequest) {
 
+        // Validaciones básicas
         if (Objects.isNull(registroRequest) ||
                 Objects.isNull(registroRequest.getCorreo()) || registroRequest.getCorreo().isEmpty() ||
                 Objects.isNull(registroRequest.getPassword()) || registroRequest.getPassword().isEmpty() ||
@@ -72,109 +73,87 @@ public class AuthServicelmpl implements IAuthService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El correo ya está registrado.");
         }
 
-
+        // Validar si la cédula ya está registrada como estudiante o docente
         try {
-
-
-            Boolean existeEstudiante = null;
-            try {
-                existeEstudiante = this.estudianteRestClient.existencia(registroRequest.getCedula());
-            } catch (FeignException.Conflict ex) {
-                // Captura conflicto cuando el estudiante ya existe
+            if (Boolean.TRUE.equals(this.estudianteRestClient.existencia(registroRequest.getCedula()))) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en estudiante.");
             }
-
-// Si el estudiante ya existe, lanzar conflicto
-            if (Boolean.TRUE.equals(existeEstudiante)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en estudiante.");
-            }
-
-
-            Boolean existeDocente = null;
-            try {
-                existeDocente = this.administrativoRestClient.existencia(registroRequest.getCedula());
-            } catch (FeignException.Conflict ex) {
-                // Captura conflicto cuando el docente ya existe
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en docente.");
-            }
-
-// Si el docente ya existe, lanzar conflicto
-            if (Boolean.TRUE.equals(existeDocente)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en docente.");
-            }
-
-            Integer idCarrera = this.carreraRepository.findById(registroRequest.getIdCarrera()).getId();
-
-
-            if (Objects.isNull(idCarrera)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La carrera seleccionada no existe o no se seleccionó.");
-            }
-
-            // Crear usuario
-            Usuario usuario = Usuario.builder()
-                    .correo(registroRequest.getCorreo())
-                    .password(this.encriptionService.encriptPass(registroRequest.getPassword()))
-                    .fechaCreacion(LocalDateTime.now())
-                    .rol("estudiante")
-                    .carrera(this.carreraRepository.findById(registroRequest.getIdCarrera()))
-                    .correoValido(Boolean.FALSE)
-                    .activo(Boolean.FALSE)
-                    .build();
-
-            Usuario usuarioGuardado = this.usuarioRepository.insertar(usuario);
-            if (usuarioGuardado == null || usuarioGuardado.getId() == null) {
-                throw new RuntimeException("Error al guardar el usuario");
-            }
-
-            // Crear estudiante con el ID del usuario guardado
-            EstudianteDTO estudianteDTO = EstudianteDTO.builder()
-                    .primerNombre(registroRequest.getPrimerNombre())
-                    .segundoNombre(registroRequest.getSegundoNombre())
-                    .primerApellido(registroRequest.getPrimerApellido())
-                    .segundoApellido(registroRequest.getSegundoApellido())
-                    .cedula(registroRequest.getCedula())
-                    .celular(registroRequest.getCelular())
-                    .idUsuario(usuarioGuardado.getId()) // Se asocia el usuario con el estudiante
-                    .build();
-
-            System.out.println("Datos enviados al servicio REST: " + estudianteDTO);
-
-
-            // Llamar al servicio REST para registrar al estudiante
-            Boolean estudianteCreado = this.estudianteRestClient.crearEstudiante(estudianteDTO);
-            if (Boolean.TRUE.equals(estudianteCreado)) {
-
-                String usuarioCreado = registroRequest.getPrimerNombre() + " " + registroRequest.getPrimerApellido();
-                String correo = registroRequest.getCorreo();
-
-                String token = JwUtil.generateToken(correo);
-
-                String enlace = "http://localhost:8080/API/tesis/auth/validacion-correo/" + token;
-
-                try {
-                    this.correoRestClient.registrarUsuario(usuarioCreado, correo, enlace, "fing.direccion.computacion@uce.edu.ec", "estudiante");
-                } catch (Exception e) {
-                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo de validación.");
-                }
-
-                return true; // Éxito en ambas inserciones
-            } else {
-                throw new RuntimeException("Error al crear el estudiante en el microservicio.");
-            }
-
-
-        } catch (ResponseStatusException ex) {
-            // Si es una ResponseStatusException, se vuelve a lanzar para que Spring maneje el error
-            throw ex;
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Datos enviados al servicio REST: " + ex);
-
-            return false; // Fallo en el proceso
+        } catch (FeignException.Conflict ex) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en estudiante.");
         }
 
+        try {
+            if (Boolean.TRUE.equals(this.administrativoRestClient.existencia(registroRequest.getCedula()))) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en docente.");
+            }
+        } catch (FeignException.Conflict ex) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en docente.");
+        }
+
+        // Obtener carrera sin usar .orElseThrow()
+        Carrera carrera = this.carreraRepository.findById(registroRequest.getIdCarrera());
+        if (carrera == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La carrera seleccionada no existe.");
+        }
+
+
+        // Crear usuario
+        Usuario usuario = Usuario.builder()
+                .correo(registroRequest.getCorreo())
+                .password(this.encriptionService.encriptPass(registroRequest.getPassword()))
+                .fechaCreacion(LocalDateTime.now())
+                .rol("estudiante")
+                .carrera(carrera)
+                .correoValido(Boolean.FALSE)
+                .activo(Boolean.FALSE)
+                .build();
+
+        Usuario usuarioGuardado = this.usuarioRepository.insertar(usuario);
+        if (usuarioGuardado == null || usuarioGuardado.getId() == null) {
+            throw new RuntimeException("Error al guardar el usuario");
+        }
+
+        // Crear estudiante con el ID del usuario guardado
+        EstudianteDTO estudianteDTO = EstudianteDTO.builder()
+                .primerNombre(registroRequest.getPrimerNombre())
+                .segundoNombre(registroRequest.getSegundoNombre())
+                .primerApellido(registroRequest.getPrimerApellido())
+                .segundoApellido(registroRequest.getSegundoApellido())
+                .cedula(registroRequest.getCedula())
+                .celular(registroRequest.getCelular())
+                .idUsuario(usuarioGuardado.getId()) // Se asocia el usuario con el estudiante
+                .build();
+
+        System.out.println("Datos enviados al servicio REST: " + estudianteDTO);
+
+        // Llamar al servicio REST para registrar al estudiante
+        Boolean estudianteCreado = this.estudianteRestClient.crearEstudiante(estudianteDTO);
+        if (Boolean.FALSE.equals(estudianteCreado)) {
+            throw new RuntimeException("Error al crear el estudiante en el microservicio.");
+        }
+
+        // Generar token y enlace de verificación
+        String usuarioCreado = registroRequest.getPrimerNombre() + " " + registroRequest.getPrimerApellido();
+        String correo = registroRequest.getCorreo();
+        String token = JwUtil.generateToken(correo);
+        String enlace = "http://localhost:4200/vista-verificacion-correo/" + token;
+
+        // Enviar correo con control de errores (fuera de la transacción)
+        try {
+
+            this.correoRestClient.registrarUsuario(usuarioCreado, correo, enlace,
+                    "fing.direccion.computacion@uce.edu.ec", "estudiante");
+
+        } catch (Exception e) {
+            // Elimina usuario local
+            EstudianteDTO porBorrar= this.estudianteRestClient.obtenerEstudiantePorCedula(estudianteDTO.getCedula());
+            this.estudianteRestClient.eliminarRegistro(porBorrar.getIdUsuario());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo de validación.");
+        }
+
+        return true; // Éxito en todo el proceso
     }
+
 
     @Override
     public AuthResponse loginUsuario(LoginRequest loginRequest) {
@@ -279,6 +258,7 @@ public class AuthServicelmpl implements IAuthService {
                             .primerApellido(administrativoDTO.getPrimerApellido())
                             .segundoApellido(administrativoDTO.getSegundoApellido())
                             .rol(usua.getRol())
+                            .correo(usua.getCorreo())
                             .idUsuario(usua.getId())
                             .nombreCarrera(usua.getCarrera().getNombre())
                             .activo(usua.getActivo())
@@ -367,7 +347,7 @@ public class AuthServicelmpl implements IAuthService {
 
             String token = JwUtil.generateToken(correo);
 
-            String enlace = "http://localhost:8080/API/tesis/auth/validacion-correo/" + token;
+            String enlace = "http://localhost:4200/password-docente/" + token;
 
             try {
                 this.correoRestClient.registrarUsuario(usuarioCreado, correo, enlace, " fing.direccion.computacion@uce.edu.ec", "docente");
@@ -438,7 +418,7 @@ public class AuthServicelmpl implements IAuthService {
             String correo = registroAdministrativoRequest.getCorreo();
 
             String token = JwUtil.generateToken(correo);
-            String enlace = "http://localhost:8080/API/tesis/auth/validacion-correo-docente/" + token;
+            String enlace = "http://localhost:4200/password-docente/" + token;
 
             System.out.println(enlace);
 
