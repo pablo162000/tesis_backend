@@ -90,7 +90,6 @@ public class AuthServicelmpl implements IAuthService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en docente.");
         }
 
-        // Obtener carrera sin usar .orElseThrow()
         Carrera carrera = this.carreraRepository.findById(registroRequest.getIdCarrera());
         if (carrera == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La carrera seleccionada no existe.");

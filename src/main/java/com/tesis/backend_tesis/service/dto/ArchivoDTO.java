@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
@@ -16,6 +17,6 @@ public class ArchivoDTO {
     private Integer id;
     private String nombre;
     private String url;
-    private LocalTime fechaCreacion;
+    private LocalDateTime fechaCreacion;
     private Integer idUsuario;
 }

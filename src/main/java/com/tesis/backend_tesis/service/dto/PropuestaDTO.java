@@ -19,7 +19,7 @@ public class PropuestaDTO {
     private Integer idDocente;
     private Integer idEstuCreacion;
     private ArchivoDTO archivo; // DTO en lugar de la entidad completa
-    private EstudianteDTO estudiantePrimero;
-    private EstudianteDTO estudianteSegundo;
-    private EstudianteDTO estudianteTercero;
+    private EstudiantesDTO estudiantePrimero;
+    private EstudiantesDTO estudianteSegundo;
+    private EstudiantesDTO estudianteTercero;
 }

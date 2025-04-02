@@ -1,6 +1,5 @@
 package com.tesis.backend_tesis.repository;
 
-import com.tesis.backend_tesis.repository.modelo.Usuarios;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Transactional
 public class UsuariosRepositoryImpl implements IUsuariosRepository {
+    /*
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -82,4 +82,6 @@ public class UsuariosRepositoryImpl implements IUsuariosRepository {
             return false; // En caso de error, se retorna false
         }
     }
+
+     */
 }

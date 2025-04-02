@@ -1,8 +1,5 @@
 package com.tesis.backend_tesis.repository;
 
-import com.tesis.backend_tesis.repository.modelo.Estudiantes;
-import com.tesis.backend_tesis.repository.modelo.Usuarios;
-import com.tesis.backend_tesis.service.dto.EstudianteDTO;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
@@ -14,6 +11,7 @@ import jakarta.persistence.NoResultException;
 @Transactional
 public class EstudiantesRepositoryImpl implements IEstudiantesRepository {
 
+    /*
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -81,6 +79,8 @@ public class EstudiantesRepositoryImpl implements IEstudiantesRepository {
             return null;
         }
     }
+
+     */
 
 
 }

@@ -73,6 +73,41 @@ public class MailSenderService {
     }
 
 
+    public void sendRecoverEmail(String toEmail, String usuario, String enlaceRecuperacion,
+                                 String correoDireccion)
+            throws MessagingException {
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+
+        // Asignar los valores al modelo de la plantilla
+        Map<String, Object> model = new HashMap<>();
+        model.put("usuario", usuario);
+        model.put("enlace_recuperacion", enlaceRecuperacion);
+        model.put("correoDireccion", correoDireccion);
+
+        // Usar FreeMarker para llenar la plantilla
+        try {
+            StringWriter stringWriter = new StringWriter();
+            freeMarkerConfigurer.getConfiguration()
+                    .getTemplate("recuperacionCuenta.html") // Seleccionar la plantilla
+                    .process(model, stringWriter);
+
+            String htmlContent = stringWriter.toString();
+
+            // Establecer los detalles del correo
+            helper.setTo(toEmail);
+            helper.setSubject("Recuperación de Cuenta");
+            helper.setText(htmlContent, true);  // true indica que es contenido HTML
+
+            // Enviar el correo
+            mailSender.send(message);
+        } catch (Exception e) {
+            throw new MessagingException("Error al procesar la plantilla FreeMarker", e);
+        }
+    }
+
 
 
     public void sendMultipleUser(String toEmail, List<String> ccEmails, String estudiante,

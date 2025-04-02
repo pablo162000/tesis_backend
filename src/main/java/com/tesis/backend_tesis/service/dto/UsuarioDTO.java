@@ -1,13 +1,11 @@
 package com.tesis.backend_tesis.service.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,11 +14,16 @@ import java.util.List;
 public class UsuarioDTO {
 
     private Integer id;
-    private String username;
+    private String primerNombre;
+    private String segundoNombre;
+    private String primerApellido;
+    private String segundoApellido;
+    private String cedula;
     private String correo;
-    private String rol;
-    private Boolean activo;
+    private String password;
+    private String celular;
     private LocalDateTime fechaCreacion;
-    private Integer idEstudiante;
-    private List<Integer> archivos;
+    private Boolean activo;
+    private Boolean correoValido;
+
 }

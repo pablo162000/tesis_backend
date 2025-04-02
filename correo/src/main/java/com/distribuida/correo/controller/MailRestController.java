@@ -1,7 +1,9 @@
 package com.distribuida.correo.controller;
 
+import com.distribuida.correo.service.MailGunService;
 import com.distribuida.correo.service.MailSenderService;
 import jakarta.mail.MessagingException;
+import kong.unirest.UnirestException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,49 @@ public class MailRestController {
     @Autowired
     private MailSenderService mailSenderService;
 
+    @Autowired
+    private MailGunService mailService;
+
+
+    @PostMapping("/registrov2")
+    public ResponseEntity<String> sendMail(
+            @RequestParam String toEmail,
+            @RequestParam String usuario,
+            @RequestParam String enlaceCuenta,
+            @RequestParam String correoDireccion,
+            @RequestParam String tipoUsuario) {
+
+        String enlaceSoporte = "http://miapp.com/soporte";
+        String enlacePrivacidad = "http://miapp.com/privacidad";
+
+        try {
+            this.mailService.sendEmail(toEmail, usuario, enlaceCuenta,
+                    correoDireccion,
+                    tipoUsuario);
+            return ResponseEntity.ok("Correo enviado exitosamente a " + toEmail);
+        } catch (UnirestException e) {
+            return ResponseEntity.status(500).body("Error al enviar el correo: " + e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/recuperacionv2")
+    public String recuperacionCuentav2(@RequestParam String correoUsuario,
+                                     @RequestParam String nombreUsuario,
+                                     @RequestParam String enlaceRecuperacion,
+                                     @RequestParam String correoDireccion) {
+        this.mailService.sendRecoverEmail(correoUsuario,
+                nombreUsuario,
+                enlaceRecuperacion,
+                correoDireccion);
+
+        return "envio correcto de recuperacion";
+    }
+
+
+
+
+
     @PostMapping("/registro")
     public String registrarUsuario(@RequestParam String usuario,
                                    @RequestParam String correo,
@@ -35,7 +80,7 @@ public class MailRestController {
         String enlacePrivacidad = "http://miapp.com/privacidad";
 
         // Enviar el correo de bienvenida
-        mailSenderService.sendRegistrationEmail(correo,
+        this.mailSenderService.sendRegistrationEmail(correo,
                                                 usuario,
                                                 enlaceVerificaion,
                                                 enlaceSoporte,
@@ -45,6 +90,20 @@ public class MailRestController {
 
 
         return "registroExitoso"; // Redirige o muestra una página de éxito
+    }
+
+    @PostMapping("/recuperacion")
+    public String recuperacionCuenta(@RequestParam String correoUsuario,
+                                   @RequestParam String nombreUsuario,
+                                   @RequestParam String enlaceRecuperacion,
+                                   @RequestParam String correoDireccion)
+            throws MessagingException {
+        this.mailSenderService.sendRecoverEmail(correoUsuario,
+                                                nombreUsuario,
+                                                enlaceRecuperacion,
+                                                correoDireccion);
+
+        return "envio correcto de recuperacion";
     }
 
 

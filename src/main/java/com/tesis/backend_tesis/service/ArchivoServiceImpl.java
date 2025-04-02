@@ -3,6 +3,7 @@ package com.tesis.backend_tesis.service;
 import com.tesis.backend_tesis.domain.document.BucketObject;
 import com.tesis.backend_tesis.domain.document.IBucket;
 import com.tesis.backend_tesis.repository.IArchivoRepository;
+import com.tesis.backend_tesis.repository.IUsuarioRepository;
 import com.tesis.backend_tesis.repository.IUsuariosRepository;
 import com.tesis.backend_tesis.repository.modelo.Archivo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class ArchivoServiceImpl implements IArchivoService{
     private IArchivoRepository archivoRepository;
 
     @Autowired
-    private IUsuariosRepository usuariosRepository;
+    private IUsuarioRepository usuarioRepository;
 
     @Autowired
     IBucket bucketDataSource;
@@ -29,7 +30,7 @@ public class ArchivoServiceImpl implements IArchivoService{
 
         BucketObject bucketObject =  bucketDataSource.uploadFile(file);
 
-        Archivo archivo = new Archivo(bucketObject.getFileName(), bucketObject.getFileUrl(), this.usuariosRepository.buscarPorId(idUsuario));
+        Archivo archivo = new Archivo(bucketObject.getFileName(), bucketObject.getFileUrl(), this.usuarioRepository.findById(idUsuario));
 
         return this.archivoRepository.crear(archivo);
     }

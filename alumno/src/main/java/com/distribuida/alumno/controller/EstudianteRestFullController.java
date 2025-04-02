@@ -284,14 +284,15 @@ public class EstudianteRestFullController {
 
 
 
-        String nombresSecundarios = Stream.of(nombreSegundo, nombreTercero)
-                .filter(Objects::nonNull)  // Filtra solo los que no son null
-                .collect(Collectors.joining(" y "));
+        String primerEstudiante =
+                propuesta.getPrimerEstudiante().getPrimerApellido()+ " "+ propuesta.getPrimerEstudiante().getPrimerNombre();
 
-        String nombrePrincipal = estudiantePrimero.getPrimerNombre() + " " + estudiantePrimero.getPrimerApellido() + ", ";
+        List<String> posiblesNombres = new ArrayList<String>();
+        posiblesNombres.add(primerEstudiante);
+        posiblesNombres.add(nombreSegundo);
+        posiblesNombres.add(nombreTercero);
 
-        String nombres = nombrePrincipal.concat(nombresSecundarios);
-
+        String nombres = obtenerNombresEstudiantes(posiblesNombres);
 
 
 
@@ -340,6 +341,26 @@ public class EstudianteRestFullController {
     @GetMapping("/download/{fileName}")
     public ResponseEntity<InputStreamResource> downloadFile(@PathVariable String fileName) throws IOException {
         return this.bucketDataSource.downloadFile(fileName);
+    }
+
+    public String obtenerNombresEstudiantes(List<String> posiblesNombres) {
+        // Filtrar nombres nulos o vacíos
+        List<String> nombresValidos = posiblesNombres.stream()
+                .filter(nombre -> nombre != null && !nombre.trim().isEmpty())
+                .collect(Collectors.toList());
+
+        return formatearListaConY(nombresValidos);
+    }
+
+    private String formatearListaConY(List<String> elementos) {
+        if (elementos.isEmpty()) {
+            return "";
+        } else if (elementos.size() == 1) {
+            return elementos.get(0);
+        } else {
+            return String.join(", ", elementos.subList(0, elementos.size() - 1)) +
+                    " y " + elementos.get(elementos.size() - 1);
+        }
     }
 
 

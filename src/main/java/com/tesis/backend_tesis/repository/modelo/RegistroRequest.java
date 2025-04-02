@@ -17,24 +17,29 @@ public class RegistroRequest implements Serializable {
 
     private static final long serialVersionUID =1L;
 
-    private String primer_nombre;
+    private String primerNombre;
 
-    private String segundo_nombre;
+    private String segundoNombre;
 
-    private String primer_apellido;
+    private String primerApellido;
 
-    private String segundo_apellido;
+    private String segundoApellido;
 
     private String cedula;
+
+    private String celular;
 
     private String correo;
 
     private String password;
 
-    private Date fecha_registro;
+    private Date fechaRegistro;
 
-    private Boolean activo;
+    private Integer idCarrera;
 
-    private String rol;
+    private Integer idFacultad;
+
+    private String tipoUsuario;
+
 
 }

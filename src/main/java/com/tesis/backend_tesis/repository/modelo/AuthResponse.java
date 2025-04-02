@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,12 +17,17 @@ public class AuthResponse implements Serializable {
 
     private static final long serialVersionUID =1L;
 
-    private Integer id;
-    private String primer_nombre;
-    private String segundo_nombre;
-    private String primer_apellido;
-    private String segundo_apellido;
-    private String rol;
+    private Integer idUsuario;
+    private String primerNombre;
+    private String segundoNombre;
+    private String primerApellido;
+    private String segundoApellido;
+    private String correo;
+    private Boolean validdo;
     private Boolean activo;
+    private String nombreFacultad;
+    private String nombreCarrera;
+    private List<String> rolesDisponibles;
+    private String rolSeleccionado;
 
 }

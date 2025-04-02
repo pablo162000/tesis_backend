@@ -1,17 +1,30 @@
 package com.tesis.backend_tesis.service;
 
 import com.tesis.backend_tesis.repository.modelo.Propuesta;
-import com.tesis.backend_tesis.service.dto.PropuestaDTO;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.io.IOException;
+
 
 public interface IPropuestaService {
 
 
-    public Propuesta guardar(Propuesta propuesta);
+    public String guardar(String tipo,
+                             String tema,
+                             String categoria,
+                             String primerCorreo,
+                             String segundoCorreo,
+                             String tercerCorreo,
+                             Integer idDocenteTutor,
+                             MultipartFile archivo) throws IOException;
 
     public Propuesta buscar(Integer id);
 
-    public List<PropuestaDTO> buscarPorIdEstudiante(Integer idEstudiante);
+    public Boolean puedeEnviarPropuestas(Integer idEstudiante,String tipo);
+    public Boolean puedeEnviarPropuestasTipoCategoria(Integer idEstudiante, String tipo, String categoria);
+    public Boolean puedeEnviarPropuestasMultimodal(Integer idEstudiante1,Integer idEstudiante2,Integer idEstudiante3, String tipo);
+    public Boolean diferentesCarreras(Integer idEstudiante1,Integer idEstudiante2, Integer idEstudiante3);
+    //public List<PropuestaDTO> buscarPorIdEstudiante(Integer idEstudiante);
+
+
 }

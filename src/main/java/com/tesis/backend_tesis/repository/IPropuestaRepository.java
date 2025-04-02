@@ -6,10 +6,11 @@ import java.util.List;
 
 public interface IPropuestaRepository {
 
-    public Propuesta crear(Propuesta propuesta);
+    public Propuesta insert(Propuesta propuesta);
     public Propuesta buscarPorId(Integer id);
     public List<Propuesta> findByEstudianteId(Integer idEstudiante);
-
+    public List<Propuesta> findPropuestasBy(Integer idEstudiante,String tipo);
+    public List<Propuesta> findPropuestasByCompleta(Integer idEstudiante, String tipo, String categoria);
     public List<Propuesta> finall();
 
 
