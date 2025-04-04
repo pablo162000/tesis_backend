@@ -31,6 +31,9 @@ public class VistaCarrera {
     @Column(name = "director_id")
     private Integer idDirector;
 
+    @Column(name = "usuario_carrera_id")
+    private Integer idUsuarioCarrera;
+
     @Column(name = "nombre_director")
     private String nombreDirector;
 

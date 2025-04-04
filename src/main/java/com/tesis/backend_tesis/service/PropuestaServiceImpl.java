@@ -1,6 +1,7 @@
 package com.tesis.backend_tesis.service;
 
 import com.tesis.backend_tesis.clients.CorreoRestClient;
+import com.tesis.backend_tesis.clients.MotorRestClient;
 import com.tesis.backend_tesis.repository.IPropuestaRepository;
 import com.tesis.backend_tesis.repository.IRevisionRepository;
 import com.tesis.backend_tesis.repository.modelo.*;
@@ -55,6 +56,9 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
     @Autowired
     private IRevisionRepository revisionRepository;
+
+    @Autowired
+    private MotorRestClient motorRestClient;
 
 
 
@@ -323,6 +327,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
 
 
+
         // 6. Construir la propuesta
         Propuesta propuesta = Propuesta.builder()
                 .carrera(vistaEstudiantePrimero.getCarrera())
@@ -338,16 +343,24 @@ public class PropuestaServiceImpl implements IPropuestaService{
                 .estadoAprobacion(EstadoAprobacion.EN_REVISON)
                 .build();
 
-        this.propuestaRepository.insert(propuesta);
+        Propuesta guardada =this.propuestaRepository.insert(propuesta);
 
         Revision revision = Revision.builder()
-                .propuesta(propuesta)
                 .archivoSubidoEstudiantes(ar)
+                .propuesta(guardada)
                 .numeroRevision(1)
                 .build();
 
         this.revisionRepository.insert(revision);
 
+
+        Revision revision2 = Revision.builder()
+                .archivoSubidoEstudiantes(ar)
+                .propuesta(guardada)
+                .numeroRevision(2)
+                .build();
+
+        this.revisionRepository.insert(revision2);
 
 
         List<String> ccEmails = new ArrayList<>();
@@ -376,8 +389,13 @@ public class PropuestaServiceImpl implements IPropuestaService{
             logger.error("Error al enviar correo: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo.");
         }
+
+        this.motorRestClient.iniciarProceso(guardada.getId());
+
         // 8. Respuesta exitosa
         return "guardada con exito";
+
+
 
     }
 

@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
-
+/*
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,8 +14,10 @@ import java.util.List;
 @Entity
 @ToString
 @Table(name = "evaluacion_revisor")
-public class EvaluacionRevisor {
 
+ */
+public class EvaluacionRevisor {
+/*
     @Id
     @Column(name = "eva_revi_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "eva_revi_id_seq")
@@ -34,13 +36,13 @@ public class EvaluacionRevisor {
     @JoinColumn(name = "eva_revi_archivo_id", referencedColumnName = "archivo_id")
     @ToString.Exclude
     private Archivo archivoRevisado;
-/*
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "eva_revi_revision_id", referencedColumnName = "revi_id",nullable = false)
     @ToString.Exclude
     private Revision revision;
 
- */
+
 
     @Column(name = "eva_revi_observaciones")
     private String observaciones;
@@ -56,5 +58,6 @@ public class EvaluacionRevisor {
     @JsonManagedReference
     private List<Revision> revisionesEvalucionesSegunda;
 
+ */
 
 }

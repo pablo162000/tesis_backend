@@ -40,9 +40,12 @@ public class Archivo {
     @JoinColumn(name = "archivo_usua_id",referencedColumnName = "usua_id", nullable = false)
     private Usuario usuario;
 
+    /*
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prop_id", referencedColumnName = "prop_id", nullable = true)
     private Propuesta propuesta;
+
+     */
 
     // Relación con Revision
     @OneToMany(mappedBy = "archivoSubidoEstudiantes", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -50,9 +53,13 @@ public class Archivo {
     private List<Revision> revisiones;
 
     // Relación con EvaluacionRevisor
-    @OneToMany(mappedBy = "archivoRevisado", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "archivoRevisado1", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @ToString.Exclude
-    private List<EvaluacionRevisor> evaluacionesRevisor;
+    private List<Revision> evaluacionesRevisor1;
+
+    @OneToMany(mappedBy = "archivoRevisado2", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private List<Revision> evaluacionesRevisor2;
 
 
 

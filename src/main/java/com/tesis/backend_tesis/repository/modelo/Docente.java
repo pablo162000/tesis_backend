@@ -37,13 +37,17 @@ public class Docente {
     @ToString.Exclude
     private List<Carrera> carrerasCoordinador;
 
-    @OneToMany(mappedBy = "revisor", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    private List<EvaluacionRevisor> evaluaciones;
-
     @OneToMany(mappedBy = "tutor", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<Propuesta> propuestas;
+
+    @OneToMany(mappedBy = "revisor1", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Revision> revisionesDocente1;
+
+    @OneToMany(mappedBy = "revisor2", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Revision> revisionesDocente2;
 
 
 
