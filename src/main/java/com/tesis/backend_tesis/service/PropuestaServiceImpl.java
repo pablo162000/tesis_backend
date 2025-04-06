@@ -390,12 +390,9 @@ public class PropuestaServiceImpl implements IPropuestaService{
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo.");
         }
 
-        this.motorRestClient.iniciarProceso(guardada.getId());
-
+        this.motorRestClient.iniciarProceso(guardada.getId(), guardada.getEstudiante1().getId(), 5, 6);
         // 8. Respuesta exitosa
         return "guardada con exito";
-
-
 
     }
 
