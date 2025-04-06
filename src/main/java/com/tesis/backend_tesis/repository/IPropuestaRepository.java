@@ -11,6 +11,7 @@ public interface IPropuestaRepository {
     public List<Propuesta> findByEstudianteId(Integer idEstudiante);
     public List<Propuesta> findPropuestasBy(Integer idEstudiante,String tipo);
     public List<Propuesta> findPropuestasByCompleta(Integer idEstudiante, String tipo, String categoria);
+    public Boolean update(Propuesta propuesta);
     public List<Propuesta> finall();
 
 

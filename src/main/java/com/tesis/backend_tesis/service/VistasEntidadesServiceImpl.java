@@ -33,6 +33,9 @@ public class VistasEntidadesServiceImpl implements IVistasEntidadesService {
     @Autowired
     private IVistaUsuarioRolRepository vistaUsuarioRolRepository;
 
+    @Autowired
+    private IVistaPropuestaRepository vistaPropuestaRepository;
+
 
     @Override
     public VistaEstudiante buscarEstudiantePorIdUsuario(Integer idUsuario) {
@@ -509,6 +512,24 @@ public class VistasEntidadesServiceImpl implements IVistasEntidadesService {
 
         logger.info("Se encontraron {} registros en VistaUsuarioRol.", vistaUsuarioRols.size());
         return vistaUsuarioRols;
+    }
+
+    @Override
+    public List<VistaPropuesta> buscarPropuestaPorIdPropuesta(Integer idPropuesta) {
+        if (idPropuesta == null || idPropuesta <= 0) {
+            logger.warn("El idPropuesta no puede ser nulo, 0 o negativo.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El idPropuesta no puede ser nulo, 0 o negativo.");
+        }
+
+        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findById(idPropuesta);
+
+        if (vistaPropuestas.isEmpty()) {
+            logger.warn("No se encontraron registros de VistaPropuesta con idPropuesta '{}'.", idPropuesta);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron registros con  idPropuesta proporcionados.");
+        }
+
+        logger.info("Se encontraron {} registros de VistaPropuesta con idPropuesta '{}'.", vistaPropuestas.size(), idPropuesta);
+        return vistaPropuestas;
     }
 
 }

@@ -154,6 +154,27 @@ public class PropuestaRepositoryImpl implements IPropuestaRepository {
         }
     }
 
+    @Override
+    public Boolean update(Propuesta propuesta) {
+        try {
+            // Intentamos encontrar la propuesta en la base de datos usando el id de la propuesta
+            Propuesta propuestaExistente = this.entityManager.find(Propuesta.class, propuesta.getId());
+
+            if (propuestaExistente != null) {
+                // Si la propuesta existe, solo guardamos los cambios sin necesidad de modificar el estado de validación nuevamente
+                this.entityManager.merge(propuestaExistente); // Guarda los cambios en la base de datos
+
+                return true; // Indicamos que la actualización fue exitosa
+            } else {
+                return false; // No se encontró la propuesta con el ID dado
+            }
+        } catch (Exception e) {
+            // En caso de error, se captura y se imprime la excepción
+            e.printStackTrace(); // En producción, reemplazar con un logger
+            return false; // Indicamos que hubo un error en la actualización
+        }
+    }
+
 
     //para Director de carrera y secreataria
     @Override
