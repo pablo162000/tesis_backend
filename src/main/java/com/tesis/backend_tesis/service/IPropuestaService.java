@@ -23,8 +23,11 @@ public interface IPropuestaService {
     public Boolean puedeEnviarPropuestas(Integer idEstudiante,String tipo);
     public Boolean puedeEnviarPropuestasTipoCategoria(Integer idEstudiante, String tipo, String categoria);
     public Boolean puedeEnviarPropuestasMultimodal(Integer idEstudiante1,Integer idEstudiante2,Integer idEstudiante3, String tipo);
+    public Boolean puedeEnviarPropuestasUnimodal(Integer idEstudiante1,Integer idEstudiante2, String tipo);
+
     public Boolean diferentesCarreras(Integer idEstudiante1,Integer idEstudiante2, Integer idEstudiante3);
     //public List<PropuestaDTO> buscarPorIdEstudiante(Integer idEstudiante);
-
+    public Boolean validarPropuesta(Integer idPropuesta, Boolean estadoValidacion, String obsercvaciones, String taskID);
+    public Boolean asignarRevisor(Integer idPropuesta, Integer idDocente, String tipoRevisor, String taskID);
 
 }

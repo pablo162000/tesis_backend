@@ -287,6 +287,26 @@ public class UsuarioServiceImpl implements IUsuarioService{
     }
 
     @Override
+    public UsuarioDTO buscarPorId(Integer idUsuario) {
+        try {
+            if (idUsuario <= 0) {
+                logger.warn("El id no puede ser 0 o negativo.");
+                return null;
+            }
+
+            Usuario usuario = this.usuarioRepository.findById(idUsuario);
+            UsuarioDTO usuarioDTO = this.converter.toDTO(usuario);
+
+            logger.info("Estudiante recuperado con IDUSUARIO {}  correctamente.", usuarioDTO.getId());
+            return usuarioDTO;
+
+        } catch (Exception e) {
+            logger.error("Error al buscar estudiante con IDUSUARIO {}: {}", idUsuario, e.getMessage(), e);
+            throw new RuntimeException("Error al buscar estudiante con IDUSUARIO: " + idUsuario, e);
+        }
+    }
+
+    @Override
     @Transactional
     @Scheduled(cron = "0 */2 * * * ?")
     public void eliminarUsuariosNoVerificadosCarrera() {

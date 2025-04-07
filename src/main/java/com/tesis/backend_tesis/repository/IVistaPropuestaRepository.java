@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface IVistaPropuestaRepository {
 
-    public VistaPropuesta findById(Integer idPropuesta);
+    public List<VistaPropuesta> findById(Integer idPropuesta);
     public List<VistaPropuesta> findByCarrera(String carrera);
     public List<VistaPropuesta> findByEstadoValidacion(EstadoValidacion estadoValidacion, String carrera);
     public List<VistaPropuesta> findByEstadoAprobacion(EstadoAprobacion estadoAprobacion, String carrera);

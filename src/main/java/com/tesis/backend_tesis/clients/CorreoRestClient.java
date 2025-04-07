@@ -55,5 +55,15 @@ public interface CorreoRestClient {
             @RequestPart("archivo") MultipartFile archivo  // Archivo adjunto
     );
 
+    @PostMapping(value = "/correo/notificacionnegaciontema")
+    public ResponseEntity<String> notificacionNegacionTema(
+            @RequestParam("email") String toEmail,  // Correo del destinatario principal
+            @RequestParam("ccemails") List<String> ccEmails,  // Lista de correos CC
+            @RequestParam("estudiante") String estudiante,  // Información del estudiante
+            @RequestParam("tema") String tema,  // Tema del correo
+            @RequestParam("correodireccion") String correoDireccion,  // Dirección del correo (si es necesario)
+            @RequestParam("observaciones") String observaciones
+    );
+
 
 }

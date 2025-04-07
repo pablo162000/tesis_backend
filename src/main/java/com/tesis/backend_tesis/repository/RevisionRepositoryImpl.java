@@ -1,5 +1,6 @@
 package com.tesis.backend_tesis.repository;
 
+import com.tesis.backend_tesis.repository.modelo.Propuesta;
 import com.tesis.backend_tesis.repository.modelo.Revision;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -40,9 +41,24 @@ public class RevisionRepositoryImpl implements IRevisionRepository {
     }
 
     @Override
-    public Revision update(Revision revision) {
-        this.entityManager.merge(revision);
-        return revision;
+    public Boolean update(Revision revision) {
+        try {
+            // Intentamos encontrar la propuesta en la base de datos usando el id de la propuesta
+            Revision revision1 = this.entityManager.find(Revision.class, revision.getId());
+
+            if (revision1 != null) {
+                // Si la propuesta existe, solo guardamos los cambios sin necesidad de modificar el estado de validación nuevamente
+                this.entityManager.merge(revision1); // Guarda los cambios en la base de datos
+
+                return true; // Indicamos que la actualización fue exitosa
+            } else {
+                return false; // No se encontró la propuesta con el ID dado
+            }
+        } catch (Exception e) {
+            // En caso de error, se captura y se imprime la excepción
+            e.printStackTrace(); // En producción, reemplazar con un logger
+            return false; // Indicamos que hubo un error en la actualización
+        }
     }
 
     @Override

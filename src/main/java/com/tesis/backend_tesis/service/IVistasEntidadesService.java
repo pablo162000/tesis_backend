@@ -49,4 +49,8 @@ public interface IVistasEntidadesService {
     public List<VistaUsuarioRol> buscarUsuarioRolPorNombres(String nombres);
     public List<VistaUsuarioRol> buscarTodosUsuarioRol();
 
+    //------------------Propuesta--------------------------------------
+
+    public List<VistaPropuesta> buscarPropuestaPorIdPropuesta (Integer idPropuesta);
+
 }

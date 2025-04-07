@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Map;
+
 @FeignClient(name = "motorRestClient", url = "http://localhost:5041/API/tesis")
 public interface MotorRestClient {
 
@@ -19,6 +21,15 @@ public interface MotorRestClient {
             @RequestParam("idDireccion") Integer idDireccion,
             @RequestParam("idSecretaria") Integer idSecretaria
     );
+
+
+    @PostMapping("/process/tasks/complete")
+    ResponseEntity<String> completarTarea(
+            @RequestParam("taskId") String taskId,
+            @RequestBody Map<String, Object> variables);
+
+
+
 
 
 

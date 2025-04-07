@@ -26,20 +26,25 @@ public class VistaPropuestaRepositoryImpl implements IVistaPropuestaRepository {
 
 
     @Override
-    public VistaPropuesta findById(Integer idPropuesta) {
+    public List<VistaPropuesta> findById(Integer idPropuesta) {
         try {
-            VistaPropuesta vistaPropuesta = this.entityManager.find(VistaPropuesta.class, idPropuesta);
+            TypedQuery<VistaPropuesta> query = this.entityManager.createQuery(
+                    "SELECT p FROM VistaPropuesta p WHERE p.id = :idPropuesta",
+                    VistaPropuesta.class
+            );
+            query.setParameter("idPropuesta", idPropuesta);
+            List<VistaPropuesta> vistaPropuestas = query.getResultList();
 
-            if (vistaPropuesta != null) {
-                logger.info("Propuesta encontrado en VistaPropuesta con IDPROPUESTA: {}", idPropuesta);
+            if (vistaPropuestas.isEmpty()) {
+                logger.debug("No se encontraron propuestas en VistaPropuesta con idPropuesta {}.", idPropuesta);
             } else {
-                logger.warn("No se encontró una Propuesta en VistaPropuesta con IDPROPUESTA: {}", idPropuesta);
+                logger.debug("Se encontraron {} propuestas en VistaPropuesta con idPropuesta {}.", vistaPropuestas.size(), idPropuesta);
             }
 
-            return vistaPropuesta;
+            return vistaPropuestas;
         } catch (Exception e) {
-            logger.error("Error al buscar la Propuesta en VistaPropuesta con IDPROPUESTA {}: {}", idPropuesta, e.getMessage(), e);
-            throw new RuntimeException("Error al buscar Propuesta en VistaPropuesta con IDPROPUESTA: " + idPropuesta, e);
+            logger.error("Error al buscar propuestas en VistaPropuesta con idPropuesta: {}", e.getMessage(), e);
+            return Collections.emptyList();
         }
     }
 

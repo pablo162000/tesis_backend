@@ -7,9 +7,9 @@ import com.tesis.backend_tesis.repository.IRevisionRepository;
 import com.tesis.backend_tesis.repository.modelo.*;
 import com.tesis.backend_tesis.service.dto.DocenteDTO;
 import com.tesis.backend_tesis.service.dto.EstudianteDTO;
+import com.tesis.backend_tesis.service.dto.UsuarioDTO;
 import com.tesis.backend_tesis.service.dto.utils.Converter;
 import com.tesis.backend_tesis.utilitarios.Validaciones;
-import jakarta.persistence.EntityNotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +59,14 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
     @Autowired
     private MotorRestClient motorRestClient;
+
+    @Autowired
+    private IUsuarioService usuarioService;
+
+
+
+    @Autowired
+    private ICarreraService carreraService;
 
 
 
@@ -173,25 +181,46 @@ public class PropuestaServiceImpl implements IPropuestaService{
                 }
 
 
-                if (categoria.equals("Unimodal")) {
+                if (categoria.equals("unimodal")) {
 
-                    if (estudiantePrimero != null && !puedeEnviarPropuestasTipoCategoria(estudiantePrimero.getId(), "Proyecto de Investigación", "Unimodal")) {
+
+                    if (estudiantePrimero!=null && estudianteSegundo!=null && estudianteTercero != null){
+
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                "El primer estudiante tiene propuestas vigentes en Proyecto de Investigación categoria Unimodal.");
+                                "Para la Unimodal solo es de 2 estudiantes de la misma carrera.");
 
                     }
 
-                    if (estudianteSegundo != null && !puedeEnviarPropuestasTipoCategoria(estudianteSegundo.getId(), "Proyecto de Investigación", "Unimodal")) {
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                "El segundo estudiante tiene propuestas vigentes en Proyecto de Investigación categoria Unimodal.");
+                    if (estudiantePrimero!=null && estudianteSegundo!=null){
+
+
+                        Set<Integer> carrerasUnicas = new HashSet<>(
+                                Arrays.asList(
+                                        estudiantePrimero.getIdCarrera(),
+                                        estudianteSegundo.getIdCarrera()));
+
+                        if (carrerasUnicas.size() != 1){
+                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                    "Para la Unimodal solo es de 2 estudiantes de la misma carrera.");
+
+                        }
 
                     }
 
-                    if (estudianteTercero != null && !puedeEnviarPropuestasTipoCategoria(estudianteTercero.getId(), "Proyecto de Investigación", "Unimodal")) {
+
+                    if (estudiantePrimero != null && !puedeEnviarPropuestasTipoCategoria(estudiantePrimero.getId(), "Proyecto de Investigación", "unimodal")) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                "El tercer estudiante tiene propuestas vigentes en Proyecto de Investigación categoria Unimodal.");
+                                "El primer estudiante tiene propuestas vigentes en Proyecto de Investigación categoria unimodal.");
 
                     }
+
+                    if (estudianteSegundo != null && !puedeEnviarPropuestasTipoCategoria(estudianteSegundo.getId(), "Proyecto de Investigación", "unimodal")) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                "El segundo estudiante tiene propuestas vigentes en Proyecto de Investigación categoria unimodal.");
+
+                    }
+
+
 
 
                 } else if (categoria.equals("multimodal")) {
@@ -203,7 +232,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
                                 "Se necesitan 3 estudiantes.");
                     }
 
-                    if (!diferentesCarreras(estudiantePrimero.getId(), estudianteSegundo.getId(), estudianteTercero.getId())) {
+                    if (!diferentesCarreras(estudiantePrimero.getIdCarrera(), estudianteSegundo.getIdCarrera(), estudianteTercero.getIdCarrera())) {
 
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                 "Dificultad de carreras 2 estudinates deben pertener a la misma carrera.");
@@ -243,23 +272,23 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
                 }
 
-                if (categoria.equals("Unimodal")) {
+                if (categoria.equals("unimodal")) {
 
-                    if (estudiantePrimero != null && !puedeEnviarPropuestasTipoCategoria(estudiantePrimero.getId(), "Proyecto de Integración", "Unimodal")) {
+                    if (estudiantePrimero != null && !puedeEnviarPropuestasTipoCategoria(estudiantePrimero.getId(), "Proyecto de Integración", "unimodal")) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                "El primer estudiante tiene propuestas vigentes en Proyecto de Integración categoria Unimodal.");
+                                "El primer estudiante tiene propuestas vigentes en Proyecto de Integración categoria unimodal.");
 
                     }
 
-                    if (estudianteSegundo != null && !puedeEnviarPropuestasTipoCategoria(estudianteSegundo.getId(), "Proyecto de Integración", "Unimodal")) {
+                    if (estudianteSegundo != null && !puedeEnviarPropuestasTipoCategoria(estudianteSegundo.getId(), "Proyecto de Integración", "unimodal")) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                "El segundo estudiante tiene propuestas vigentes en Proyecto de Integración categoria Unimodal.");
+                                "El segundo estudiante tiene propuestas vigentes en Proyecto de Integración categoria unimodal.");
 
                     }
 
-                    if (estudianteTercero != null && !puedeEnviarPropuestasTipoCategoria(estudianteTercero.getId(), "Proyecto de Integración", "Unimodal")) {
+                    if (estudianteTercero != null && !puedeEnviarPropuestasTipoCategoria(estudianteTercero.getId(), "Proyecto de Integración", "unimodal")) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                "El tercer estudiante tiene propuestas vigentes en Proyecto de Integración categoria Unimodal.");
+                                "El tercer estudiante tiene propuestas vigentes en Proyecto de Integración categoria unimodal.");
 
                     }
 
@@ -351,16 +380,8 @@ public class PropuestaServiceImpl implements IPropuestaService{
                 .numeroRevision(1)
                 .build();
 
-        this.revisionRepository.insert(revision);
+        Revision revisionGuardada = this.revisionRepository.insert(revision);
 
-
-        Revision revision2 = Revision.builder()
-                .archivoSubidoEstudiantes(ar)
-                .propuesta(guardada)
-                .numeroRevision(2)
-                .build();
-
-        this.revisionRepository.insert(revision2);
 
 
         List<String> ccEmails = new ArrayList<>();
@@ -383,6 +404,13 @@ public class PropuestaServiceImpl implements IPropuestaService{
         String nombres = this.validaciones.obtenerNombresEstudiantes(posiblesNombres);
 
         try {
+
+            if (revisionGuardada==null || guardada==null){
+
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar propuesta y revision.");
+            }
+
+
             this.correoRestClient.enviareachivo(primerCorreo, ccEmails, nombres, tema, "fing.direccion.computacion@uce.edu.ec", archivo);
             logger.info("Correo enviado exitosamente a {}", primerCorreo);
         } catch (Exception e) {
@@ -398,7 +426,11 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
     @Override
     public Propuesta buscar(Integer id) {
+
         return null;
+
+
+
     }
 
     @Override
@@ -460,12 +492,263 @@ public class PropuestaServiceImpl implements IPropuestaService{
     }
 
     @Override
+    public Boolean puedeEnviarPropuestasUnimodal(Integer idEstudiante1, Integer idEstudiante2, String tipo) {
+        List<Propuesta> propuestasValidas1 = propuestaRepository.findPropuestasByCompleta(idEstudiante1, tipo, "unimodal");
+        List<Propuesta> propuestasValidas2 = propuestaRepository.findPropuestasByCompleta(idEstudiante2, tipo, "unimodal");
+        if (propuestasValidas1.isEmpty() && propuestasValidas2.isEmpty()){
+            return true;
+        }
+
+        if (propuestasValidas1.size() > 1 || propuestasValidas2.size() > 1) {
+            return false;
+        }
+
+        Propuesta propuestaExistente = null;
+
+        if (propuestasValidas1.size() == 1) {
+            propuestaExistente = propuestasValidas1.get(0);
+        } else if (propuestasValidas2.size() == 1) {
+            propuestaExistente = propuestasValidas2.get(0);
+        }
+
+        if (propuestaExistente != null) {
+            // Obtener los estudiantes de la propuesta existente
+            Integer e1 = propuestaExistente.getEstudiante1().getId();
+            Integer e2 = propuestaExistente.getEstudiante2().getId();
+            Integer e3 = propuestaExistente.getEstudiante3().getId();
+
+            // Verificar si los tres estudiantes actuales coinciden con la propuesta registrada (en cualquier orden)
+            List<Integer> estudiantesRegistrados = Arrays.asList(e1, e2, e3);
+            List<Integer> estudiantesIngresados = Arrays.asList(idEstudiante1, idEstudiante2);
+
+            if (new HashSet<>(estudiantesRegistrados).equals(new HashSet<>(estudiantesIngresados))) {
+                return true;  // Se permite enviar porque es la misma propuesta
+            }
+        }
+
+        return false; // No se puede enviar una nueva propuesta
+    }
+
+    @Override
     public Boolean diferentesCarreras(Integer idCarreraEstudiante1, Integer idCarreraEstudiante2, Integer idCarreraEstudiante3) {
 
         Set<Integer> carrerasUnicas = new HashSet<>(Arrays.asList(idCarreraEstudiante1, idCarreraEstudiante2, idCarreraEstudiante3));
 
         // Solo es válido si hay exactamente 2 carreras distintas (1 diferente y 2 iguales)
         return carrerasUnicas.size() == 2;
+    }
+
+    @Override
+    @Transactional
+    public Boolean validarPropuesta(Integer idPropuesta, Boolean estadoValidacion, String obsercvaciones, String taskID) {
+        if (estadoValidacion == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La respuesta de validación no puede ser nula.");
+        }
+
+        // Obtener la propuesta por ID
+        Propuesta propuestaExistente = this.propuestaRepository.buscarPorId(idPropuesta);
+
+
+        VistaCarrera carrera = this.vistasEntidadesService.buscarCarreraPorNombreCarrera(propuestaExistente.getCarrera());
+
+
+        if (carrera == null) {
+
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El carrera no existe");
+
+        }
+
+        if (propuestaExistente == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró la propuesta con el ID: " + idPropuesta);
+        }
+
+        //Integer idDirector = this.carreraService.buscarCarreraPorNombre(propuestaExistente.getCarrera()).getIdDirector();
+
+
+        // Actualizar el estado de validación
+        propuestaExistente.setEstadoValidacion(estadoValidacion ? EstadoValidacion.VALIDADO : EstadoValidacion.NO_VALIDADO);
+        propuestaExistente.setObservaciones(obsercvaciones);
+
+        Boolean seGuardo= false;
+        seGuardo= this.propuestaRepository.update(propuestaExistente);
+
+        if (propuestaExistente.getEstadoValidacion().equals(EstadoValidacion.NO_VALIDADO)){
+
+            Integer idPrimerEstudiante = propuestaExistente.getEstudiante1().getUsuario().getId();
+
+            UsuarioDTO primerEstudianteDTO =  this.usuarioService.buscarPorId(idPrimerEstudiante);
+
+            String primerEstudiante =
+                    primerEstudianteDTO.getPrimerApellido()+ " "+ primerEstudianteDTO.getPrimerNombre();
+
+            UsuarioDTO segundoEstudianteDTO=null;
+            String segundoEstudiante = null;
+            String segundoCorreo = null;
+            if (propuestaExistente.getEstudiante2()!=null) {
+                segundoEstudianteDTO=   this.usuarioService.buscarPorId(propuestaExistente.getEstudiante2().getUsuario().getId());
+                segundoEstudiante =
+                        segundoEstudianteDTO.getPrimerApellido()+ " "+ segundoEstudianteDTO.getPrimerNombre();
+
+                segundoCorreo = segundoEstudianteDTO.getCorreo();
+
+            }
+
+
+            UsuarioDTO tercerEstudianteDTO = null;
+            String tercerEstudiante = null;
+            String tercerCorreo = null;
+            if (propuestaExistente.getEstudiante3()!=null) {
+
+                tercerEstudianteDTO =
+                        this.usuarioService.buscarPorId(propuestaExistente.getEstudiante3().getUsuario().getId());
+
+                tercerEstudiante =
+                        tercerEstudianteDTO.getPrimerApellido()+ " "+ tercerEstudianteDTO.getPrimerNombre();
+
+                tercerCorreo = tercerEstudianteDTO.getCorreo();
+            }
+
+
+            List<String> posiblesNombres = new ArrayList<String>();
+
+            List<String> ccEmails = new ArrayList<>();
+            Stream.of(segundoCorreo, tercerCorreo)
+                    .filter(Objects::nonNull) // Filtra solo los que no son null
+                    .forEach(ccEmails::add);
+
+
+            posiblesNombres.add(primerEstudiante);
+            posiblesNombres.add(segundoEstudiante);
+            posiblesNombres.add(tercerEstudiante);
+
+            String nombres = this.validaciones.obtenerNombresEstudiantes(posiblesNombres);
+
+            System.out.println(nombres);
+            System.out.println(ccEmails);
+
+
+            try {
+                if(!seGuardo){
+                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar la validacion.");
+                }
+
+                this.correoRestClient.notificacionNegacionTema(
+                        primerEstudianteDTO.getCorreo(),
+                        ccEmails,
+                        nombres,
+                        propuestaExistente.getTema()
+                        ,carrera.getCorreoDireccion()
+                        , propuestaExistente.getObservaciones()
+                );
+            } catch (Exception e) {
+
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo.");
+            }
+
+        }
+
+        // ✅ Hasta aquí sabemos que todo salió bien, así que completamos la tarea BPMN
+        try {
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("validacionAprobada", estadoValidacion);
+
+            this.motorRestClient.completarTarea(taskID, variables);
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN.");
+        }
+
+        // Guardar los cambios
+        return seGuardo;
+
+    }
+
+    @Override
+    public Boolean asignarRevisor(Integer idPropuesta, Integer idDocente, String tipoRevisor, String taskID) {
+        // Validar entrada
+        if (idPropuesta == null || idDocente == null || tipoRevisor == null || tipoRevisor.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Los parámetros no pueden ser nulos o vacíos.");
+        }
+
+        // Obtener la propuesta por ID
+        //Propuesta propuestaExistente = this.propuestaRepository.buscarPorId(idPropuesta);
+
+        List<VistaPropuesta> vistaPropuestaExistente = this.vistasEntidadesService.buscarPropuestaPorIdPropuesta(idPropuesta);
+        if (vistaPropuestaExistente.get(0) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró una propuesta con el ID: " + idPropuesta);
+        }
+
+        if (vistaPropuestaExistente.get(0).getEstadoValidacion().equals(EstadoValidacion.NO_VALIDADO) ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La propuesta con el ID: " + idPropuesta + " no está validada.");
+        }else if (vistaPropuestaExistente.get(0).getEstadoValidacion().equals(EstadoValidacion.NO_REVISADO)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La propuesta con el ID: " + idPropuesta + " no está revisada.");
+
+        }
+
+        VistaDocente docenteExistente = this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente);
+
+        if (docenteExistente == null) {
+            // Si el docente es null (aunque Feign debería lanzarlo como excepción), lanzar una excepción HTTP Not Found
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró un docente con el ID: " + idDocente);
+        }
+
+        Revision revision = this.revisionRepository.findByIdPropuesta(vistaPropuestaExistente.get(0).getId()).getFirst();
+
+
+        if (revision == null) {
+
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró revision para la propuesta: " + idDocente);
+        }
+
+        // Validar que el docente no sea asignado como primer y segundo revisor a la vez
+        if (("primer".equals(tipoRevisor) && idDocente.equals(revision.getRevisor2())) ||
+                ("segundo".equals(tipoRevisor) && idDocente.equals(revision.getRevisor1()))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El mismo docente no puede ser asignado como primer y segundo revisor.");
+        }
+
+
+        // Asignar el docente según el tipo de revisor
+        boolean cambioRealizado = false;
+        if ("primer".equals(tipoRevisor) && !idDocente.equals(revision.getRevisor1())) {
+
+            revision.setRevisor1(this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente.getIdUsuario())));
+            cambioRealizado = true;
+        } else if ("segundo".equals(tipoRevisor) && !idDocente.equals(revision.getRevisor2())) {
+
+            revision.setRevisor2(this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente.getIdUsuario())));
+            cambioRealizado = true;
+        }
+
+        // Si hubo cambios, actualizar la base de datos
+        if (!cambioRealizado) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se realizaron cambios, ya estaba asignado.");
+        }
+
+
+        // Guarda el cambio
+        boolean actualizado = this.revisionRepository.update(revision);
+        if (!actualizado) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No se pudo guardar la revisión.");
+        }
+
+        // Verifica si ambos revisores están asignados
+
+        Revision revisionActualizada = this.revisionRepository.findByIdPropuesta(vistaPropuestaExistente.get(0).getId()).getFirst();
+
+        if (revisionActualizada != null && revisionActualizada.getRevisor1() != null && revisionActualizada.getRevisor2() != null) {
+            // Completa la tarea
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("idRevisor1", revisionActualizada.getRevisor1().getId());
+            variables.put("idRevisor2", revisionActualizada.getRevisor2().getId());
+
+            try {
+                this.motorRestClient.completarTarea(taskID, variables);
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN.");
+            }
+        }
+
+        return true;
     }
 
 

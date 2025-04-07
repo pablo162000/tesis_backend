@@ -15,6 +15,8 @@ public interface IUsuarioService {
 
     public Boolean recuperarContrasena (String password, String token);
 
+    public UsuarioDTO buscarPorId(Integer idUsuario);
+
     public void eliminarUsuariosNoVerificadosCarrera();
 
     public void eliminarUsuariosNoVerificados();
