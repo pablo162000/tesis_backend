@@ -19,7 +19,7 @@ target/
 *.iws
 *.iml
 *.ipr
-correo/src/main/resources/application.properties
+*.properties
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
