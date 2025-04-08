@@ -52,5 +52,14 @@ public interface IVistasEntidadesService {
     //------------------Propuesta--------------------------------------
 
     public List<VistaPropuesta> buscarPropuestaPorIdPropuesta (Integer idPropuesta);
-
+    public List<VistaPropuesta> buscarPropuestaPorCarrera(String carrera);
+    public List<VistaPropuesta> buscarPropuestaPorEstadoValidacion(Integer estadoValidacion, String carrera);
+    public List<VistaPropuesta> buscarPropuestaPorEstadoAprobacion(Integer estadoAprobacion, String carrera);
+    public List<VistaPropuesta> buscarPropuestaPorPeriodo(String periodo, String carrera);
+    public List<VistaPropuesta> buscarPropuestaPorTipo(String tipo, String carrera);
+    public List<VistaPropuesta> buscarPropuestaPorCategoria(String categoria, String carrera);
+    public List<VistaPropuesta> buscarPropuestaPorTipoCategoria(String tipo,String categoria, String carrera);
+    public List<VistaPropuesta> buscarPropuestaPorTema(String tema, String carrera);
+    public List<VistaPropuesta> buscarPropuestaPorTutor(Integer idUsuario, String facultad);
+    public List<VistaPropuesta> buscarPropuestaPorRevisor (Integer idUsuario, String facultad);
 }

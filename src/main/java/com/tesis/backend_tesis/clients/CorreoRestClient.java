@@ -66,4 +66,14 @@ public interface CorreoRestClient {
     );
 
 
+
+    @PostMapping(value = "/correo/notificacionenviopropuestav2", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> notificacionenviopropuestav2(
+            @RequestParam("email") String toEmail,  // Correo del destinatario principal
+            @RequestParam("ccemails") List<String> ccEmails,  // Lista de correos CC
+            @RequestParam("estudiante") String estudiante,  // Información del estudiante
+            @RequestParam("tema") String tema,  // Tema del correo
+            @RequestParam("correodireccion") String correoDireccion,  // Dirección del correo (si es necesario)
+            @RequestPart("archivo") MultipartFile archivo  // Archivo adjunto
+    );
 }

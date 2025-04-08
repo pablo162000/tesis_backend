@@ -136,7 +136,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
         if (segundoCorreo != null) {
             vistaEstudianteSegundo = this.vistasEntidadesService.buscarPorCorreoEstudainte(segundoCorreo);
             estudianteSegundo= this.estudianteService.buscarPorIdUsuario(vistaEstudianteSegundo.getIdUsuario());
-            nombresSegundoEstudiante = vistaEstudianteSegundo.getApellidos() + " "+ vistaEstudianteSegundo.getApellidos();
+            nombresSegundoEstudiante = vistaEstudianteSegundo.getApellidos() + " "+ vistaEstudianteSegundo.getNombres();
             if (vistaEstudianteSegundo == null || !vistaEstudianteSegundo.getActivo() || !vistaEstudianteSegundo.getCorreoValido()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El segundo estudiante con correo " + segundoCorreo + " no existe, no está activo o no tiene rol de estudiante.");
             }
@@ -150,7 +150,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
         if (tercerCorreo != null) {
             vistaEstudianteTercero = this.vistasEntidadesService.buscarPorCorreoEstudainte(tercerCorreo);
             estudianteTercero = this.estudianteService.buscarPorIdUsuario(vistaEstudianteTercero.getIdUsuario());
-            nombresTercerEstudiante = vistaEstudianteTercero.getApellidos() + " "+ vistaEstudianteTercero.getApellidos();
+            nombresTercerEstudiante = vistaEstudianteTercero.getApellidos() + " "+ vistaEstudianteTercero.getNombres();
             if (vistaEstudianteTercero == null || !vistaEstudianteTercero.getActivo() || !vistaEstudianteTercero.getCorreoValido()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El segundo estudiante con correo " + tercerCorreo + " no existe, no está activo o no tiene rol de estudiante.");
             }
@@ -392,7 +392,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
 
         String nombresPrimerEstudiante =
-                propuesta.getEstudiante1().getUsuario().getPrimerApellido()+ " "+ propuesta.getEstudiante1().getUsuario().getPrimerNombre();
+                vistaEstudiantePrimero.getApellidos() + " "+ vistaEstudiantePrimero.getNombres();
 
 
 
@@ -403,23 +403,29 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
         String nombres = this.validaciones.obtenerNombresEstudiantes(posiblesNombres);
 
+
         try {
+            if (revisionGuardada == null || guardada == null ||
+                    this.revisionRepository.findById(revisionGuardada.getId()) == null ||
+                    this.propuestaRepository.buscarPorId(guardada.getId()) == null) {
 
-            if (revisionGuardada==null || guardada==null){
-
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar propuesta y revision.");
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar propuesta y revisión.");
             }
 
+            String correoDireccion = this.vistasEntidadesService.buscarCarreraPorNombreCarrera(guardada.getCarrera()).getCorreoDireccion();
 
-            this.correoRestClient.enviareachivo(primerCorreo, ccEmails, nombres, tema, "fing.direccion.computacion@uce.edu.ec", archivo);
+            this.motorRestClient.iniciarProceso(guardada.getId());
+            logger.info("Se conectó correctamente con el motor de procesos. ID propuesta: {}", guardada.getId());
+
+            this.correoRestClient.notificacionenviopropuestav2(primerCorreo, ccEmails, nombres, tema,
+                    correoDireccion, archivo);
             logger.info("Correo enviado exitosamente a {}", primerCorreo);
+
         } catch (Exception e) {
-            logger.error("Error al enviar correo: {}", e.getMessage(), e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo.");
+            logger.error("Error en el proceso: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al procesar propuesta.");
         }
 
-        this.motorRestClient.iniciarProceso(guardada.getId());// inicie y termine el estudiante-> idprocesso
-        //
 
 
         // 8. Respuesta exitosa
@@ -574,6 +580,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
         propuestaExistente.setObservaciones(obsercvaciones);
 
         Boolean seGuardo= false;
+        seGuardo= this.propuestaRepository.update(propuestaExistente);
 
         if (propuestaExistente.getEstadoValidacion().equals(EstadoValidacion.NO_VALIDADO)){
 
@@ -722,6 +729,9 @@ public class PropuestaServiceImpl implements IPropuestaService{
         if (!cambioRealizado) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se realizaron cambios, ya estaba asignado.");
         }
+
+
+
 
         return this.revisionRepository.update(revision);
     }

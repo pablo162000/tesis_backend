@@ -1,5 +1,6 @@
 package com.tesis.backend_tesis.repository;
 
+import com.tesis.backend_tesis.repository.modelo.Estudiante;
 import com.tesis.backend_tesis.repository.modelo.Propuesta;
 import com.tesis.backend_tesis.repository.modelo.Revision;
 import jakarta.persistence.EntityManager;
@@ -37,6 +38,24 @@ public class RevisionRepositoryImpl implements IRevisionRepository {
         } catch (Exception e) {
             logger.error("Error al insertar la revision: {}", e.getMessage(), e);
             return null;
+        }
+    }
+
+    @Override
+    public Revision findById(Integer id) {
+        try {
+            Revision revision = this.entityManager.find(Revision.class, id);
+
+            if (revision != null) {
+                logger.info("revision encontrado con ID: {}", id);
+            } else {
+                logger.warn("No se encontró un revision con ID: {}", id);
+            }
+
+            return revision;
+        } catch (Exception e) {
+            logger.error("Error al buscar el revision con ID {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Error al buscar el revision con ID: " + id, e);
         }
     }
 

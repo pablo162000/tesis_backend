@@ -25,7 +25,7 @@ public class MailRestController {
     private MailSenderService mailSenderService;
 
     @Autowired
-    private MailGunService mailService;
+    private MailGunService mailGunServices;
 
 
     @PostMapping("/registrov2")
@@ -40,7 +40,7 @@ public class MailRestController {
         String enlacePrivacidad = "http://miapp.com/privacidad";
 
         try {
-            this.mailService.sendEmail(toEmail, usuario, enlaceCuenta,
+            this.mailGunServices.sendEmail(toEmail, usuario, enlaceCuenta,
                     correoDireccion,
                     tipoUsuario);
             return ResponseEntity.ok("Correo enviado exitosamente a " + toEmail);
@@ -55,7 +55,7 @@ public class MailRestController {
                                      @RequestParam String nombreUsuario,
                                      @RequestParam String enlaceRecuperacion,
                                      @RequestParam String correoDireccion) {
-        this.mailService.sendRecoverEmail(correoUsuario,
+        this.mailGunServices.sendRecoverEmail(correoUsuario,
                 nombreUsuario,
                 enlaceRecuperacion,
                 correoDireccion);
@@ -63,6 +63,83 @@ public class MailRestController {
         return "envio correcto de recuperacion";
     }
 
+    @PostMapping(value="/notificacionenviopropuestav2", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> sendNotificacionEnvioPropuestaMailgun(@RequestParam("email") String toEmail,
+                                                      @RequestParam("ccemails") List<String> ccEmails,
+                                                      @RequestParam("estudiante")String estudiante,
+                                                      @RequestParam("tema") String tema,
+                                                      @RequestParam("correodireccion") String correoDireccion,
+                                                      @RequestPart("archivo")MultipartFile  archivo)
+            throws UnirestException, IOException {
+
+        InputStream fileInputStream = archivo.getInputStream();
+        String fileName = archivo.getOriginalFilename();
+
+        try {
+
+
+            this.mailGunServices.sendNotificacionEnvioPropuestaMailgun(
+                    toEmail,
+                    ccEmails,
+                    estudiante,
+                    tema,
+                    correoDireccion,
+                    fileInputStream,
+                    fileName);
+
+            return ResponseEntity.ok("Correo enviado exitosamente a " + toEmail);
+        } catch (UnirestException e) {
+            return ResponseEntity.status(500).body("Error al enviar el correo: " + e.getMessage());
+        }
+
+    }
+
+    @PostMapping(value="/notificacionasignacionrevisorv2")
+    public ResponseEntity<String> sendEmailAsignacionRevisor(
+                                            @RequestParam("toemails") List<String> toEmails,
+                                            @RequestParam("ccemails") List<String> ccEmails,
+                                            @RequestParam("nombreRevisor")String nombreRevisor,
+                                            @RequestParam("nombreEstudiantes")String nombreEstudiantes,
+                                            @RequestParam("linkRevision")String linkRevision,
+                                            @RequestParam("tema")String temaPropuesta,
+                                            @RequestParam("correoDireccion")String correoDireccion,
+                                            @RequestParam("fechaEntrega")String fechaEntrega,
+                                            @RequestPart("rubrica") MultipartFile rubrica,
+                                            @RequestPart("archivo") MultipartFile archivo ,
+                                            @RequestPart("oficio") MultipartFile oficio ) throws UnirestException, IOException  {
+
+
+        InputStream fileInputStreamRubrica = rubrica.getInputStream();
+        String fileNameRubrica = rubrica.getOriginalFilename();
+
+        InputStream fileInputStreamArchivo = archivo.getInputStream();
+        String fileNameArchivo = archivo.getOriginalFilename();
+
+        InputStream fileInputStreamOficio = oficio.getInputStream();
+        String fileNameOficio = oficio.getOriginalFilename();
+
+
+        try {
+            this.mailGunServices.sendEmailAsignacionRevisor(toEmails,
+                    ccEmails,
+                    nombreRevisor,
+                    nombreEstudiantes,
+                    linkRevision,
+                    temaPropuesta,
+                    correoDireccion,
+                    fechaEntrega,
+                    fileInputStreamRubrica,
+                    fileNameRubrica,
+                    fileInputStreamArchivo,
+                    fileNameArchivo,
+                    fileInputStreamOficio,
+                    fileNameOficio);
+            return ResponseEntity.ok("Correo enviado exitosamente a " + toEmails);
+        } catch (UnirestException e) {
+            return ResponseEntity.status(500).body("Error al enviar el correo: " + e.getMessage());
+        }
+
+    }
 
 
 

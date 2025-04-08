@@ -532,4 +532,211 @@ public class VistasEntidadesServiceImpl implements IVistasEntidadesService {
         return vistaPropuestas;
     }
 
+    @Override
+    public List<VistaPropuesta> buscarPropuestaPorCarrera(String carrera) {
+        if (carrera == null || carrera.isEmpty()) {
+            logger.warn("La carrea no puede ser nulo o vacío.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La carrea no puede ser nulo o vacío.");
+        }
+
+        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findByCarrera(carrera);
+
+        if (vistaPropuestas.isEmpty()) {
+            logger.warn("No se encontraron registros de VistaPropuesta con carrera '{}'.", carrera);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron registros con carrera proporcionados.");
+        }
+
+        logger.info("Se encontraron {} registros de VistaPropuesta con carrera '{}'.", vistaPropuestas.size(), carrera);
+        return vistaPropuestas;
+    }
+
+    @Override
+    public List<VistaPropuesta> buscarPropuestaPorEstadoValidacion(Integer estadoValidacion, String carrera) {
+        if (estadoValidacion < 0  || estadoValidacion >3 || carrera == null || carrera.isEmpty()) {
+            logger.warn("La carrea no puede ser nulo o vacío y el estado de validacion es 0, 1 o 2.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La carrea no puede ser nulo o vacío y el estado de validacion es 0, 1 o 2.");
+        }
+        EstadoValidacion validacion = null;
+
+        if(estadoValidacion == 0){
+            validacion = EstadoValidacion.NO_VALIDADO;
+        }
+        if(estadoValidacion == 1){
+            validacion = EstadoValidacion.NO_REVISADO;
+        }
+
+        if(estadoValidacion == 2){
+            validacion = EstadoValidacion.VALIDADO;
+        }
+
+        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findByEstadoValidacion(validacion,carrera);
+
+        if (vistaPropuestas.isEmpty()) {
+            logger.warn("No se encontraron registros de VistaPropuesta con carrera {} y el estado de validacion '{}'.", carrera, validacion);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron registros con carrera y estado de validacion proporcionados.");
+        }
+
+        logger.info("Se encontraron {} registros de VistaPropuesta con carrera '{}' y estado validacion {} .", vistaPropuestas.size(), carrera, validacion);
+        return vistaPropuestas;
+    }
+
+    @Override
+    public List<VistaPropuesta> buscarPropuestaPorEstadoAprobacion(Integer estadoAprobacion, String carrera) {
+        if (estadoAprobacion < 0  || estadoAprobacion >3 || carrera == null || carrera.isEmpty()) {
+            logger.warn("La carrea no puede ser nulo o vacío y el estado de validacion es 0, 1 o 2.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La carrea no puede ser nulo o vacío y el estado de aprobacion es 0, 1 o 2.");
+        }
+        EstadoAprobacion aprobacion = null;
+
+        if(estadoAprobacion == 0){
+            aprobacion = EstadoAprobacion.NO_APROBADO;
+        }
+        if(estadoAprobacion == 1){
+            aprobacion = EstadoAprobacion.EN_REVISON;
+        }
+
+        if(estadoAprobacion == 2){
+            aprobacion = EstadoAprobacion.APROBADO;
+        }
+
+        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findByEstadoAprobacion(aprobacion,carrera);
+
+        if (vistaPropuestas.isEmpty()) {
+            logger.warn("No se encontraron registros de VistaPropuesta con carrera {} y estado de aprobación'{}'.", carrera, aprobacion);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron registros con carrera y estado de aprobación proporcionados.");
+        }
+
+        logger.info("Se encontraron {} registros de VistaPropuesta con carrera '{}' y estado aprobacion {} .", vistaPropuestas.size(), carrera, aprobacion);
+        return vistaPropuestas;
+    }
+
+    @Override
+    public List<VistaPropuesta> buscarPropuestaPorPeriodo(String periodo, String carrera) {
+        if (periodo ==null || periodo.isEmpty()|| carrera == null || carrera.isEmpty()) {
+            logger.warn("La carrea o periodo no puede ser nulo o vacío.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La carrea o periodo no puede ser nulo o vacío.");
+        }
+
+        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findByPeriodo(periodo,carrera);
+
+        if (vistaPropuestas.isEmpty()) {
+            logger.warn("No se encontraron registros de VistaPropuesta con carrera {} y periodo'{}'.", carrera, periodo);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron registros con carrera y periodo proporcionados.");
+        }
+
+        logger.info("Se encontraron {} registros de VistaPropuesta con carrera '{}' y periodo {} .", vistaPropuestas.size(), carrera, periodo);
+        return vistaPropuestas;
+    }
+
+    @Override
+    public List<VistaPropuesta> buscarPropuestaPorTipo(String tipo, String carrera) {
+        if (tipo ==null || tipo.isEmpty()|| carrera == null || carrera.isEmpty()) {
+            logger.warn("La carrea o tipo no puede ser nulo o vacío.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La carrea o tipo no puede ser nulo o vacío.");
+        }
+
+        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findByTipo(tipo,carrera);
+
+        if (vistaPropuestas.isEmpty()) {
+            logger.warn("No se encontraron registros de VistaPropuesta con carrera {} y tipo'{}'.", carrera, tipo);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron registros con carrera y tipo proporcionados.");
+        }
+
+        logger.info("Se encontraron {} registros de VistaPropuesta con carrera '{}' y tipo {} .", vistaPropuestas.size(), carrera, tipo);
+        return vistaPropuestas;
+    }
+
+    @Override
+    public List<VistaPropuesta> buscarPropuestaPorCategoria(String categoria, String carrera) {
+        if (categoria ==null || categoria.isEmpty()|| carrera == null || carrera.isEmpty()) {
+            logger.warn("La carrea o categoria no puede ser nulo o vacío.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La carrea o categoria no puede ser nulo o vacío.");
+        }
+
+        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findByCategoria(categoria,carrera);
+
+        if (vistaPropuestas.isEmpty()) {
+            logger.warn("No se encontraron registros de VistaPropuesta con carrera {} y categoria'{}'.", carrera, categoria);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron registros con carrera y categoria proporcionados.");
+        }
+
+        logger.info("Se encontraron {} registros de VistaPropuesta con carrera '{}' y categoria {} .", vistaPropuestas.size(), carrera, categoria);
+        return vistaPropuestas;
+    }
+
+    @Override
+    public List<VistaPropuesta> buscarPropuestaPorTipoCategoria(String tipo, String categoria, String carrera) {
+        if (tipo ==null || tipo.isEmpty() || categoria ==null || categoria.isEmpty()|| carrera == null || carrera.isEmpty()) {
+            logger.warn("La carrea, tipo o categoria no puede ser nulo o vacío.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La carrea, tipo o categoria no puede ser nulo o vacío.");
+        }
+
+        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findByCategoria(categoria,carrera);
+
+        if (vistaPropuestas.isEmpty()) {
+            logger.warn("No se encontraron registros de VistaPropuesta con carrera {}, tipo {} y categoria'{}'.", carrera, tipo,categoria);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron registros con carrera, tipo y categoria proporcionados.");
+        }
+
+        logger.info("Se encontraron {} registros de VistaPropuesta con carrera '{}'. tipo {} y categoria {} .", vistaPropuestas.size(), carrera, tipo,categoria);
+        return vistaPropuestas;
+    }
+
+    @Override
+    public List<VistaPropuesta> buscarPropuestaPorTema(String tema, String carrera) {
+        if (tema ==null || tema.isEmpty()|| carrera == null || carrera.isEmpty()) {
+            logger.warn("La carrea o tema no puede ser nulo o vacío.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La carrea o tema no puede ser nulo o vacío.");
+        }
+
+        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findByTema(tema,carrera);
+
+        if (vistaPropuestas.isEmpty()) {
+            logger.warn("No se encontraron registros de VistaPropuesta con carrera {} y tema'{}'.", carrera, tema);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron registros con carrera y categoria proporcionados.");
+        }
+
+        logger.info("Se encontraron {} registros de VistaPropuesta con carrera '{}' y tema {} .", vistaPropuestas.size(), carrera, tema);
+        return vistaPropuestas;
+    }
+
+    @Override
+    public List<VistaPropuesta> buscarPropuestaPorTutor(Integer idUsuario, String facultad) {
+        if (idUsuario == null || idUsuario <= 0 || facultad == null || facultad.isEmpty()) {
+            logger.warn("La facultad no puede ser nulo o vacío y el idUsuario para tutor no puede ser nullo o negativo.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "La facultad no puede ser nulo o vacío y el idUsuario para tutor no puede ser nullo o negativo.");
+        }
+
+        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findByTutor(idUsuario,facultad);
+
+        if (vistaPropuestas.isEmpty()) {
+            logger.warn("No se encontraron registros de VistaPropuesta con facultad {} e idUsuario para tutor'{}'.", facultad, idUsuario);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron registros con carrera e idTutor proporcionados.");
+        }
+
+        logger.info("Se encontraron {} registros de VistaPropuesta con facultad '{}' e idUsuario para tutor{} .", vistaPropuestas.size(), facultad, idUsuario);
+        return vistaPropuestas;
+    }
+
+    @Override
+    public List<VistaPropuesta> buscarPropuestaPorRevisor(Integer idUsuario, String facultad) {
+        if (idUsuario == null || idUsuario <= 0 || facultad == null || facultad.isEmpty()) {
+            logger.warn("La facultad no puede ser nulo o vacío y el idUsuario para revisor no puede ser nullo o negativo.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "La facultad no puede ser nulo o vacío y el idUsuario para revisor no puede ser nullo o negativo.");
+        }
+
+        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findByTutor(idUsuario,facultad);
+
+        if (vistaPropuestas.isEmpty()) {
+            logger.warn("No se encontraron registros de VistaPropuesta con facultad {} e idUsuario para revisor'{}'.", facultad, idUsuario);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "No se encontraron registros con carrera e idUsuario para revisor proporcionados.");
+        }
+
+        logger.info("Se encontraron {} registros de VistaPropuesta con facultad '{}' e idUsuario para revisor {} .", vistaPropuestas.size(), facultad, idUsuario);
+        return vistaPropuestas;
+    }
+
 }

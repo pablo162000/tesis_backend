@@ -5,8 +5,6 @@ import com.tesis.backend_tesis.service.IVistasEntidadesService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -149,6 +147,72 @@ public class VistaRestFullController {
     @GetMapping("/usuariosRoles")
     public List<VistaUsuarioRol> buscarTodosUsariosRoles() {
         return this.vistasEntidadesService.buscarTodosUsuarioRol();
+    }
+
+
+    @GetMapping("propuesta/{idPropuesta}")
+    public VistaPropuesta buscarPropuestaPorIdPropuesta(@PathVariable Integer idPropuesta) {
+        return this.vistasEntidadesService.buscarPropuestaPorIdPropuesta(idPropuesta).getFirst();
+    }
+
+    @GetMapping("propuesta/por-carrera")
+    public List<VistaPropuesta> buscarPropuestaPorCarrera(@RequestParam ("carrera")  String carrera ) {
+        return this.vistasEntidadesService.buscarPropuestaPorCarrera(carrera);
+    }
+
+    @GetMapping("propuesta/por-validacion")
+    public List<VistaPropuesta> buscarPropuestaPorEstadoValidacion(@RequestParam("validacion") Integer validacion,
+                                                                   @RequestParam("carrera") String carrera ) {
+        return this.vistasEntidadesService.buscarPropuestaPorEstadoValidacion(validacion, carrera);
+    }
+
+    @GetMapping("propuesta/por-aprobacion")
+    public List<VistaPropuesta> buscarPropuestaPorEstadoAprobacion(@RequestParam("aprobacion") Integer aprobacion,
+                                                                   @RequestParam("carrera") String carrera ) {
+        return this.vistasEntidadesService.buscarPropuestaPorEstadoValidacion(aprobacion, carrera);
+    }
+
+    @GetMapping("propuesta/por-periodo")
+    public List<VistaPropuesta> buscarPropuestaPorPeriodo(@RequestParam("periodo") String periodo,
+                                                          @RequestParam("carrera") String carrera ) {
+        return this.vistasEntidadesService.buscarPropuestaPorPeriodo(periodo, carrera);
+    }
+
+    @GetMapping("propuesta/por-tipo")
+    public List<VistaPropuesta> buscarPropuestaPorTipo(@RequestParam("tipo") String tipo,
+                                                       @RequestParam("carrera") String carrera ) {
+        return this.vistasEntidadesService.buscarPropuestaPorTipo(tipo, carrera);
+    }
+
+    @GetMapping("propuesta/por-categoria")
+    public List<VistaPropuesta> buscarPropuestaPorCategoria(@RequestParam("categoria") String categoria,
+                                                            @RequestParam("carrera") String carrera ) {
+        return this.vistasEntidadesService.buscarPropuestaPorCategoria(categoria, carrera);
+    }
+
+    @GetMapping("propuesta/por-tipo-categoria")
+    public List<VistaPropuesta> buscarPropuestaPorCategoria(@RequestParam("tipo") String tipo,
+                                                            @RequestParam("categoria") String categoria,
+                                                            @RequestParam("carrera") String carrera ) {
+        return this.vistasEntidadesService.buscarPropuestaPorTipoCategoria(tipo,categoria, carrera);
+    }
+
+    @GetMapping("propuesta/por-tema")
+    public List<VistaPropuesta> buscarPropuestaPorTema(@RequestParam("tema") String tema,
+                                                       @RequestParam("carrera") String carrera ) {
+        return this.vistasEntidadesService.buscarPropuestaPorTema(tema, carrera);
+    }
+
+    @GetMapping("propuesta/por-tutor")
+    public List<VistaPropuesta> buscarPropuestaPorTutor(@RequestParam("idUsuario") Integer idUsuario,
+                                                       @RequestParam("facultad") String facultad ) {
+        return this.vistasEntidadesService.buscarPropuestaPorTutor(idUsuario, facultad);
+    }
+
+    @GetMapping("propuesta/por-revisor")
+    public List<VistaPropuesta> buscarPropuestaPorRevisor(@RequestParam("idUsuario") Integer idUsuario,
+                                                        @RequestParam("facultad") String facultad ) {
+        return this.vistasEntidadesService.buscarPropuestaPorRevisor(idUsuario, facultad);
     }
 
 }

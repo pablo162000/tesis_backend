@@ -1,18 +1,14 @@
 package com.distribuida.correo.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import kong.unirest.HttpResponse;
-import kong.unirest.JsonNode;
-import kong.unirest.Unirest;
-import kong.unirest.UnirestException;
+import kong.unirest.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-
-import java.io.StringWriter;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -61,6 +57,129 @@ public class MailGunService {
                 .queryString("template", templateName) // 🔹 Nombre de la plantilla
                 .queryString("h:X-Mailgun-Variables", variablesJson) // 🔹 Enviar JSON bien formateado
                 .asJson();
+
+        if (response.getStatus() != 200) {
+            throw new UnirestException("Error al enviar el correo: " + response.getStatus() + " " + response.getBody());
+        }
+    }
+
+    public void sendEmailAsignacionRevisor(List<String> toEmails,
+                                           List<String> ccEmails,
+                                           String nombreRevisor,
+                                           String nombreEstudiantes,
+                                           String linkRevision,
+                                           String temaPropuesta,
+                                           String correoDireccion,
+                                           String fechaEntrega,
+                                           InputStream rubrica, String fileNameRubrica,
+                                           InputStream archivo, String fileNameArchivo,
+                                           InputStream oficio, String fileNameOficio) throws UnirestException {
+
+        // Crear el mapa de variables dinámicas
+        Map<String, String> variablesMap = new HashMap<>();
+        variablesMap.put("nombreRevisor", nombreRevisor);
+        variablesMap.put("nombreEstudiantes", nombreEstudiantes);
+        variablesMap.put("temaPropuesta", temaPropuesta);
+        variablesMap.put("fechaEntrega", fechaEntrega);
+        variablesMap.put("linkRevision", linkRevision);
+        variablesMap.put("correoDireccion", correoDireccion);
+
+        String variablesJson;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            variablesJson = objectMapper.writeValueAsString(variablesMap);
+        } catch (Exception e) {
+            throw new UnirestException("Error al generar JSON de variables", e);
+        }
+
+        MultipartBody request = Unirest.post("https://api.mailgun.net/v3/" + sandboxDomain + "/messages")
+                .basicAuth("api", apiKey)
+                .field("from", fromEmail)
+                .field("subject", "Registro Exitoso")
+                .field("template", "asignacionrevisor")
+                .field("h:X-Mailgun-Variables", variablesJson);
+
+        // Agregar destinatarios principales
+        if (toEmails != null && !toEmails.isEmpty()) {
+            for (String email : toEmails) {
+                request.field("to", email);
+            }
+        }
+
+        // Agregar destinatarios en copia (CC)
+        if (ccEmails != null && !ccEmails.isEmpty()) {
+            for (String cc : ccEmails) {
+                request.field("cc", cc);
+            }
+        }
+
+        // Adjuntar archivos si existen
+        try {
+            if (rubrica != null && fileNameRubrica != null)
+                request.field("attachment", new ByteArrayInputStream(rubrica.readAllBytes()), fileNameRubrica);
+
+            if (archivo != null && fileNameArchivo != null)
+                request.field("attachment", new ByteArrayInputStream(archivo.readAllBytes()), fileNameArchivo);
+
+            if (oficio != null && fileNameOficio != null)
+                request.field("attachment", new ByteArrayInputStream(oficio.readAllBytes()), fileNameOficio);
+        } catch (IOException e) {
+            throw new UnirestException("Error al leer archivos adjuntos", e);
+        }
+
+        HttpResponse<JsonNode> response = request.asJson();
+
+        if (response.getStatus() != 200) {
+            throw new UnirestException("Error al enviar el correo: " + response.getStatus() + " " + response.getBody());
+        }
+    }
+
+    public void sendNotificacionEnvioPropuestaMailgun(String toEmail, List<String> ccEmails,
+                                                      String estudiante, String tema, String correoDireccion,
+                                                      InputStream fileInputStream, String fileName)
+            throws UnirestException {
+
+        // Variables dinámicas de plantilla
+        Map<String, String> variablesMap = new HashMap<>();
+        variablesMap.put("nombreEstudiante", estudiante);
+        variablesMap.put("tema", tema);
+        variablesMap.put("correoDireccion", correoDireccion);
+
+        String variablesJson;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            variablesJson = objectMapper.writeValueAsString(variablesMap);
+        } catch (Exception e) {
+            throw new UnirestException("Error al generar JSON de variables", e);
+        }
+
+        // Preparar solicitud base con campos comunes
+        MultipartBody request = Unirest.post("https://api.mailgun.net/v3/" + sandboxDomain + "/messages")
+                .basicAuth("api", apiKey)
+                .field("from", fromEmail)
+                .field("to", toEmail)
+                .field("subject", "Recepción Propuesta")
+                .field("template", "confirmacionpropuesta")
+                .field("h:X-Mailgun-Variables", variablesJson);
+
+        // Agregar CC si existen
+        if (ccEmails != null && !ccEmails.isEmpty()) {
+            String ccList = String.join(",", ccEmails);
+            request.field("cc", ccList);
+        }
+
+        // Agregar archivo adjunto si existe
+        if (fileInputStream != null && fileName != null) {
+            try {
+                byte[] fileBytes = fileInputStream.readAllBytes();
+                request.field("attachment", new ByteArrayInputStream(fileBytes), fileName);
+            } catch (IOException e) {
+                throw new UnirestException("Error al leer el archivo adjunto", e);
+            }
+        }
+
+        // Enviar correo
+        HttpResponse<JsonNode> response = request.asJson();
 
         if (response.getStatus() != 200) {
             throw new UnirestException("Error al enviar el correo: " + response.getStatus() + " " + response.getBody());

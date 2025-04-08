@@ -1,10 +1,7 @@
 package com.tesis.backend_tesis.repository.modelo;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 
 @Entity
@@ -20,9 +17,11 @@ public class VistaPropuesta {
     private String carrera;
 
     @Column(name = "prop_estado_validacion")
+    @Enumerated(EnumType.STRING)
     private EstadoValidacion estadoValidacion;
 
     @Column(name = "prop_estado_aprobacion")
+    @Enumerated(EnumType.STRING)
     private EstadoAprobacion estadoAprobacion;
 
     @Column(name = "prop_observaciones")
