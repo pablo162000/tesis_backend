@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
-@RequestMapping(path = "/carrera")
+@RequestMapping(path = "/carreras")
 public class CarreraRestFulController {
 
 
@@ -33,14 +33,21 @@ public class CarreraRestFulController {
 
     }
 
-
+    /*
     @PutMapping("/vincularautoridades")
     public ResponseEntity<Boolean> registroAutoridades(@RequestParam Integer idCarrera,
                                                        @RequestParam Integer idUsuario,
                                                        @RequestParam String tipo) {
         Boolean registro = this.carreraService.insertarAutoridadesCarrera(idCarrera, idUsuario, tipo);
         return ResponseEntity.ok(registro);
-
     }
+     */
 
+    @PutMapping("/{idCarrera}/autoridades/{idUsuario}")
+    public ResponseEntity<Boolean> registroAutoridades(@PathVariable Integer idCarrera,
+                                                       @PathVariable Integer idUsuario,
+                                                       @RequestParam String tipo) {
+        Boolean registro = this.carreraService.insertarAutoridadesCarrera(idCarrera, idUsuario, tipo);
+        return ResponseEntity.ok(registro);
+    }
 }

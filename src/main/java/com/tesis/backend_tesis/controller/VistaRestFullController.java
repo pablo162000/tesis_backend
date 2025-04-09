@@ -150,17 +150,17 @@ public class VistaRestFullController {
     }
 
 
-    @GetMapping("propuesta/{idPropuesta}")
+    @GetMapping("propuestas/{idPropuesta}")
     public VistaPropuesta buscarPropuestaPorIdPropuesta(@PathVariable Integer idPropuesta) {
         return this.vistasEntidadesService.buscarPropuestaPorIdPropuesta(idPropuesta).getFirst();
     }
 
-    @GetMapping("propuesta/por-carrera")
-    public List<VistaPropuesta> buscarPropuestaPorCarrera(@RequestParam ("carrera")  String carrera ) {
+    @GetMapping("propuestas/carrera/{carrera}")
+    public List<VistaPropuesta> buscarPropuestaPorCarrera(@PathVariable String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorCarrera(carrera);
     }
 
-    @GetMapping("propuesta/por-validacion")
+    @GetMapping("propuestas/por-validacion")
     public List<VistaPropuesta> buscarPropuestaPorEstadoValidacion(@RequestParam("validacion") Integer validacion,
                                                                    @RequestParam("carrera") String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorEstadoValidacion(validacion, carrera);

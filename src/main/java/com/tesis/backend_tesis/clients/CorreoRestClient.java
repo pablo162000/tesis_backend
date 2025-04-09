@@ -76,4 +76,18 @@ public interface CorreoRestClient {
             @RequestParam("correodireccion") String correoDireccion,  // Dirección del correo (si es necesario)
             @RequestPart("archivo") MultipartFile archivo  // Archivo adjunto
     );
+
+    @PostMapping(value="/notificacionasignacionrevisorv2")
+    public ResponseEntity<String> asignacionrtevisores(
+            @RequestParam("toemails") List<String> toEmails,
+            @RequestParam("ccemails") List<String> ccEmails,
+            @RequestParam("nombreRevisor")String nombreRevisor,
+            @RequestParam("nombreEstudiantes")String nombreEstudiantes,
+            @RequestParam("linkRevision")String linkRevision,
+            @RequestParam("tema")String temaPropuesta,
+            @RequestParam("correoDireccion")String correoDireccion,
+            @RequestParam("fechaEntrega")String fechaEntrega,
+            @RequestPart("rubrica") MultipartFile rubrica,
+            @RequestPart("archivo") MultipartFile archivo ,
+            @RequestPart("oficio") MultipartFile oficio );
 }

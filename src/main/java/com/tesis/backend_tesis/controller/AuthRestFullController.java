@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @CrossOrigin
 @RequestMapping(path = "/auth")
@@ -30,11 +32,23 @@ public class AuthRestFullController {
         return ResponseEntity.ok(response);
     }
 
+    /*
     @PostMapping("/seleccionar-rol")
     public ResponseEntity<AuthResponse> seleccionarRol(@RequestParam Integer idUsuario, @RequestParam String rol) {
         AuthResponse authResponse = this.authService.seleccionarRol(idUsuario, rol);
         return ResponseEntity.ok(authResponse);
     }
+     */
+    @PutMapping("/usuarios/{idUsuario}/rol")
+    public ResponseEntity<AuthResponse> seleccionarRol(@PathVariable Integer idUsuario,
+                                                       @RequestBody Map<String, String> body) {
+        AuthResponse authResponse = this.authService.seleccionarRol(idUsuario, body.get("rol"));
+        return ResponseEntity.ok(authResponse);
+    }
+
+    //{
+    //  "rol": "Director"
+    //}
 
 
 

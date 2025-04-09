@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -63,14 +64,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
     @Autowired
     private IUsuarioService usuarioService;
 
-
-
-    @Autowired
-    private ICarreraService carreraService;
-
-
-
-
     @Override
     @Transactional
     public String guardar(String tipo,
@@ -83,14 +76,8 @@ public class PropuestaServiceImpl implements IPropuestaService{
                           MultipartFile archivo)throws IOException {
 
         // 1. Validar si el archivo está presente
-        if (archivo==null || archivo.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se ha seleccionado ningún archivo.");
-        }
+        this.validaciones.validarArchivo(archivo, "archivo propuesta", List.of("application/pdf"));
 
-        String contentType = archivo.getContentType();
-        if (contentType == null || !contentType.equals("application/pdf")) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Solo se permiten archivos en formato PDF.");
-        }
 
         // 2. Obtener el estudiante principal (obligatorio)
 
@@ -110,8 +97,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
         if (vistaEstudiantePrimero == null || !vistaEstudiantePrimero.getActivo() || !vistaEstudiantePrimero.getCorreoValido()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El primer estudiante con correo " + primerCorreo + " no existe, no está activo o no tiene rol de estudiante.");
         }
-
-
 
         // 3. Validar que los correos sean correctos y distintos entre sí
 
@@ -221,8 +206,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
                     }
 
 
-
-
                 } else if (categoria.equals("multimodal")) {
 
 
@@ -245,8 +228,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                 "Conflicto en los estudiantes solo puede existir dos propuestas una en cada carrera. Proyecto de Investigacion.");
                     }
-
-
 
 
                 } else {
@@ -312,14 +293,11 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
                         }
 
-
                         if (!puedeEnviarPropuestasMultimodal(estudiantePrimero.getId(), estudianteSegundo.getId(), estudianteTercero.getId(), "Proyecto de Investigación")) {
 
                             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                     "Conflicto en los estudiantes solo puede existir dos propuestas una en cada carrera. Proyecto de Integración.");
                         }
-
-
 
 
                 } else {
@@ -328,12 +306,10 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
                 }
 
-
             } else {
 
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         tipo + " no existente.");
-
 
             }
 
@@ -352,9 +328,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
         if (Objects.isNull(ar)) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar el archivo.");
         }
-
-
-
 
 
         // 6. Construir la propuesta
@@ -383,12 +356,10 @@ public class PropuestaServiceImpl implements IPropuestaService{
         Revision revisionGuardada = this.revisionRepository.insert(revision);
 
 
-
         List<String> ccEmails = new ArrayList<>();
         Stream.of(segundoCorreo, tercerCorreo)
                 .filter(Objects::nonNull) // Filtra solo los que no son null
                 .forEach(ccEmails::add);
-
 
 
         String nombresPrimerEstudiante =
@@ -426,11 +397,8 @@ public class PropuestaServiceImpl implements IPropuestaService{
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al procesar propuesta.");
         }
 
-
-
         // 8. Respuesta exitosa
         return "guardada con exito";
-
 
     }
 
@@ -673,10 +641,28 @@ public class PropuestaServiceImpl implements IPropuestaService{
     }
 
     @Override
-    public Boolean asignarRevisor(Integer idPropuesta, Integer idDocente, String tipoRevisor) {
+    public Boolean asignarRevisor(Integer idPropuesta, Integer idDocente1, Integer idDocente2,
+                                  MultipartFile rubrica,
+                                  MultipartFile archivo,
+                                  MultipartFile oficio) {
         // Validar entrada
-        if (idPropuesta == null || idDocente == null || tipoRevisor == null || tipoRevisor.trim().isEmpty()) {
+        if (idPropuesta == null || idPropuesta < 1 ||
+                idDocente1 == null || idDocente1 < 1 ||
+                idDocente2 == null || idDocente2 <1 ) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Los parámetros no pueden ser nulos o vacíos.");
+        }
+
+        this.validaciones.validarArchivo(archivo, "archivo propuesta", List.of("application/pdf"));
+        this.validaciones.validarArchivo(oficio, "oficio de desiganción", List.of("application/pdf"));
+
+        if (rubrica==null || rubrica.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se ha seleccionado ningún archivo de la propuesta presentada.");
+        }
+
+
+        if (idDocente1.equals(idDocente2)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Los docentes no pueden ser iguales.");
+
         }
 
         // Obtener la propuesta por ID
@@ -694,46 +680,141 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
         }
 
-        VistaDocente docenteExistente = this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente);
+        VistaDocente docenteExistente1 = this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1);
 
-        if (docenteExistente == null) {
+        if (docenteExistente1 == null) {
             // Si el docente es null (aunque Feign debería lanzarlo como excepción), lanzar una excepción HTTP Not Found
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró un docente con el ID: " + idDocente);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró un docente1 con el ID: " + idDocente1);
         }
+
+        VistaDocente docenteExistente2 = this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2);
+
+        if (docenteExistente2 == null) {
+            // Si el docente es null (aunque Feign debería lanzarlo como excepción), lanzar una excepción HTTP Not Found
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró un docente2 con el ID: " + idDocente2);
+        }
+
 
         Revision revision = this.revisionRepository.findByIdPropuesta(vistaPropuestaExistente.get(0).getId()).getFirst();
 
 
         if (revision == null) {
 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró revision para la propuesta: " + idDocente);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró revision para la propuesta: " + idPropuesta);
         }
 
-        // Validar que el docente no sea asignado como primer y segundo revisor a la vez
-        if (("primer".equals(tipoRevisor) && idDocente.equals(revision.getRevisor2())) ||
-                ("segundo".equals(tipoRevisor) && idDocente.equals(revision.getRevisor1()))) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El mismo docente no puede ser asignado como primer y segundo revisor.");
-        }
+        List<Integer> docentesRegistrados = Arrays.asList(revision.getRevisor1().getId(), revision.getRevisor2().getId());
+        List<Integer> docentesIngresados = Arrays.asList(idDocente1, idDocente2);
+
 
         // Asignar el docente según el tipo de revisor
-        boolean cambioRealizado = false;
-        if ("primer".equals(tipoRevisor) && !idDocente.equals(revision.getRevisor1())) {
-            revision.setRevisor1(this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente.getIdUsuario())));
-            cambioRealizado = true;
-        } else if ("segundo".equals(tipoRevisor) && !idDocente.equals(revision.getRevisor2())) {
-            revision.setRevisor2(this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente.getIdUsuario())));
-            cambioRealizado = true;
+        boolean cambioRealizado;
+
+        if (new HashSet<>(docentesRegistrados).equals(new HashSet<>(docentesIngresados))) {
+           cambioRealizado = false;
+        }else {
+
+            revision.setRevisor1(
+                    this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente1.getIdUsuario())));
+
+            revision.setRevisor2(
+                    this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente2.getIdUsuario())));
+
+           cambioRealizado= true;
         }
+
 
         // Si hubo cambios, actualizar la base de datos
         if (!cambioRealizado) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se realizaron cambios, ya estaba asignado.");
         }
 
+        Boolean revisionGuardada= this.revisionRepository.update(revision);
+        List<String> toEmails = new ArrayList<>();
+        toEmails.add(docenteExistente1.getCorreo());
+        toEmails.add(docenteExistente2.getCorreo());
+
+        List<String> ccEmails =  new ArrayList<>();
+
+        String nombresRevisores = docenteExistente1.getApellidos()+" "+ docenteExistente1.getNombres()+
+                " y "
+                + docenteExistente2.getApellidos()+" "+ docenteExistente2.getNombres();
 
 
+        VistaEstudiante primer =null;
+        VistaEstudiante segundo =null;
+        VistaEstudiante tercero =null;
 
-        return this.revisionRepository.update(revision);
+        String nombresPrimerEstudiante =null;
+        String nombresSegundoEstudiante =null;
+        String nombresTercerEstudiante =null;
+
+        if (vistaPropuestaExistente.getFirst().getCategoria().equals("multimodal")){
+
+            primer =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
+            segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
+            tercero =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getTercerEstuId());
+
+            ccEmails.add(primer.getCorreo());
+            ccEmails.add(segundo.getCorreo());
+            ccEmails.add(tercero.getCorreo());
+
+            nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
+            nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
+            nombresTercerEstudiante =tercero.getApellidos() +" "+tercero.getNombres();
+
+
+        } else if (vistaPropuestaExistente.getFirst().getCategoria().equals("unimodal")) {
+            primer =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
+
+            ccEmails.add(primer.getCorreo());
+            nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
+
+            if (vistaPropuestaExistente.getFirst().getSegundoEstuId()!=null){
+                segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
+                ccEmails.add(segundo.getCorreo());  }
+                nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
+        }
+
+        List<String> posiblesNombres = new ArrayList<String>();
+        posiblesNombres.add(nombresPrimerEstudiante);
+        posiblesNombres.add(nombresSegundoEstudiante);
+        posiblesNombres.add(nombresTercerEstudiante);
+
+        String nombresEstudiantes = this.validaciones.obtenerNombresEstudiantes(posiblesNombres);
+        String correoDireccion = this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaPropuestaExistente.getFirst().getCarrera()).getCorreoDireccion();
+        String fechaEntrega = this.validaciones.sumarDiasLaborables(LocalDate.now(), 10);
+        ccEmails.add(correoDireccion);
+        try{
+            if (!revisionGuardada) {
+
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al asiganr los revisores.");
+
+            }
+
+            //this.motorRestClient.iniciarProceso(guardada.getId());
+            logger.info("Se conectó correctamente con el motor de procesos para asignacion revisores. ID propuesta: {}",
+                    vistaPropuestaExistente.getFirst().getId());
+
+            this.correoRestClient.asignacionrtevisores(toEmails,
+                                                        ccEmails,
+                                                        nombresRevisores,
+                                                        nombresEstudiantes,
+                                                        "fsadf",
+                                                        vistaPropuestaExistente.getFirst().getTema(),
+                                                        correoDireccion,
+                                                        fechaEntrega,
+                                                        rubrica,
+                                                        archivo,
+                                                        oficio);
+
+            logger.info("Correo enviado exitosamente a {} con copia {}", toEmails, ccEmails);
+
+        }catch (Exception e){
+            logger.error("Error en el proceso: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de procesos o correo.");
+        }
+        return revisionGuardada;
     }
 
 

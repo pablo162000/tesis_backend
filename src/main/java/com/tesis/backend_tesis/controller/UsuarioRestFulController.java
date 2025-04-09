@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
-@RequestMapping(path = "/usuario")
+@RequestMapping(path = "/usuarios")
 public class UsuarioRestFulController {
 
     @Autowired
