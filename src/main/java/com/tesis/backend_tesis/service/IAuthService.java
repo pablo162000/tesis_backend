@@ -14,5 +14,5 @@ public interface IAuthService {
     public Boolean registroNuevoUsuario(RegistroRequest registroRequest);
 
     public AuthResponse login(LoginRequest loginRequest);
-    public AuthResponse seleccionarRol(Integer idUsuario, String rolSeleccionado);
+    //public AuthResponse seleccionarRol(Integer idUsuario, String rolSeleccionado);
 }

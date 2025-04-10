@@ -13,6 +13,7 @@ public interface IVistaDocenteRepository {
     public List<VistaDocente> findAll();
     public List<VistaDocente> findByEstado(Boolean activo);
     public VistaDocente findByCorreo(String correo);
+    public List<VistaDocente> findByNomBreFacultad(String nomBreFacultad);
 
 
 }

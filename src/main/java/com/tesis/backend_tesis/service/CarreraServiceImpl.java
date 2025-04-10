@@ -76,7 +76,7 @@ public class CarreraServiceImpl implements ICarreraService {
 
             // Convertir DTO a Entidad
             CarreraDTO carreraDTO = CarreraDTO.builder()
-                    .nombre(carreraRequest.getNombre())
+                    .nombre(carreraRequest.getNombre().trim())
                     .idFacultad(carreraRequest.getIdFacultad())
                     .build();
 
@@ -93,7 +93,6 @@ public class CarreraServiceImpl implements ICarreraService {
             Carrera carreraGuardada = this.carreraRepository.insert(carrera);
             logger.info("Usuario con correo {} insertado correctamente en la facultad {}.", carrera.getNombre(),carrera.getFacultad().getNombre());
             System.out.println("service de usuario insertado correctamente."+this.carreraRepository.insert(carrera));
-            CarreraDTO carreraDTOSalida = this.converter.toDTO(carrera);
             return carreraGuardada!=null;
 
         } catch (Exception e) {
@@ -149,7 +148,7 @@ public class CarreraServiceImpl implements ICarreraService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "La carrea ya está registrada con ese nombre.");
             }
 
-            if (this.usuarioRepository.existeUsuarioConEmail(registroRequest.getCorreo())) {
+            if (this.usuarioRepository.existeUsuarioConEmail(registroRequest.getCorreo().trim())) {
                 logger.error("El correo ya está registrado: {}", registroRequest.getCorreo());
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "El correo ya está registrado.");
             }
@@ -157,11 +156,11 @@ public class CarreraServiceImpl implements ICarreraService {
 
             //--------------------------------------
             UsuarioDTO usuarioDTO = UsuarioDTO.builder()
-                    .primerNombre(carreraExistente.getNombre())
-                    .segundoNombre(carreraExistente.getNombre())
-                    .primerApellido(carreraExistente.getNombre())
-                    .segundoApellido(carreraExistente.getNombre())
-                    .correo(registroRequest.getCorreo())
+                    .primerNombre(carreraExistente.getNombre().trim())
+                    .segundoNombre(carreraExistente.getNombre().trim())
+                    .primerApellido(carreraExistente.getNombre().trim())
+                    .segundoApellido(carreraExistente.getNombre().trim())
+                    .correo(registroRequest.getCorreo().trim())
                     .password(this.encriptionService.encriptPass("claveSecreta123"))
                     .fechaCreacion(LocalDateTime.now())
                     .correoValido(Boolean.FALSE)
@@ -236,41 +235,92 @@ public class CarreraServiceImpl implements ICarreraService {
         }
 
     @Override
-    @Transactional
-    public Boolean insertarAutoridadesCarrera(Integer idCarrera, Integer idUsuario, String tipo) {
+    public CarreraDTO buscarPorIDUsuario(Integer idUsuario) {
+        if (idUsuario == null || idUsuario <= 0) {
+            logger.warn("El IDUSUARIO no puede ser nulo, 0 o negativo.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El IDUSUARIO no puede ser nulo, 0 o negativo.");
+        }
 
-        if (idCarrera == null || idUsuario == null || tipo == null || tipo.isEmpty()) {
-            logger.warn("es necesario tener todos los datos.");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "todos los datos son obligatorios.");
+        Carrera carrera = this.carreraRepository.findByIdDireccion(idUsuario);
+        CarreraDTO carreraDTO = this.converter.toDTO(carrera);
+
+        if (carreraDTO == null) {
+            logger.warn("No se encontró una carrera con IDUSUARIO {}.", idUsuario);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró una carrera con IDUSUARIO.");
+        }
+
+        logger.info("Carrera recuperada con IDUSUARIO {} correctamente.", carreraDTO.getIdUsuario());
+        return carreraDTO;
+    }
+
+    @Override
+    @Transactional
+    public Boolean insertarAutoridadesCarrera(Integer idCarrera, Integer idUsuario) {
+
+        if (idCarrera == null || idCarrera < 1 || idUsuario == null || idUsuario < 1) {
+            logger.warn("Es necesario tener todos los datos. idCarrera: {}, idUsuario: {}", idCarrera, idUsuario);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Todos los datos son obligatorios.");
         }
 
         Carrera carreraExistente = this.carreraRepository.findById(idCarrera);
-
-
         if (carreraExistente == null) {
             logger.warn("La carrera con ID {} no existe.", idCarrera);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrera no existe.");
         }
 
         DocenteDTO docenteExistenteDTO = this.docenteService.buscarPorIdUsuario(idUsuario);
-
         if (docenteExistenteDTO == null) {
-            logger.warn("El docente con IDUSUARIO {} no existe.", idUsuario);
+            logger.warn("El docente con ID USUARIO {} no existe.", idUsuario);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Docente no existe.");
         }
 
-        Boolean validacion = this.verificarAutoridaesUnicas(carreraExistente, docenteExistenteDTO, tipo);
+        // Si ya hay un coordinador, se le revierte el rol a "docente"
+        if (carreraExistente.getCoordinador() != null) {
+            Integer idCoordinadorActual = carreraExistente.getCoordinador().getUsuario().getId();
+            UsuarioRol usuarioRolActual = this.usuarioRolRepository.findById(idCoordinadorActual);
 
-        if (validacion) {
-
-            return true;
+            if (usuarioRolActual != null) {
+                Rol rolDocente = this.rolRepository.findByNombre("docente");
+                usuarioRolActual.setRol(rolDocente);
+                this.usuarioRolRepository.update(usuarioRolActual);
+            } else {
+                logger.warn("No se encontró UsuarioRol del coordinador actual (ID Usuario {}).", idCoordinadorActual);
+            }
         }
 
+        // Asignar nuevo rol de "coordinador" al nuevo docente
+        Rol rolCoordinador = this.rolRepository.findByNombre("coordinador");
+        UsuarioRol usuarioRolNuevo = this.usuarioRolRepository.findById(docenteExistenteDTO.getIdUsuario());
 
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede insertar el autoridad.");
+        if (usuarioRolNuevo == null) {
+            logger.error("No se encontró UsuarioRol para el nuevo coordinador (ID Usuario {}).", docenteExistenteDTO.getIdUsuario());
+            throw new RuntimeException("No se encontró UsuarioRol del nuevo coordinador");
+        }
+
+        usuarioRolNuevo.setRol(rolCoordinador);
+        Boolean seAsigno = this.usuarioRolRepository.update(usuarioRolNuevo);
+
+        if (!seAsigno) {
+            logger.error("Error al guardar el rol de coordinador para el usuario ID: {}", docenteExistenteDTO.getIdUsuario());
+            throw new RuntimeException("Error al guardar la relación UsuarioRol con rol coordinador");
+        }
+
+        // Asignar el nuevo coordinador en la carrera
+        carreraExistente.setCoordinador(this.converter.toEntity(docenteExistenteDTO));
+        Carrera carreraActualizada = this.carreraRepository.update(carreraExistente);
+
+        if (carreraActualizada == null || carreraActualizada.getId() == null) {
+            logger.error("Error al actualizar la carrera con ID {} al asignar el nuevo coordinador.", idCarrera);
+            throw new RuntimeException("Error al actualizar la carrera con el nuevo coordinador");
+        }
+
+        logger.info("Se asignó correctamente al nuevo coordinador (ID Usuario {}) en la carrera (ID {}).",
+                docenteExistenteDTO.getIdUsuario(), idCarrera);
+
+        return true;
     }
 
-
+/*
     @Transactional
     public Boolean verificarAutoridaesUnicas (Carrera carrera, DocenteDTO docente, String tipo){
 
@@ -350,5 +400,7 @@ public class CarreraServiceImpl implements ICarreraService {
         }
 
     }
+
+ */
 
 }

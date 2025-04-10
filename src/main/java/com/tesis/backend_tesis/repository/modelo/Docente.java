@@ -29,9 +29,11 @@ public class Docente {
     @JoinColumn(name = "docen_fac_id", referencedColumnName = "fac_id", nullable = false)
     private Facultad facultad;
 
+    /*
     @OneToMany(mappedBy = "director", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<Carrera> carrerasDirector;
+     */
 
     @OneToMany(mappedBy = "coordinador", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude

@@ -41,6 +41,11 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarEstudiantesPorEstadoActivacion(estado);
     }
 
+    @GetMapping("/estudiantes/correo")
+    public VistaEstudiante buscarEstudiantePorCorreo(@RequestParam("correo") String correo){
+        return this.vistasEntidadesService.buscarPorCorreoEstudainte(correo);
+    }
+
     //------------------------ Rutas para VistaDocente ------------------------
 
     @GetMapping("/docente/usuario/{idUsuario}")
@@ -61,6 +66,15 @@ public class VistaRestFullController {
     @GetMapping("/docentes/estado/{activo}")
     public List<VistaDocente> buscarDocentesPorEstado(@PathVariable Boolean activo) {
         return this.vistasEntidadesService.buscarDocentesPorEstado(activo);
+    }
+
+    @GetMapping("/docentes/facultad")
+    public List<VistaDocente> buscarDocentesPorFacultad(@RequestParam("nombreFacultad") String nombreFacultad) {
+        return this.vistasEntidadesService.buscarDocentesPorFacultad(nombreFacultad);
+    }
+    @GetMapping("/docentes/correo")
+    public VistaDocente buscarDocentePorCorreo(@RequestParam("correo") String correoDocente){
+        return this.vistasEntidadesService.buscarPorCorreoDocente(correoDocente);
     }
 
     //------------------------ Rutas para VistaSecretaria ------------------------
@@ -102,8 +116,8 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarTodasCarreras();
     }
 
-    @GetMapping("/carrera/nombre/{nombreCarrera}")
-    public VistaCarrera buscarCarreraPorNombreCarrera(@PathVariable String nombreCarrera) {
+    @GetMapping("/carrera")
+    public VistaCarrera buscarCarreraPorNombreCarrera(@RequestParam ("nombreCarrera") String nombreCarrera) {
         return this.vistasEntidadesService.buscarCarreraPorNombreCarrera(nombreCarrera);
     }
 
@@ -114,8 +128,8 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarUsuarioRolPorIdUsuarioRol(idUsuarioRol);
     }
 
-    @GetMapping("/usuarioRol/correo/{correo}")
-    public VistaUsuarioRol buscarUsuarioRolPorCorreo(@PathVariable String correo) {
+    @GetMapping("/usuarioRol/correo")
+    public VistaUsuarioRol buscarUsuarioRolPorCorreo(@RequestParam("correo") String correo) {
         return this.vistasEntidadesService.buscarUsuarioRolPorCorreo(correo);
     }
 
@@ -134,13 +148,13 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarUsuarioRolPorIdUsuario(idUsuario);
     }
 
-    @GetMapping("/usuarioRol/apellidos/{apellidos}")
-    public List<VistaUsuarioRol> buscarUsuarioRolPorApellidos(@PathVariable String apellidos) {
+    @GetMapping("/usuarioRol/apellidos")
+    public List<VistaUsuarioRol> buscarUsuarioRolPorApellidos(@RequestParam("apellidos") String apellidos) {
         return this.vistasEntidadesService.buscarUsuarioRolPorApellidos(apellidos);
     }
 
-    @GetMapping("/usuarioRol/nombres/{nombres}")
-    public List<VistaUsuarioRol> buscarUsuarioRolPorNombres(@PathVariable String nombres) {
+    @GetMapping("/usuarioRol/nombres")
+    public List<VistaUsuarioRol> buscarUsuarioRolPorNombres(@RequestParam("nombres")  String nombres) {
         return this.vistasEntidadesService.buscarUsuarioRolPorNombres(nombres);
     }
 
@@ -155,8 +169,8 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarPropuestaPorIdPropuesta(idPropuesta).getFirst();
     }
 
-    @GetMapping("propuestas/carrera/{carrera}")
-    public List<VistaPropuesta> buscarPropuestaPorCarrera(@PathVariable String carrera ) {
+    @GetMapping("propuestas/carrera")
+    public List<VistaPropuesta> buscarPropuestaPorCarrera(@RequestParam("carrera")  String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorCarrera(carrera);
     }
 

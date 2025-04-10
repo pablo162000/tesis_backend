@@ -131,5 +131,28 @@ public class VistaDocenteRepositoryImpl implements IVistaDocenteRepository {
         }
     }
 
+    @Override
+    public List<VistaDocente> findByNomBreFacultad(String nomBreFacultad) {
+        try {
+            TypedQuery<VistaDocente> query = this.entityManager.createQuery(
+                    "SELECT d FROM VistaDocente d WHERE d.facultad = :nomBreFacultad",
+                    VistaDocente.class
+            );
+            query.setParameter("nomBreFacultad", nomBreFacultad);
+            List<VistaDocente> vistaDocentes = query.getResultList();
+
+            if (vistaDocentes.isEmpty()) {
+                logger.debug("No se encontraron docentes en VistaDocentes con Facultad {}.", nomBreFacultad);
+            } else {
+                logger.debug("Se encontraron {} docentes en VistaDocentes con Facultad {}.", vistaDocentes.size(), nomBreFacultad);
+            }
+
+            return vistaDocentes;
+        } catch (Exception e) {
+            logger.error("Error al buscar docentes en VistaDocentes con Facultad: {}", e.getMessage(), e);
+            return Collections.emptyList();
+        }
+    }
+
 
 }

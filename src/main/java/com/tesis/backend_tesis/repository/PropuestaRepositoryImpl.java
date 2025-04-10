@@ -3,6 +3,7 @@ package com.tesis.backend_tesis.repository;
 import com.tesis.backend_tesis.repository.modelo.EstadoAprobacion;
 import com.tesis.backend_tesis.repository.modelo.EstadoValidacion;
 import com.tesis.backend_tesis.repository.modelo.Propuesta;
+import com.tesis.backend_tesis.repository.modelo.UsuarioRol;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
@@ -157,21 +158,21 @@ public class PropuestaRepositoryImpl implements IPropuestaRepository {
     @Override
     public Boolean update(Propuesta propuesta) {
         try {
-            // Intentamos encontrar la propuesta en la base de datos usando el id de la propuesta
-            Propuesta propuestaExistente = this.entityManager.find(Propuesta.class, propuesta.getId());
+            Propuesta existente = this.entityManager.find(Propuesta.class, propuesta.getId());
 
-            if (propuestaExistente != null) {
-                // Si la propuesta existe, solo guardamos los cambios sin necesidad de modificar el estado de validación nuevamente
-                this.entityManager.merge(propuestaExistente); // Guarda los cambios en la base de datos
+            if (existente != null) {
 
-                return true; // Indicamos que la actualización fue exitosa
+                this.entityManager.merge(propuesta); // Guarda los cambios
+
+                logger.info("propuesta con ID {} actualizado correctamente.", propuesta.getId());
+                return true;
             } else {
-                return false; // No se encontró la propuesta con el ID dado
+                logger.warn("No se encontró propuesta con ID {} para actualizar.", propuesta.getId());
+                return false;
             }
         } catch (Exception e) {
-            // En caso de error, se captura y se imprime la excepción
-            e.printStackTrace(); // En producción, reemplazar con un logger
-            return false; // Indicamos que hubo un error en la actualización
+            logger.error("Error al actualizar propuesta con ID {}: {}", propuesta.getId(), e.getMessage(), e);
+            return false;
         }
     }
 

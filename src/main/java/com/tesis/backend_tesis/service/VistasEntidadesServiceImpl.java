@@ -120,7 +120,7 @@ public class VistasEntidadesServiceImpl implements IVistasEntidadesService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo no puede ser nulo o vacio.");
         }
 
-        VistaEstudiante vistaEstudiante = this.vistaEstudianteRepository.findByCorreo(correoEstudiante);
+        VistaEstudiante vistaEstudiante = this.vistaEstudianteRepository.findByCorreo(correoEstudiante.trim());
 
         if (vistaEstudiante == null) {
             logger.warn("No se encontró un VistaEstudiante con correo {}.", correoEstudiante);
@@ -206,13 +206,31 @@ public class VistasEntidadesServiceImpl implements IVistasEntidadesService {
     }
 
     @Override
+    public List<VistaDocente> buscarDocentesPorFacultad(String facultad) {
+        if (facultad == null || facultad.isEmpty()) {
+            logger.warn("La facultad no puede ser nulo");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La facultad no puede ser nulo.");
+        }
+
+        List<VistaDocente> vistaDocentes = this.vistaDocenteRepository.findByNomBreFacultad(facultad);
+
+        if (vistaDocentes.isEmpty()) {
+            logger.warn("No se encontraron registros en VistaDocentes con facultad {}.", facultad);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron estudiantes con facultad: " + facultad);
+        }
+
+        logger.info("Se encontraron {} registros en VistaDocentes con estado {}.", vistaDocentes.size(), facultad);
+        return vistaDocentes;
+    }
+
+    @Override
     public VistaDocente buscarPorCorreoDocente(String correoDocente) {
         if (correoDocente == null || correoDocente.isEmpty()) {
             logger.warn("El correo docente no puede ser nulo o vacío.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo no puede ser nulo o vacio.");
         }
 
-        VistaDocente vistaDocente = this.vistaDocenteRepository.findByCorreo(correoDocente);
+        VistaDocente vistaDocente = this.vistaDocenteRepository.findByCorreo(correoDocente.trim());
 
         if (vistaDocente == null) {
             logger.warn("No se encontró un Vistadocente con correo {}.", correoDocente);

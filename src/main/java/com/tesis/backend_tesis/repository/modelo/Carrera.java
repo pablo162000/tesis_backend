@@ -27,10 +27,12 @@ public class Carrera {
     @ManyToOne
     @JoinColumn(name = "carr_fac_id",  referencedColumnName = "fac_id",nullable = false) // Clave foránea
     private Facultad facultad;
-
+/*
     @ManyToOne
     @JoinColumn(name = "carr_director_id", referencedColumnName = "docen_id", nullable = true, unique = true)
     private Docente director;
+
+ */
 
     @OneToOne
     @JoinColumn(name = "carr_usua_id", referencedColumnName = "usua_id", unique = true, nullable = true)

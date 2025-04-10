@@ -10,7 +10,7 @@ public interface IUsuarioRolRepository {
     public UsuarioRol findById(Integer id);
     public List<UsuarioRol> findByIdUsuario(Integer idUsuario);
     public Boolean deleteUsuarioRolbyIdUsuario(Integer idUsuario);
-
+    public Boolean update(UsuarioRol usuarioRol);
     public Boolean deleteUsuarioRolbyIdUsuarioAndRol(Integer idUsuario, String rol);
     //public UsuarioRol findByNombre(String nombre);
     public List<UsuarioRol> findAll();
