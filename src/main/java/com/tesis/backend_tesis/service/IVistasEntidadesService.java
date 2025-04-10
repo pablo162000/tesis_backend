@@ -1,6 +1,7 @@
 package com.tesis.backend_tesis.service;
 
 import com.tesis.backend_tesis.repository.modelo.*;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public interface IVistasEntidadesService {
     public VistaDocente buscarDocentePorIdDocente(Integer idDocente);
     public List<VistaDocente> buscarTodosDocente();
     public List<VistaDocente> buscarDocentesPorEstado(Boolean activo);
+    public List<VistaDocente> buscarDocentesPorFacultad(String facultad);
     public VistaDocente buscarPorCorreoDocente(String correoDocente);
 
     //------------------Secretaerias----------------------------------

@@ -26,7 +26,9 @@ public class AuthResponse implements Serializable {
     private Boolean validdo;
     private Boolean activo;
     private String nombreFacultad;
+    private Integer idFacultad;
     private String nombreCarrera;
+    private Integer idCarrera;
     private List<String> rolesDisponibles;
     private String rolSeleccionado;
 

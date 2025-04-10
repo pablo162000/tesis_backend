@@ -45,9 +45,8 @@ public class CarreraRestFulController {
 
     @PutMapping("/{idCarrera}/autoridades/{idUsuario}")
     public ResponseEntity<Boolean> registroAutoridades(@PathVariable Integer idCarrera,
-                                                       @PathVariable Integer idUsuario,
-                                                       @RequestParam String tipo) {
-        Boolean registro = this.carreraService.insertarAutoridadesCarrera(idCarrera, idUsuario, tipo);
+                                                       @PathVariable Integer idUsuario) {
+        Boolean registro = this.carreraService.insertarAutoridadesCarrera(idCarrera, idUsuario);
         return ResponseEntity.ok(registro);
     }
 }

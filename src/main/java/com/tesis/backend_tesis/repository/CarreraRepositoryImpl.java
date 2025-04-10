@@ -76,8 +76,21 @@ public class CarreraRepositoryImpl implements ICarreraRepository{
 
     @Override
     public Carrera update(Carrera carrera) {
-        this.entityManager.merge(carrera);
-        return carrera;
+        try {
+            Carrera existente = this.entityManager.find(Carrera.class, carrera.getId());
+
+            if (existente != null) {
+                Carrera actualizada = this.entityManager.merge(carrera);
+                logger.info("Carrera con ID {} actualizada correctamente.", carrera.getId());
+                return actualizada;
+            } else {
+                logger.warn("No se encontró la carrera con ID {} para actualizar.", carrera.getId());
+                return null;
+            }
+        } catch (Exception e) {
+            logger.error("Error al actualizar la carrera con ID {}: {}", carrera.getId(), e.getMessage(), e);
+            return null;
+        }
     }
 
     @Override

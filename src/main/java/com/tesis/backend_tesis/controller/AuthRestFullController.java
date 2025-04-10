@@ -39,12 +39,15 @@ public class AuthRestFullController {
         return ResponseEntity.ok(authResponse);
     }
      */
+    /*
     @PutMapping("/usuarios/{idUsuario}/rol")
     public ResponseEntity<AuthResponse> seleccionarRol(@PathVariable Integer idUsuario,
                                                        @RequestBody Map<String, String> body) {
         AuthResponse authResponse = this.authService.seleccionarRol(idUsuario, body.get("rol"));
         return ResponseEntity.ok(authResponse);
     }
+
+     */
 
     //{
     //  "rol": "Director"

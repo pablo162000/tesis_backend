@@ -155,7 +155,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
             case "docente":
 
                 usuario.setCorreoValido(Boolean.TRUE);
-                usuario.setPassword(this.encriptionService.encriptPass(password));
+                usuario.setPassword(this.encriptionService.encriptPass(password.trim()));
                 usuario.setActivo(Boolean.TRUE);
 
                 break;
@@ -163,14 +163,14 @@ public class UsuarioServiceImpl implements IUsuarioService{
             case "secretaria":
 
                 usuario.setCorreoValido(Boolean.TRUE);
-                usuario.setPassword(this.encriptionService.encriptPass(password));
+                usuario.setPassword(this.encriptionService.encriptPass(password.trim()));
                 usuario.setActivo(Boolean.TRUE);
                 break;
 
             case "dirección":
 
                 usuario.setCorreoValido(Boolean.TRUE);
-                usuario.setPassword(this.encriptionService.encriptPass(password));
+                usuario.setPassword(this.encriptionService.encriptPass(password).trim());
                 usuario.setActivo(Boolean.TRUE);
                 break;
 
@@ -195,14 +195,14 @@ public class UsuarioServiceImpl implements IUsuarioService{
 
         }
 
-        Usuario usuario = this.usuarioRepository.buscarPorEmail(correo);
+        Usuario usuario = this.usuarioRepository.buscarPorEmail(correo.trim());
 
         if (usuario == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El usuario no existe");
 
         }
 
-        usuario.setPassword(this.encriptionService.encriptPass(password));
+        usuario.setPassword(this.encriptionService.encriptPass(password.trim()));
 
         // Llamada a actualizar el usuario
         Usuario usuarioActualizado = this.usuarioRepository.actualizar(usuario);
@@ -214,7 +214,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
     @Override
     public Boolean recuperarCuenta(String correo) {
 
-        Usuario usuario = this.usuarioRepository.buscarPorEmail(correo);
+        Usuario usuario = this.usuarioRepository.buscarPorEmail(correo.trim());
 
         if (usuario==null) {
             logger.error("El correo no existe : {}", correo);
@@ -276,7 +276,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El usuario no existe");
 
         }
-        usuario.setPassword(this.encriptionService.encriptPass(password));
+        usuario.setPassword(this.encriptionService.encriptPass(password.trim()));
 
         // Llamada a actualizar el usuario
         Usuario usuarioActualizado = this.usuarioRepository.actualizar(usuario);

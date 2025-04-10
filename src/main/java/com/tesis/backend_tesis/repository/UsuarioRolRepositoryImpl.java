@@ -1,6 +1,6 @@
 package com.tesis.backend_tesis.repository;
 
-import com.tesis.backend_tesis.repository.modelo.Estudiante;
+import com.tesis.backend_tesis.repository.modelo.Propuesta;
 import com.tesis.backend_tesis.repository.modelo.UsuarioRol;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -96,6 +96,27 @@ public class UsuarioRolRepositoryImpl implements IUsuarioRolRepository{
             }
         } catch (Exception e) {
             logger.error("Error al eliminar UsuarioRol con IDUSUARIO {}: {}", idUsuario, e.getMessage(), e);
+            return false;
+        }
+    }
+
+    @Override
+    public Boolean update(UsuarioRol usuarioRol) {
+        try {
+            UsuarioRol existente = this.entityManager.find(UsuarioRol.class, usuarioRol.getId());
+
+            if (existente != null) {
+
+                this.entityManager.merge(usuarioRol); // Guarda los cambios
+
+                logger.info("UsuarioRol con ID {} actualizado correctamente.", usuarioRol.getId());
+                return true;
+            } else {
+                logger.warn("No se encontró UsuarioRol con ID {} para actualizar.", usuarioRol.getId());
+                return false;
+            }
+        } catch (Exception e) {
+            logger.error("Error al actualizar UsuarioRol con ID {}: {}", usuarioRol.getId(), e.getMessage(), e);
             return false;
         }
     }

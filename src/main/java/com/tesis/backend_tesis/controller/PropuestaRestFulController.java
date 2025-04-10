@@ -27,7 +27,7 @@ public class PropuestaRestFulController {
             @RequestParam MultipartFile archivo) throws IOException {
 
             String respuesta = propuestaService.guardar(
-                    tipo, tema, categoria, primerCorreo, segundoCorreo, tercerCorreo, idDocenteTutor, archivo);
+                    tipo, tema.trim(), categoria, primerCorreo.trim(), segundoCorreo.trim(), tercerCorreo.trim(), idDocenteTutor, archivo);
 
             return ResponseEntity.ok(respuesta);
 
@@ -52,7 +52,6 @@ public class PropuestaRestFulController {
 
     @PutMapping("/{idPropuesta}/validar")
     public ResponseEntity<Boolean> validarPropuesta(@PathVariable Integer idPropuesta,
-                                                    @RequestParam("idDocenteDirector")  Integer idDocenteDirector,
                                                     @RequestParam("respuesta") Boolean respuesta,
                                                     @RequestParam(value="observaciones", required = false) String observaciones) {
 

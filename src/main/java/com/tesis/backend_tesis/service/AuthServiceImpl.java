@@ -14,11 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import static com.tesis.backend_tesis.utilitarios.Validaciones.esCorreoValido;
 
 
@@ -66,6 +63,9 @@ public class AuthServiceImpl implements IAuthService {
 
     @Autowired
     private IFacultadService facultadService;
+
+    @Autowired
+    private IVistasEntidadesService vistasEntidadesService;
 
 
 
@@ -307,17 +307,17 @@ public class AuthServiceImpl implements IAuthService {
                     "Los datos del registro son inválidos. Verifique correo, contraseña y tipo de usuario.");
         }
 
-        if (!esCorreoValido(registroRequest.getCorreo())) {
+        if (!esCorreoValido(registroRequest.getCorreo().trim())) {
             logger.error("Correo no válido: {}", registroRequest.getCorreo());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo no es válido.");
         }
 
-        if (this.usuarioRepository.existeUsuarioConEmail(registroRequest.getCorreo())) {
+        if (this.usuarioRepository.existeUsuarioConEmail(registroRequest.getCorreo().trim())) {
             logger.error("El correo ya está registrado: {}", registroRequest.getCorreo());
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El correo ya está registrado.");
         }
 
-        if (this.usuarioRepository.existeUsuarioConCedula(registroRequest.getCedula())) {
+        if (this.usuarioRepository.existeUsuarioConCedula(registroRequest.getCedula().trim())) {
             logger.error("La cédula ya está registrada: {}", registroRequest.getCedula());
             throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en otro usuario.");
         }
@@ -337,13 +337,13 @@ public class AuthServiceImpl implements IAuthService {
 
         // Crear usuario base
         UsuarioDTO usuarioDTO = UsuarioDTO.builder()
-                .primerNombre(registroRequest.getPrimerNombre())
-                .segundoNombre(registroRequest.getSegundoNombre())
-                .primerApellido(registroRequest.getPrimerApellido())
-                .segundoApellido(registroRequest.getSegundoApellido())
-                .cedula(registroRequest.getCedula())
-                .celular(registroRequest.getCelular())
-                .correo(registroRequest.getCorreo())
+                .primerNombre(registroRequest.getPrimerNombre().trim())
+                .segundoNombre(registroRequest.getSegundoNombre().trim())
+                .primerApellido(registroRequest.getPrimerApellido().trim())
+                .segundoApellido(registroRequest.getSegundoApellido().trim())
+                .cedula(registroRequest.getCedula().trim())
+                .celular(registroRequest.getCelular().trim())
+                .correo(registroRequest.getCorreo().trim())
                 .password(this.encriptionService.encriptPass(registroRequest.getPassword()))
                 .fechaCreacion(LocalDateTime.now())
                 .correoValido(Boolean.FALSE)
@@ -562,11 +562,13 @@ public class AuthServiceImpl implements IAuthService {
                     "Los datos del login son inválidos. Verifique correo y contraseña.");
         }
 
-        Usuario usua = this.usuarioRepository.buscarPorEmail(loginRequest.getCorreo());
+
 
         if (!esCorreoValido(loginRequest.getCorreo())){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El correo no es institucional.");
         }
+
+        Usuario usua = this.usuarioRepository.buscarPorEmail(loginRequest.getCorreo().trim());
 
         if (usua == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no está registrado.");
@@ -585,22 +587,102 @@ public class AuthServiceImpl implements IAuthService {
         }
 
         // Recuperar los roles del usuario
-        List<UsuarioRol> rolesUsuario = this.usuarioRolRepository.findByIdUsuario(usua.getId());
+        UsuarioRol rolUsuario = this.usuarioRolRepository.findByIdUsuario(usua.getId()).getFirst();
 
-        if (rolesUsuario.isEmpty()) {
-            throw new RuntimeException("El usuario no tiene roles asignados.");
+        if (rolUsuario == null) {
+            throw new RuntimeException("El usuario no tiene rol asignados.");
         }
 
-        List<String> rolesDisponibles = rolesUsuario.stream()
-                .map(rol -> rol.getRol().getNombre())
-                .collect(Collectors.toList());
+        String nombreFacultad = null;
+        String nombreCarrera = null;
+        Integer idCarrera = null;
+        Integer idFacultad = null;
+
+
+        switch (rolUsuario.getRol().getNombre()) {
+            case "estudiante":
+                EstudianteDTO estudianteDTO = this.estudianteService.buscarPorIdUsuario(usua.getId());
+                if (estudianteDTO == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante no encontrado.");
+                }
+
+                CarreraDTO carreraEstudiante = this.carreraService.buscarCarreraPorId(estudianteDTO.getIdCarrera());
+                nombreFacultad = this.facultadService.buscarFacultadPorId(carreraEstudiante.getIdFacultad()).getNombre();
+                nombreCarrera = carreraEstudiante.getNombre();
+                idCarrera=carreraEstudiante.getId();
+                idFacultad=carreraEstudiante.getIdFacultad();
+                break;
+
+            case "docente":
+                DocenteDTO docenteDTO = this.docenteService.buscarPorIdUsuario(usua.getId());
+                if (docenteDTO == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Docente no encontrado.");
+                }
+
+                nombreFacultad = this.facultadService.buscarFacultadPorId(docenteDTO.getIdFacultad()).getNombre();
+                nombreCarrera = "MultiCarrera";
+                idFacultad=docenteDTO.getIdFacultad();
+                break;
+
+            case "secretaria":
+                SecretariaDTO secretariaDTO = this.secretariaService.buscarPorIdUsuario(usua.getId());
+                if (secretariaDTO == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Secretaria no encontrada.");
+                }
+
+                CarreraDTO carreraSec = this.carreraService.buscarCarreraPorId(secretariaDTO.getIdCarrera());
+                nombreFacultad = this.facultadService.buscarFacultadPorId(carreraSec.getIdFacultad()).getNombre();
+                nombreCarrera = carreraSec.getNombre();
+                idCarrera=carreraSec.getId();
+                idFacultad=carreraSec.getIdFacultad();
+                break;
+
+            case "direccion":
+                CarreraDTO carreraDTO = this.carreraService.buscarPorIDUsuario(usua.getId());
+                if (carreraDTO == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario dirección no encontrado.");
+                }
+
+                nombreFacultad = this.facultadService.buscarFacultadPorId(carreraDTO.getIdFacultad()).getNombre();
+                nombreCarrera = carreraDTO.getNombre();
+                idCarrera=carreraDTO.getId();
+                idFacultad=carreraDTO.getIdFacultad();
+                break;
+
+            case "coordinador":
+                DocenteDTO coordinadorDTO = this.docenteService.buscarPorIdUsuario(usua.getId());
+                if (coordinadorDTO == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Docente no encontrado.");
+                }
+
+                nombreFacultad = this.facultadService.buscarFacultadPorId(coordinadorDTO.getIdFacultad()).getNombre();
+                nombreCarrera = "MultiCarrera";
+                idCarrera=coordinadorDTO.getId();
+                idFacultad=coordinadorDTO.getIdFacultad();
+                break;
+
+            default:
+                throw new RuntimeException("Rol desconocido: " + rolUsuario);
+        }
 
         return AuthResponse.builder()
-                .idUsuario(usua.getId())
+                .primerNombre(usua.getPrimerNombre())
+                .segundoNombre(usua.getSegundoNombre())
+                .primerApellido(usua.getPrimerApellido())
+                .segundoApellido(usua.getSegundoApellido())
                 .correo(usua.getCorreo())
-                .rolesDisponibles(rolesDisponibles) // Solo enviamos la lista de roles
+                .rolSeleccionado(rolUsuario.getRol().getNombre())
+                .idUsuario(usua.getId())
+                .nombreCarrera(nombreCarrera)
+                .idCarrera(idCarrera)
+                .nombreFacultad(nombreFacultad)
+                .idFacultad(idFacultad)
+                .activo(usua.getActivo())
+                .validdo(usua.getCorreoValido())
                 .build();
     }
+
+    /*
 
     @Override
     @Transactional
@@ -679,5 +761,7 @@ public class AuthServiceImpl implements IAuthService {
                 .validdo(usua.getCorreoValido())
                 .build();
     }
+
+     */
 
 }
