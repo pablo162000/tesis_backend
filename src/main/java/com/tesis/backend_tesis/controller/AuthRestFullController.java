@@ -19,6 +19,7 @@ public class AuthRestFullController {
     @Autowired
     private IAuthService authService;
 
+    //
     @PostMapping("/registro")
     public ResponseEntity<Boolean> registroUsuario(@RequestBody RegistroRequest registroRequest) {
         Boolean registro = this.authService.registroNuevoUsuario(registroRequest);

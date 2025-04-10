@@ -52,7 +52,7 @@ public class PropuestaRestFulController {
 
     @PutMapping("/{idPropuesta}/validar")
     public ResponseEntity<Boolean> validarPropuesta(@PathVariable Integer idPropuesta,
-                                                    @RequestParam("idDocenteDirector")  Integer idDocenteDirector,
+
                                                     @RequestParam("respuesta") Boolean respuesta,
                                                     @RequestParam(value="observaciones", required = false) String observaciones) {
 
