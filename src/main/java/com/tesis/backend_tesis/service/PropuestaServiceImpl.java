@@ -385,6 +385,13 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
             String correoDireccion = this.vistasEntidadesService.buscarCarreraPorNombreCarrera(guardada.getCarrera()).getCorreoDireccion();
 
+
+            //para el motor de procesos
+
+            Integer idUsuarioCarrera =
+                    this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaEstudiantePrimero.getCarrera()).getIdUsuarioCarrera();
+
+
             this.motorRestClient.iniciarProceso(guardada.getId());
             logger.info("Se conectó correctamente con el motor de procesos. ID propuesta: {}", guardada.getId());
 
@@ -518,7 +525,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
     @Override
     @Transactional
-    public Boolean validarPropuesta(Integer idPropuesta, Boolean estadoValidacion, String obsercvaciones) {
+    public Boolean validarPropuesta(Integer idPropuesta, Boolean estadoValidacion, String obsercvaciones, Integer idUsuarioSecretaria) {
         if (estadoValidacion == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La respuesta de validación no puede ser nula.");
         }
@@ -791,6 +798,8 @@ public class PropuestaServiceImpl implements IPropuestaService{
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al asiganr los revisores.");
 
             }
+
+
 
             //this.motorRestClient.iniciarProceso(guardada.getId());
             logger.info("Se conectó correctamente con el motor de procesos para asignacion revisores. ID propuesta: {}",

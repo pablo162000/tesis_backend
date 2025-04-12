@@ -306,11 +306,14 @@ public class AuthServiceImpl implements IAuthService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Los datos del registro son inválidos. Verifique correo, contraseña y tipo de usuario.");
         }
-
+/*
         if (!esCorreoValido(registroRequest.getCorreo().trim())) {
             logger.error("Correo no válido: {}", registroRequest.getCorreo());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo no es válido.");
         }
+
+
+ */
 
         if (this.usuarioRepository.existeUsuarioConEmail(registroRequest.getCorreo().trim())) {
             logger.error("El correo ya está registrado: {}", registroRequest.getCorreo());
@@ -373,6 +376,13 @@ public class AuthServiceImpl implements IAuthService {
         }
 
         Integer idCarrera = registroRequest.getIdCarrera();
+
+        if (idCarrera!=null &&this.carreraService.buscarCarreraPorId(idCarrera)==null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "No existe carrera con id: " + idCarrera);
+
+        }
+
 
         // Creación de entidades específicas según el tipo de usuario
         switch (registroRequest.getTipoUsuario().toLowerCase()) {

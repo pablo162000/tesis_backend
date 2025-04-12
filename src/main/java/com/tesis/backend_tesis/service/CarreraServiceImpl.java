@@ -115,6 +115,7 @@ public class CarreraServiceImpl implements ICarreraService {
             }
 
             Carrera carrera = this.carreraRepository.findById(id);
+
             CarreraDTO carreraDTO = this.converter.toDTO(carrera);
 
             logger.info("Carrera recuperad con ID {}  correctamente.", carreraDTO.getId());

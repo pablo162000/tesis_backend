@@ -17,6 +17,8 @@ public interface IUsuarioService {
 
     public UsuarioDTO buscarPorId(Integer idUsuario);
 
+    public Boolean activarDesactivarCuenta(Integer id, Boolean accion);
+
     public void eliminarUsuariosNoVerificadosCarrera();
 
     public void eliminarUsuariosNoVerificados();

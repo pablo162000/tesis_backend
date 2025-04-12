@@ -22,7 +22,5 @@ public class BackendTesisApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		System.out.println("Ejecucion Correcta");
-		System.out.println( this.carreraService.buscarCarreraPorId(1));
 	}
 }

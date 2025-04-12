@@ -53,12 +53,14 @@ public class PropuestaRestFulController {
     @PutMapping("/{idPropuesta}/validar")
     public ResponseEntity<Boolean> validarPropuesta(@PathVariable Integer idPropuesta,
                                                     @RequestParam("respuesta") Boolean respuesta,
-                                                    @RequestParam(value="observaciones", required = false) String observaciones) {
+                                                    @RequestParam(value="observaciones", required = false) String observaciones,
+                                                    @RequestParam("idUsuarioSecretaria") Integer idUsuarioSecretaria) {
 
 
         Boolean exito = this.propuestaService.validarPropuesta(idPropuesta,
                 respuesta,
-                observaciones);
+                observaciones,
+                idUsuarioSecretaria);
 
         return ResponseEntity.ok(exito); // Retorna un HTTP 200 con true si fue exitoso
 

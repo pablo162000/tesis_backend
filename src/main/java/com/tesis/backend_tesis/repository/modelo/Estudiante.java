@@ -29,7 +29,7 @@ public class Estudiante {
     private Usuario usuario;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "estu_carr_id", referencedColumnName = "carr_id", nullable = false)
+    @JoinColumn(name = "estu_carr_id", referencedColumnName = "carr_id")
     private Carrera carrera;
 
     // Relación bidireccional con Propuesta

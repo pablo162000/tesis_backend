@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @CrossOrigin
 @RequestMapping(path = "/usuarios")
@@ -15,7 +16,7 @@ public class UsuarioRestFulController {
     private IUsuarioService usuarioService;
 
 
-    @PutMapping("/activar")
+    @PutMapping("/validar")
     public ResponseEntity<Boolean> validarCorreo(@RequestParam(value = "token") String token,
                                                 @RequestParam(value = "password") String password) {
         Boolean resultado = this.usuarioService.activarCuenta(token, password);
@@ -82,6 +83,15 @@ public class UsuarioRestFulController {
 
          */
         return ResponseEntity.ok(resultado);
+    }
+
+
+    @PutMapping("/activardesactivar/{idUsuario}")
+    public ResponseEntity<Boolean>  activarDesactivarUsuario(@PathVariable("idUsuario") Integer idUsuario,
+                                                             @RequestParam("accion") Boolean accion) {
+        Boolean exito = this.usuarioService.activarDesactivarCuenta(idUsuario,accion );
+
+        return ResponseEntity.ok(exito);
     }
 
 }
