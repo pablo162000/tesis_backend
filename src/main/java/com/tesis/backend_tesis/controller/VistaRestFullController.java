@@ -174,28 +174,28 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarPropuestaPorCarrera(carrera);
     }
 
-    @GetMapping("propuestas/por-validacion")
-    public List<VistaPropuesta> buscarPropuestaPorEstadoValidacion(@RequestParam("validacion") Integer validacion,
+    @GetMapping("propuestas/validacion/{numero}")
+    public List<VistaPropuesta> buscarPropuestaPorEstadoValidacion(@PathVariable Integer numero,
                                                                    @RequestParam("carrera") String carrera ) {
-        return this.vistasEntidadesService.buscarPropuestaPorEstadoValidacion(validacion, carrera);
+        return this.vistasEntidadesService.buscarPropuestaPorEstadoValidacion(numero, carrera);
     }
 
-    @GetMapping("propuesta/por-aprobacion")
-    public List<VistaPropuesta> buscarPropuestaPorEstadoAprobacion(@RequestParam("aprobacion") Integer aprobacion,
+    @GetMapping("propuesta/aprobacion/{numero}")
+    public List<VistaPropuesta> buscarPropuestaPorEstadoAprobacion(@PathVariable Integer numero,
                                                                    @RequestParam("carrera") String carrera ) {
-        return this.vistasEntidadesService.buscarPropuestaPorEstadoValidacion(aprobacion, carrera);
+        return this.vistasEntidadesService.buscarPropuestaPorEstadoAprobacion(numero, carrera);
     }
 
-    @GetMapping("propuesta/por-periodo")
-    public List<VistaPropuesta> buscarPropuestaPorPeriodo(@RequestParam("periodo") String periodo,
+    @GetMapping("propuesta/periodo/{valor}")
+    public List<VistaPropuesta> buscarPropuestaPorPeriodo(@PathVariable String valor,
                                                           @RequestParam("carrera") String carrera ) {
-        return this.vistasEntidadesService.buscarPropuestaPorPeriodo(periodo, carrera);
+        return this.vistasEntidadesService.buscarPropuestaPorPeriodo(valor, carrera);
     }
 
-    @GetMapping("propuesta/por-tipo")
-    public List<VistaPropuesta> buscarPropuestaPorTipo(@RequestParam("tipo") String tipo,
+    @GetMapping("propuesta/tipo")
+    public List<VistaPropuesta> buscarPropuestaPorTipo(@RequestParam("nombre") String nombre,
                                                        @RequestParam("carrera") String carrera ) {
-        return this.vistasEntidadesService.buscarPropuestaPorTipo(tipo, carrera);
+        return this.vistasEntidadesService.buscarPropuestaPorTipo(nombre, carrera);
     }
 
     @GetMapping("propuesta/por-categoria")
@@ -204,29 +204,35 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarPropuestaPorCategoria(categoria, carrera);
     }
 
-    @GetMapping("propuesta/por-tipo-categoria")
-    public List<VistaPropuesta> buscarPropuestaPorCategoria(@RequestParam("tipo") String tipo,
+    @GetMapping("propuesta/tipo-categoria")
+    public List<VistaPropuesta> buscarPropuestaPorCategoriaTipo(@RequestParam("tipo") String tipo,
                                                             @RequestParam("categoria") String categoria,
                                                             @RequestParam("carrera") String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorTipoCategoria(tipo,categoria, carrera);
     }
 
-    @GetMapping("propuesta/por-tema")
-    public List<VistaPropuesta> buscarPropuestaPorTema(@RequestParam("tema") String tema,
+    @GetMapping("propuesta/tema/{nombre}")
+    public List<VistaPropuesta> buscarPropuestaPorTema(@PathVariable String nombre,
                                                        @RequestParam("carrera") String carrera ) {
-        return this.vistasEntidadesService.buscarPropuestaPorTema(tema, carrera);
+        return this.vistasEntidadesService.buscarPropuestaPorTema(nombre, carrera);
     }
 
-    @GetMapping("propuesta/por-tutor")
-    public List<VistaPropuesta> buscarPropuestaPorTutor(@RequestParam("idUsuario") Integer idUsuario,
+    @GetMapping("propuesta/tutor/usuario/{idUsuario}")
+    public List<VistaPropuesta> buscarPropuestaPorTutor(@PathVariable Integer idUsuario,
                                                        @RequestParam("facultad") String facultad ) {
         return this.vistasEntidadesService.buscarPropuestaPorTutor(idUsuario, facultad);
     }
 
-    @GetMapping("propuesta/por-revisor")
-    public List<VistaPropuesta> buscarPropuestaPorRevisor(@RequestParam("idUsuario") Integer idUsuario,
+    @GetMapping("propuesta/revisor/usuario/{idUsuario}")
+    public List<VistaPropuesta> buscarPropuestaPorRevisor(@PathVariable Integer idUsuario,
                                                         @RequestParam("facultad") String facultad ) {
         return this.vistasEntidadesService.buscarPropuestaPorRevisor(idUsuario, facultad);
+    }
+
+
+    @GetMapping("propuesta/estudiante/usuario/{idUsuario}")
+    public List<VistaPropuesta> buscarPropuestaPorEstudiante(@PathVariable("idUsuario") Integer idUsuario) {
+        return this.vistasEntidadesService.buscarPropuestaPorEstudiante(idUsuario);
     }
 
 }

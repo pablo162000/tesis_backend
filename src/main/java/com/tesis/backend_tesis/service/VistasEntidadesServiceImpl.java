@@ -689,7 +689,7 @@ public class VistasEntidadesServiceImpl implements IVistasEntidadesService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La carrea, tipo o categoria no puede ser nulo o vacío.");
         }
 
-        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findByCategoria(categoria,carrera);
+        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findByTipoCategoria(tipo,categoria,carrera);
 
         if (vistaPropuestas.isEmpty()) {
             logger.warn("No se encontraron registros de VistaPropuesta con carrera {}, tipo {} y categoria'{}'.", carrera, tipo,categoria);
@@ -745,7 +745,7 @@ public class VistasEntidadesServiceImpl implements IVistasEntidadesService {
                     "La facultad no puede ser nulo o vacío y el idUsuario para revisor no puede ser nullo o negativo.");
         }
 
-        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findByTutor(idUsuario,facultad);
+        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findByRevisor(idUsuario,facultad);
 
         if (vistaPropuestas.isEmpty()) {
             logger.warn("No se encontraron registros de VistaPropuesta con facultad {} e idUsuario para revisor'{}'.", facultad, idUsuario);
@@ -754,6 +754,26 @@ public class VistasEntidadesServiceImpl implements IVistasEntidadesService {
         }
 
         logger.info("Se encontraron {} registros de VistaPropuesta con facultad '{}' e idUsuario para revisor {} .", vistaPropuestas.size(), facultad, idUsuario);
+        return vistaPropuestas;
+    }
+
+    @Override
+    public List<VistaPropuesta> buscarPropuestaPorEstudiante(Integer idUsuario) {
+        if (idUsuario == null || idUsuario <= 0) {
+            logger.warn("El idUsuario para revisor no puede ser nullo o negativo.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El idUsuario para revisor no puede ser nullo o negativo.");
+        }
+
+        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findByEstudiante(idUsuario);
+
+        if (vistaPropuestas.isEmpty()) {
+            logger.warn("No se encontraron registros de VistaPropuesta idUsuario para revisor'{}'.", idUsuario);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "No se encontraron registros con carrera e idUsuario para revisor proporcionados.");
+        }
+
+        logger.info("Se encontraron {} registros de VistaPropuesta e idUsuario para revisor {} .", vistaPropuestas.size(), idUsuario);
         return vistaPropuestas;
     }
 

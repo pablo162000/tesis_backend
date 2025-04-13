@@ -2,7 +2,6 @@ package com.tesis.backend_tesis.repository;
 
 import com.tesis.backend_tesis.repository.modelo.EstadoAprobacion;
 import com.tesis.backend_tesis.repository.modelo.EstadoValidacion;
-import com.tesis.backend_tesis.repository.modelo.VistaEstudiante;
 import com.tesis.backend_tesis.repository.modelo.VistaPropuesta;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -284,6 +283,31 @@ public class VistaPropuestaRepositoryImpl implements IVistaPropuestaRepository {
             return vistaPropuestas;
         } catch (Exception e) {
             logger.error("Error al buscar propuestas en VistaPropuesta con revisor idUsuario  y facultad: {}", e.getMessage(), e);
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<VistaPropuesta> findByEstudiante(Integer idUsuario) {
+        try {
+            TypedQuery<VistaPropuesta> query = this.entityManager.createQuery(
+                    "SELECT p FROM VistaPropuesta p " +
+                            "WHERE p.primerUsuaId = :idUsuario " +
+                            "OR p.segundoUsuaId = :idUsuario " +
+                            "OR p.tercerUsuaId = :idUsuario",VistaPropuesta.class
+            );
+            query.setParameter("idUsuario", idUsuario);
+            List<VistaPropuesta> vistaPropuestas = query.getResultList();
+
+            if (vistaPropuestas.isEmpty()) {
+                logger.debug("No se encontraron propuestas en VistaPropuesta con estudiante  con idUsuario {}.", idUsuario);
+            } else {
+                logger.debug("Se encontraron {} propuestas en VistaPropuesta con estudiante con idUsuario {} .", vistaPropuestas.size(), idUsuario);
+            }
+
+            return vistaPropuestas;
+        } catch (Exception e) {
+            logger.error("Error al buscar propuestas en VistaPropuesta con estudiante con idUsuario  y facultad: {}", e.getMessage(), e);
             return Collections.emptyList();
         }
     }
