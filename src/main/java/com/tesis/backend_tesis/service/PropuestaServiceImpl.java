@@ -89,9 +89,8 @@ public class PropuestaServiceImpl implements IPropuestaService{
         EstudianteDTO estudiantePrimero= null;
         VistaEstudiante vistaEstudiantePrimero = null;
 
-
+         // variables para buscar el estudiante por el correo
         vistaEstudiantePrimero  = this.vistasEntidadesService.buscarPorCorreoEstudainte(primerCorreo);
-
         estudiantePrimero = this.estudianteService.buscarPorIdUsuario(vistaEstudiantePrimero.getIdUsuario());
 
         if (vistaEstudiantePrimero == null || !vistaEstudiantePrimero.getActivo() || !vistaEstudiantePrimero.getCorreoValido()) {
@@ -385,8 +384,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
             String correoDireccion = this.vistasEntidadesService.buscarCarreraPorNombreCarrera(guardada.getCarrera()).getCorreoDireccion();
 
-            this.motorRestClient.iniciarProceso(guardada.getId());
-            logger.info("Se conectó correctamente con el motor de procesos. ID propuesta: {}", guardada.getId());
 
             this.correoRestClient.notificacionenviopropuestav2(primerCorreo, ccEmails, nombres, tema,
                     correoDireccion, archivo);
@@ -396,6 +393,9 @@ public class PropuestaServiceImpl implements IPropuestaService{
             logger.error("Error en el proceso: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al procesar propuesta.");
         }
+
+        this.motorRestClient.iniciarProceso(guardada.getId(), guardada.getEstudiante1().getId(), 5);
+
 
         // 8. Respuesta exitosa
         return "guardada con exito";
