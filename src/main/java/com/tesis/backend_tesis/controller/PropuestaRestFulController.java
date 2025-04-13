@@ -53,12 +53,13 @@ public class PropuestaRestFulController {
     @PutMapping("/{idPropuesta}/validar")
     public ResponseEntity<Boolean> validarPropuesta(@PathVariable Integer idPropuesta,
                                                     @RequestParam("respuesta") Boolean respuesta,
-                                                    @RequestParam(value="observaciones", required = false) String observaciones) {
+                                                    @RequestParam(value="observaciones", required = false) String observaciones,
+                                                    @RequestParam("taskID") String taskID) {
 
 
         Boolean exito = this.propuestaService.validarPropuesta(idPropuesta,
                 respuesta,
-                observaciones);
+                observaciones, taskID);
 
         return ResponseEntity.ok(exito); // Retorna un HTTP 200 con true si fue exitoso
 
@@ -88,11 +89,11 @@ public class PropuestaRestFulController {
                                                     @RequestParam("idDocente2") Integer idDocente2,
                                                     @RequestPart("rubrica") MultipartFile rubrica,
                                                     @RequestPart("archivo") MultipartFile archivo ,
-                                                    @RequestPart("oficio") MultipartFile oficio
+                                                    @RequestPart("oficio") MultipartFile oficio, @RequestPart("taskID") String taskID
 
     ) {
 
-        Boolean exito = this.propuestaService.asignarRevisor(idPropuesta, idDocente1, idDocente2, rubrica, archivo, oficio);
+        Boolean exito = this.propuestaService.asignarRevisor(idPropuesta, idDocente1, idDocente2, rubrica, archivo, oficio, taskID);
 
         return ResponseEntity.ok(exito);
     }

@@ -30,6 +30,6 @@ public class AuthResponse implements Serializable {
     private String nombreCarrera;
     private Integer idCarrera;
     private List<String> rolesDisponibles;
-    private String rolSeleccionado;
+    private String rol;
 
 }

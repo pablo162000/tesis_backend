@@ -671,7 +671,7 @@ public class AuthServiceImpl implements IAuthService {
                 .primerApellido(usua.getPrimerApellido())
                 .segundoApellido(usua.getSegundoApellido())
                 .correo(usua.getCorreo())
-                .rolSeleccionado(rolUsuario.getRol().getNombre())
+                .rol(rolUsuario.getRol().getNombre())
                 .idUsuario(usua.getId())
                 .nombreCarrera(nombreCarrera)
                 .idCarrera(idCarrera)

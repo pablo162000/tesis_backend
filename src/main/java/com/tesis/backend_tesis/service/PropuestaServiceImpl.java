@@ -518,7 +518,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
     @Override
     @Transactional
-    public Boolean validarPropuesta(Integer idPropuesta, Boolean estadoValidacion, String obsercvaciones) {
+    public Boolean validarPropuesta(Integer idPropuesta, Boolean estadoValidacion, String obsercvaciones, String taskID) {
         if (estadoValidacion == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La respuesta de validación no puede ser nula.");
         }
@@ -549,6 +549,10 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
         Boolean seGuardo= false;
         seGuardo= this.propuestaRepository.update(propuestaExistente);
+
+        if(!seGuardo){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar la validacion.");
+        }
 
         if (propuestaExistente.getEstadoValidacion().equals(EstadoValidacion.NO_VALIDADO)){
 
@@ -612,12 +616,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
             seGuardo= this.propuestaRepository.update(propuestaExistente);
             try {
 
-                if(!seGuardo){
-
-                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar la validacion.");
-                }
-
-
                 this.correoRestClient.notificacionNegacionTema(
                         primerEstudianteDTO.getCorreo(),
                         ccEmails,
@@ -635,6 +633,17 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
         }
 
+        // ✅ Hasta aquí sabemos que todo salió bien, así que completamos la tarea BPMN
+        try {
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("validacionAprobada", estadoValidacion);
+
+            this.motorRestClient.completarTarea(taskID, variables);
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN.");
+        }
+
         // Guardar los cambios
         return seGuardo;
 
@@ -644,7 +653,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
     public Boolean asignarRevisor(Integer idPropuesta, Integer idDocente1, Integer idDocente2,
                                   MultipartFile rubrica,
                                   MultipartFile archivo,
-                                  MultipartFile oficio) {
+                                  MultipartFile oficio, String taskID) {
         // Validar entrada
         if (idPropuesta == null || idPropuesta < 1 ||
                 idDocente1 == null || idDocente1 < 1 ||
@@ -814,6 +823,19 @@ public class PropuestaServiceImpl implements IPropuestaService{
             logger.error("Error en el proceso: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de procesos o correo.");
         }
+
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("idRevisor1", idDocente1);
+            variables.put("idRevisor2", idDocente2);
+
+            try {
+                this.motorRestClient.completarTarea(taskID, variables);
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN.");
+            }
+
+
         return revisionGuardada;
     }
 
