@@ -54,12 +54,13 @@ public class PropuestaRestFulController {
     public ResponseEntity<Boolean> validarPropuesta(@PathVariable Integer idPropuesta,
                                                     @RequestParam("respuesta") Boolean respuesta,
                                                     @RequestParam(value="observaciones", required = false) String observaciones,
+                                                    @RequestParam("idUsuarioSecretaria") Integer idUsuarioSecretaria,
                                                     @RequestParam("taskID") String taskID) {
 
 
         Boolean exito = this.propuestaService.validarPropuesta(idPropuesta,
                 respuesta,
-                observaciones, taskID);
+                observaciones,  idUsuarioSecretaria, taskID);
 
         return ResponseEntity.ok(exito); // Retorna un HTTP 200 con true si fue exitoso
 

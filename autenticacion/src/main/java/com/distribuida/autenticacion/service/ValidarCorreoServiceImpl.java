@@ -17,12 +17,14 @@ public class ValidarCorreoServiceImpl implements IValidarCorreoService{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Falta el correo del usuario.");
         }
-
+/*
         if(!correo.toLowerCase().endsWith("@uce.edu.ec")){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "El dominio de correo no es valido.");
 
         }
+
+ */
 
 
         String token = JwUtil.generateToken(correo.toLowerCase());

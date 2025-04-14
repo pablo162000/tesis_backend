@@ -19,6 +19,7 @@ public interface IVistaPropuestaRepository {
     public List<VistaPropuesta> findByTema(String tema, String carrera);
     public List<VistaPropuesta> findByTutor(Integer idUsuario, String facultad);
     public List<VistaPropuesta> findByRevisor (Integer idUsuario, String facultad);
+    public List<VistaPropuesta> findByEstudiante(Integer idUsuario);
 
 
     public List<VistaPropuesta> findAll();

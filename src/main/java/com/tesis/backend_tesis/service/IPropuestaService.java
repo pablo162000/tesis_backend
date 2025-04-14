@@ -27,7 +27,7 @@ public interface IPropuestaService {
 
     public Boolean diferentesCarreras(Integer idEstudiante1,Integer idEstudiante2, Integer idEstudiante3);
     //public List<PropuestaDTO> buscarPorIdEstudiante(Integer idEstudiante);
-    public Boolean validarPropuesta(Integer idPropuesta, Boolean estadoValidacion, String obsercvaciones, String taskID);
+    public Boolean validarPropuesta(Integer idPropuesta, Boolean estadoValidacion, String obsercvaciones,Integer idUsuarioSecretaria, String taskID);
     public Boolean asignarRevisor(Integer idPropuesta,
                                   Integer idDocente1,
                                   Integer idDocente2,

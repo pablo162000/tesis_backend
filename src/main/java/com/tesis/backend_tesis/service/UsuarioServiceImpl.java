@@ -307,6 +307,33 @@ public class UsuarioServiceImpl implements IUsuarioService{
     }
 
     @Override
+    public Boolean activarDesactivarCuenta(Integer id, Boolean accion) {
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID del usuario no puede ser nulo.");
+        }
+
+        if (accion == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "La acción de activación o desactivación no puede ser nula.");
+        }
+
+        Usuario usuario = this.usuarioRepository.findById(id);
+        if (usuario == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Usuario no encontrado.");
+        }
+
+        Boolean respuesta = this.usuarioRepository.activarDesactivarUsuario(id, accion);
+
+        if (!respuesta){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, "Error al activarDesactivarCuenta .");
+        }
+
+        return respuesta;
+    }
+
+    @Override
     @Transactional
     @Scheduled(cron = "0 */2 * * * ?")
     public void eliminarUsuariosNoVerificadosCarrera() {

@@ -372,7 +372,8 @@ public class PropuestaServiceImpl implements IPropuestaService{
         posiblesNombres.add(nombresTercerEstudiante);
 
         String nombres = this.validaciones.obtenerNombresEstudiantes(posiblesNombres);
-
+        Integer idUsuarioCarrera =
+        this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaEstudiantePrimero.getCarrera()).getIdUsuarioCarrera();
 
         try {
             if (revisionGuardada == null || guardada == null ||
@@ -394,7 +395,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al procesar propuesta.");
         }
 
-        this.motorRestClient.iniciarProceso(guardada.getId(), guardada.getEstudiante1().getId(), 5);
+        this.motorRestClient.iniciarProceso(guardada.getId(), guardada.getEstudiante1().getId(), idUsuarioCarrera);
 
 
         // 8. Respuesta exitosa
@@ -518,7 +519,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
     @Override
     @Transactional
-    public Boolean validarPropuesta(Integer idPropuesta, Boolean estadoValidacion, String obsercvaciones, String taskID) {
+    public Boolean validarPropuesta(Integer idPropuesta, Boolean estadoValidacion, String obsercvaciones, Integer idUsuarioSecretaria, String taskID) {
         if (estadoValidacion == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La respuesta de validación no puede ser nula.");
         }
@@ -800,6 +801,8 @@ public class PropuestaServiceImpl implements IPropuestaService{
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al asiganr los revisores.");
 
             }
+
+
 
             //this.motorRestClient.iniciarProceso(guardada.getId());
             logger.info("Se conectó correctamente con el motor de procesos para asignacion revisores. ID propuesta: {}",
