@@ -163,6 +163,7 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarTodosUsuarioRol();
     }
 
+//------------------- Vista Propuestas-----------------------//
 
     @GetMapping("propuestas/{idPropuesta}")
     public VistaPropuesta buscarPropuestaPorIdPropuesta(@PathVariable Integer idPropuesta) {
