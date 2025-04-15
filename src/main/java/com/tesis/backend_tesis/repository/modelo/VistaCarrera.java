@@ -25,20 +25,14 @@ public class VistaCarrera {
     @Column(name = "carrera")
     private String carrera;
 
-    @Column(name = "correo_direccion")
+    @Column(name = "correodireccion")
     private String correoDireccion;
 
-    @Column(name = "director_id")
-    private Integer idDirector;
 
     @Column(name = "usuario_carrera_id")
     private Integer idUsuarioCarrera;
 
-    @Column(name = "nombre_director")
-    private String nombreDirector;
 
-    @Column(name = "correo_director")
-    private String correoDirector;
 
     @Column(name = "coordinador_id")
     private Integer idCoordinador;

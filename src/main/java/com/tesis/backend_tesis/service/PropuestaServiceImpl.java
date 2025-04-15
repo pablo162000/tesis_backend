@@ -328,31 +328,42 @@ public class PropuestaServiceImpl implements IPropuestaService{
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar el archivo.");
         }
 
+        Propuesta guardada;
+        Revision revisionGuardada;
 
-        // 6. Construir la propuesta
-        Propuesta propuesta = Propuesta.builder()
-                .carrera(vistaEstudiantePrimero.getCarrera())
-                .tipo(tipo)
-                .categoria(categoria)
-                .tema(tema)
-                .estudiante1(this.converter.toEntity(estudiantePrimero))
-                .estudiante2(estudianteSegundo != null ? this.converter.toEntity(estudianteSegundo) : null)
-                .estudiante3(estudianteTercero != null ? this.converter.toEntity(estudianteTercero) : null)
-                .tutor(tutor!= null ? this.converter.toEntity(tutor) : null)
-                .estadoValidacion(EstadoValidacion.NO_REVISADO)
-                .periodo("2024")
-                .estadoAprobacion(EstadoAprobacion.EN_REVISON)
-                .build();
+        try {
 
-        Propuesta guardada =this.propuestaRepository.insert(propuesta);
+            // 6. Construir la propuesta
+            Propuesta propuesta = Propuesta.builder()
+                    .carrera(vistaEstudiantePrimero.getCarrera())
+                    .tipo(tipo)
+                    .categoria(categoria)
+                    .tema(tema)
+                    .estudiante1(this.converter.toEntity(estudiantePrimero))
+                    .estudiante2(estudianteSegundo != null ? this.converter.toEntity(estudianteSegundo) : null)
+                    .estudiante3(estudianteTercero != null ? this.converter.toEntity(estudianteTercero) : null)
+                    .tutor(tutor!= null ? this.converter.toEntity(tutor) : null)
+                    .estadoValidacion(EstadoValidacion.NO_REVISADO)
+                    .periodo("2024")
+                    .estadoAprobacion(EstadoAprobacion.EN_REVISON)
+                    .build();
 
-        Revision revision = Revision.builder()
-                .archivoSubidoEstudiantes(ar)
-                .propuesta(guardada)
-                .numeroRevision(1)
-                .build();
+             guardada =this.propuestaRepository.insert(propuesta);
 
-        Revision revisionGuardada = this.revisionRepository.insert(revision);
+            Revision revision = Revision.builder()
+                    .archivoSubidoEstudiantes(ar)
+                    .propuesta(guardada)
+                    .numeroRevision(1)
+                    .build();
+
+             revisionGuardada = this.revisionRepository.insert(revision);
+
+        } catch (Exception e) {
+
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al registrar propuesta.");
+
+        }
+
 
 
         List<String> ccEmails = new ArrayList<>();
@@ -375,6 +386,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
         Integer idUsuarioCarrera =
         this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaEstudiantePrimero.getCarrera()).getIdUsuarioCarrera();
 
+        /*
         try {
             if (revisionGuardada == null || guardada == null ||
                     this.revisionRepository.findById(revisionGuardada.getId()) == null ||
@@ -394,10 +406,19 @@ public class PropuestaServiceImpl implements IPropuestaService{
             logger.error("Error en el proceso: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al procesar propuesta.");
         }
+        */
 
-        this.motorRestClient.iniciarProceso(guardada.getId(), guardada.getEstudiante1().getId(), idUsuarioCarrera);
 
 
+
+        try {
+            this.motorRestClient.iniciarProceso(guardada.getId(), guardada.getEstudiante1().getId(), idUsuarioCarrera);
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error iniciando proceso en Flowable");
+
+            // dependiendo del negocio, podrías eliminar lo guardado, notificar, etc.
+        }
         // 8. Respuesta exitosa
         return "guardada con exito";
 

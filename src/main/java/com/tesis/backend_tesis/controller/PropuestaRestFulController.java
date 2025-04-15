@@ -26,8 +26,11 @@ public class PropuestaRestFulController {
             @RequestParam(required = false) Integer idDocenteTutor,
             @RequestParam MultipartFile archivo) throws IOException {
 
+            String segundoCorreoVal = segundoCorreo != null ? segundoCorreo.trim() : null;
+            String tercerCorreoVal = tercerCorreo != null ? tercerCorreo.trim() : null;
+
             String respuesta = propuestaService.guardar(
-                    tipo, tema.trim(), categoria, primerCorreo.trim(), segundoCorreo.trim(), tercerCorreo.trim(), idDocenteTutor, archivo);
+                    tipo, tema.trim(), categoria, primerCorreo.trim(), segundoCorreoVal,tercerCorreoVal, idDocenteTutor, archivo);
 
             return ResponseEntity.ok(respuesta);
 
