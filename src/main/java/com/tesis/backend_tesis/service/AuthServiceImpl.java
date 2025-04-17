@@ -675,6 +675,8 @@ public class AuthServiceImpl implements IAuthService {
                 throw new RuntimeException("Rol desconocido: " + rolUsuario);
         }
 
+
+
         return AuthResponse.builder()
                 .primerNombre(usua.getPrimerNombre())
                 .segundoNombre(usua.getSegundoNombre())
