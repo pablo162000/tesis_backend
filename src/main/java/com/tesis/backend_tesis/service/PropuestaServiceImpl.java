@@ -748,7 +748,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
             List<Integer> posiblesTutores = Arrays.asList(idDocente1, idDocente2);
             // Verificar que ningun revisor sea el mismo tutor si ya esta asignado
-            if (posiblesTutores.contains(vistaPropuestaExistente.getFirst().getTutorUsuaId())) {
+            if (posiblesTutores.contains(vistaPropuestaExistente.getFirst().getTutorDocenteId())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El tutor no puede ser un revisor");
             }
         }
@@ -828,6 +828,13 @@ public class PropuestaServiceImpl implements IPropuestaService{
         String correoDireccion = this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaPropuestaExistente.getFirst().getCarrera()).getCorreoDireccion();
         String fechaEntrega = this.validaciones.sumarDiasLaborables(LocalDate.now(), 10);
         ccEmails.add(correoDireccion);
+
+        if (vistaPropuestaExistente.getFirst().getTutorDocenteId()!=null){
+
+            ccEmails.add( this.vistasEntidadesService.buscarDocentePorIdDocente(
+                    vistaPropuestaExistente.getFirst().getTutorDocenteId()).getCorreo());
+        }
+
         try{
             if (!revisionGuardada) {
 
