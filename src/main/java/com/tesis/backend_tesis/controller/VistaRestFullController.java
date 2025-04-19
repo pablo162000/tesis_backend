@@ -181,57 +181,57 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarPropuestaPorEstadoValidacion(numero, carrera);
     }
 
-    @GetMapping("propuesta/aprobacion/{numero}")
+    @GetMapping("propuestas/aprobacion/{numero}")
     public List<VistaPropuesta> buscarPropuestaPorEstadoAprobacion(@PathVariable Integer numero,
                                                                    @RequestParam("carrera") String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorEstadoAprobacion(numero, carrera);
     }
 
-    @GetMapping("propuesta/periodo/{valor}")
+    @GetMapping("propuestas/periodo/{valor}")
     public List<VistaPropuesta> buscarPropuestaPorPeriodo(@PathVariable String valor,
                                                           @RequestParam("carrera") String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorPeriodo(valor, carrera);
     }
 
-    @GetMapping("propuesta/tipo")
+    @GetMapping("propuestas/tipo")
     public List<VistaPropuesta> buscarPropuestaPorTipo(@RequestParam("nombre") String nombre,
                                                        @RequestParam("carrera") String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorTipo(nombre, carrera);
     }
 
-    @GetMapping("propuesta/por-categoria")
+    @GetMapping("propuestas/por-categoria")
     public List<VistaPropuesta> buscarPropuestaPorCategoria(@RequestParam("categoria") String categoria,
                                                             @RequestParam("carrera") String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorCategoria(categoria, carrera);
     }
 
-    @GetMapping("propuesta/tipo-categoria")
+    @GetMapping("propuestas/tipo-categoria")
     public List<VistaPropuesta> buscarPropuestaPorCategoriaTipo(@RequestParam("tipo") String tipo,
                                                             @RequestParam("categoria") String categoria,
                                                             @RequestParam("carrera") String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorTipoCategoria(tipo,categoria, carrera);
     }
 
-    @GetMapping("propuesta/tema/{nombre}")
+    @GetMapping("propuestas/tema/{nombre}")
     public List<VistaPropuesta> buscarPropuestaPorTema(@PathVariable String nombre,
                                                        @RequestParam("carrera") String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorTema(nombre, carrera);
     }
 
-    @GetMapping("propuesta/tutor/usuario/{idUsuario}")
+    @GetMapping("propuestas/tutor/usuario/{idUsuario}")
     public List<VistaPropuesta> buscarPropuestaPorTutor(@PathVariable Integer idUsuario,
                                                        @RequestParam("facultad") String facultad ) {
         return this.vistasEntidadesService.buscarPropuestaPorTutor(idUsuario, facultad);
     }
 
-    @GetMapping("propuesta/revisor/usuario/{idUsuario}")
+    @GetMapping("propuestas/revisor/usuario/{idUsuario}")
     public List<VistaPropuesta> buscarPropuestaPorRevisor(@PathVariable Integer idUsuario,
                                                         @RequestParam("facultad") String facultad ) {
         return this.vistasEntidadesService.buscarPropuestaPorRevisor(idUsuario, facultad);
     }
 
 
-    @GetMapping("propuesta/estudiante/usuario/{idUsuario}")
+    @GetMapping("propuestas/estudiante/usuario/{idUsuario}")
     public List<VistaPropuesta> buscarPropuestaPorEstudiante(@PathVariable("idUsuario") Integer idUsuario) {
         return this.vistasEntidadesService.buscarPropuestaPorEstudiante(idUsuario);
     }
