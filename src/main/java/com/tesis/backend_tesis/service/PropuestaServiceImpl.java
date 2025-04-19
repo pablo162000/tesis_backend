@@ -742,6 +742,17 @@ public class PropuestaServiceImpl implements IPropuestaService{
         // Asignar el docente según el tipo de revisor
         boolean cambioRealizado;
 
+
+        if (vistaPropuestaExistente.getFirst().getTutorUsuaId() != null){
+
+
+            List<Integer> posiblesTutores = Arrays.asList(idDocente1, idDocente2);
+            // Verificar que ningun revisor sea el mismo tutor si ya esta asignado
+            if (posiblesTutores.contains(vistaPropuestaExistente.getFirst().getTutorUsuaId())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El tutor no puede ser un revisor");
+            }
+        }
+
         if (new HashSet<>(docentesRegistrados).equals(new HashSet<>(docentesIngresados))) {
            cambioRealizado = false;
         }else {
