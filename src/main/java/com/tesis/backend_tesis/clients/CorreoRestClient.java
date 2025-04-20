@@ -90,4 +90,17 @@ public interface CorreoRestClient {
             @RequestPart("rubrica") MultipartFile rubrica,
             @RequestPart("archivo") MultipartFile archivo ,
             @RequestPart("oficio") MultipartFile oficio );
+
+
+    @PostMapping(value = "/correo/notificacionnegaciontemav2")
+    public ResponseEntity<String> notificacionNegacionTemaV2(
+            @RequestParam("email") String toEmail,  // Correo del destinatario principal
+            @RequestParam("ccemails") List<String> ccEmails,  // Lista de correos CC
+            @RequestParam("estudiante") String estudiante,  // Información del estudiante
+            @RequestParam("tema") String tema,  // Tema del correo
+            @RequestParam("correodireccion") String correoDireccion,  // Dirección del correo (si es necesario)
+            @RequestParam("observaciones") String observaciones
+    );
 }
+
+

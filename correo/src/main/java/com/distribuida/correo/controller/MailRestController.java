@@ -141,6 +141,28 @@ public class MailRestController {
 
     }
 
+    @PostMapping(value = "/notificacionnegaciontemav2")
+    public ResponseEntity<String> notificacionNegacionTemaV2(
+            @RequestParam("email") String toEmail,  // Correo del destinatario principal
+            @RequestParam("ccemails") List<String> ccEmails,  // Lista de correos CC
+            @RequestParam("estudiante") String estudiante,  // Información del estudiante
+            @RequestParam("tema") String tema,  // Tema del correo
+            @RequestParam("correodireccion") String correoDireccion,  // Dirección del correo (si es necesario)
+            @RequestParam("observaciones") String observaciones
+    ) {
+        try {
+
+
+            // Llamar al servicio para enviar el correo
+            this.mailGunServices.sendEmaiNegacionTema(toEmail, ccEmails, estudiante, tema, correoDireccion, observaciones);
+
+            // Si todo va bien, respondemos con un mensaje de éxito
+            return ResponseEntity.status(HttpStatus.OK).body("Correo enviado exitosamente de negacion tema.");
+        }  catch (UnirestException e) {
+            return ResponseEntity.status(500).body("Error al enviar el correo de negacion tema: " + e.getMessage());
+        }
+    }
+
 
 
 

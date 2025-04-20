@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -192,7 +193,6 @@ public class MailGunService {
 
         toEmail = "luismosquera97@gmail.com"; //FORZADO SOLO PARA PRUEBAS
 
-
         //Crear el mapa de variables dinámicas
         Map<String, String> variablesMap = new HashMap<>();
         variablesMap.put("usuario", usuario);
@@ -222,9 +222,58 @@ public class MailGunService {
             throw new UnirestException("Error al enviar el correo: " + response.getStatus() + " " + response.getBody());
         }
 
-
     }
 
+
+    public void sendEmaiNegacionTema(String toEmail, List<String> ccEmails, String estudiante,
+                                     String tema, String correoDireccion, String observaciones) throws UnirestException {
+
+        toEmail = "luismosquera97@gmail.com";
+        List<String> ccEmailsQuemados = new ArrayList<>();
+        ccEmailsQuemados.add("jdmasabanda@uce.edu.ec");
+        ccEmailsQuemados.add("lfmosquerar@uce.edu.ec");
+        ccEmailsQuemados.add("pasuntaxih@uce.edu.ec");
+
+
+        // Crear el mapa de variables dinámicas
+        Map<String, String> variablesMap = new HashMap<>();
+        variablesMap.put("nombreEstudiante", estudiante);
+        variablesMap.put("tema", tema);
+        variablesMap.put("observaciones", observaciones);
+        variablesMap.put("correoDireccion", correoDireccion);
+
+        String variablesJson;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            variablesJson = objectMapper.writeValueAsString(variablesMap);
+        } catch (Exception e) {
+            throw new UnirestException("Error al generar JSON de variables", e);
+        }
+
+        MultipartBody request = Unirest.post("https://api.mailgun.net/v3/" + sandboxDomain + "/messages")
+                .basicAuth("api", apiKey)
+                .field("from", fromEmail)
+                .field("to", toEmail)
+                .field("subject", "Rechazo Propuesta por Tema")
+                .field("template", "negaciontema")
+                .field("h:X-Mailgun-Variables", variablesJson);
+
+
+
+        // Agregar destinatarios en copia (CC)
+        if (ccEmailsQuemados != null && !ccEmailsQuemados.isEmpty()) {
+            for (String cc : ccEmailsQuemados) {
+                request.field("cc", cc);
+            }
+        }
+
+
+        HttpResponse<JsonNode> response = request.asJson();
+
+        if (response.getStatus() != 200) {
+            throw new UnirestException("Error al enviar el correo: " + response.getStatus() + " " + response.getBody());
+        }
+    }
 
 
 

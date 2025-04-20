@@ -617,12 +617,20 @@ public class PropuestaServiceImpl implements IPropuestaService{
             }
 
 
+
+
             List<String> posiblesNombres = new ArrayList<String>();
 
             List<String> ccEmails = new ArrayList<>();
             Stream.of(segundoCorreo, tercerCorreo)
                     .filter(Objects::nonNull) // Filtra solo los que no son null
                     .forEach(ccEmails::add);
+
+            if (propuestaExistente.getTutor()!=null){
+
+                ccEmails.add( this.vistasEntidadesService.buscarDocentePorIdDocente(
+                        propuestaExistente.getTutor().getId()).getCorreo());
+            }
 
 
             posiblesNombres.add(primerEstudiante);
@@ -638,7 +646,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
             seGuardo= this.propuestaRepository.update(propuestaExistente);
             try {
 
-                this.correoRestClient.notificacionNegacionTema(
+                this.correoRestClient.notificacionNegacionTemaV2(
                         primerEstudianteDTO.getCorreo(),
                         ccEmails,
                         nombres,
