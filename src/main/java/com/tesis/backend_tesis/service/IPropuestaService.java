@@ -35,7 +35,6 @@ public interface IPropuestaService {
     public Boolean asignarRevisor(Integer idPropuesta,
                                   Integer idDocente1,
                                   Integer idDocente2,
-                                  String linkPropuesta,
                                   MultipartFile rubrica,
                                   MultipartFile oficio,
                                   String taskID);

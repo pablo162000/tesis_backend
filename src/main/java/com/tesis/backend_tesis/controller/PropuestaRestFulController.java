@@ -91,14 +91,13 @@ public class PropuestaRestFulController {
     public ResponseEntity<Boolean> asignarRevisores(@PathVariable Integer idPropuesta,
                                                     @RequestParam("idDocente1") Integer idDocente1,
                                                     @RequestParam("idDocente2") Integer idDocente2,
-                                                    @RequestPart("archivo") String archivo ,
                                                     @RequestPart("rubrica") MultipartFile rubrica,
                                                     @RequestPart("oficio") MultipartFile oficio,
                                                     @RequestPart("taskID") String taskID
 
     ) {
 
-        Boolean exito = this.propuestaService.asignarRevisor(idPropuesta, idDocente1, idDocente2, archivo,rubrica, oficio, taskID);
+        Boolean exito = this.propuestaService.asignarRevisor(idPropuesta, idDocente1, idDocente2,rubrica, oficio, taskID);
 
         return ResponseEntity.ok(exito);
     }
