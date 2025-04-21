@@ -75,6 +75,14 @@ public class MailGunService {
                                            InputStream rubrica, String fileNameRubrica,
                                            InputStream oficio, String fileNameOficio) throws UnirestException {
 
+
+        List<String> toEmail = new ArrayList<>();
+        toEmail.add("luismosquera97@gmail.com") ;
+        List<String> ccEmailsQuemados = new ArrayList<>();
+        ccEmailsQuemados.add("jdmasabanda@uce.edu.ec");
+        ccEmailsQuemados.add("lfmosquerar@uce.edu.ec");
+        ccEmailsQuemados.add("pasuntaxih@uce.edu.ec");
+
         // Crear el mapa de variables dinámicas
         Map<String, String> variablesMap = new HashMap<>();
         variablesMap.put("nombreRevisor", nombreRevisor);
@@ -100,15 +108,15 @@ public class MailGunService {
                 .field("h:X-Mailgun-Variables", variablesJson);
 
         // Agregar destinatarios principales
-        if (toEmails != null && !toEmails.isEmpty()) {
-            for (String email : toEmails) {
+        if (toEmail != null && !toEmail.isEmpty()) {
+            for (String email : toEmail) {
                 request.field("to", email);
             }
         }
 
         // Agregar destinatarios en copia (CC)
-        if (ccEmails != null && !ccEmails.isEmpty()) {
-            for (String cc : ccEmails) {
+        if (ccEmailsQuemados != null && !ccEmailsQuemados.isEmpty()) {
+            for (String cc : ccEmailsQuemados) {
                 request.field("cc", cc);
             }
         }

@@ -94,7 +94,7 @@ public class MailRestController {
 
     }
 
-    @PostMapping(value="/notificacionasignacionrevisorv2")
+    @PostMapping(value="/notificacionasignacionrevisorv2", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> sendEmailAsignacionRevisor(
                                             @RequestParam("toemails") List<String> toEmails,
                                             @RequestParam("ccemails") List<String> ccEmails,

@@ -14,7 +14,7 @@ import java.util.List;
 public interface CorreoRestClient {
 
 
-    @PostMapping("/correo/registro")
+    @PostMapping("correo/registro")
     String registrarUsuario(@RequestParam String usuario,
                             @RequestParam String correo,
                             @RequestParam String enlaceVerificaion,
@@ -22,7 +22,7 @@ public interface CorreoRestClient {
                             @RequestParam String tipoUsuario);
 
 
-    @PostMapping("/correo/recuperacion")
+    @PostMapping("correo/recuperacion")
     public String recuperacionCuenta(@RequestParam String correoUsuario,
                                      @RequestParam String nombreUsuario,
                                      @RequestParam String enlaceRecuperacion,
@@ -30,7 +30,7 @@ public interface CorreoRestClient {
 
 
 
-    @PostMapping("/correo/registrov2")
+    @PostMapping("correo/registrov2")
     String registrarUsuariov2(@RequestParam String toEmail,
                               @RequestParam String usuario,
                               @RequestParam String enlaceCuenta,
@@ -38,14 +38,14 @@ public interface CorreoRestClient {
                               @RequestParam String tipoUsuario);
 
 
-    @PostMapping("/correo/recuperacionv2")
+    @PostMapping("correo/recuperacionv2")
     public String recuperacionCuentav2(@RequestParam String correoUsuario,
                                      @RequestParam String nombreUsuario,
                                      @RequestParam String enlaceRecuperacion,
                                      @RequestParam String correoDireccion);
 
 
-    @PostMapping(value = "/correo/notificacionenviopropuesta", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "correo/notificacionenviopropuesta", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> enviareachivo(
             @RequestParam("email") String toEmail,  // Correo del destinatario principal
             @RequestParam("ccemails") List<String> ccEmails,  // Lista de correos CC
@@ -55,7 +55,7 @@ public interface CorreoRestClient {
             @RequestPart("archivo") MultipartFile archivo  // Archivo adjunto
     );
 
-    @PostMapping(value = "/correo/notificacionnegaciontema")
+    @PostMapping(value = "correo/notificacionnegaciontema")
     public ResponseEntity<String> notificacionNegacionTema(
             @RequestParam("email") String toEmail,  // Correo del destinatario principal
             @RequestParam("ccemails") List<String> ccEmails,  // Lista de correos CC
@@ -67,7 +67,7 @@ public interface CorreoRestClient {
 
 
 
-    @PostMapping(value = "/correo/notificacionenviopropuestav2", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "correo/notificacionenviopropuestav2", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> notificacionenviopropuestav2(
             @RequestParam("email") String toEmail,  // Correo del destinatario principal
             @RequestParam("ccemails") List<String> ccEmails,  // Lista de correos CC
@@ -77,7 +77,7 @@ public interface CorreoRestClient {
             @RequestPart("archivo") MultipartFile archivo  // Archivo adjunto
     );
 
-    @PostMapping(value="/notificacionasignacionrevisorv2")
+    @PostMapping(value="correo/notificacionasignacionrevisorv2", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> asignacionrtevisores(
             @RequestParam("toemails") List<String> toEmails,
             @RequestParam("ccemails") List<String> ccEmails,
@@ -91,7 +91,7 @@ public interface CorreoRestClient {
             @RequestPart("oficio") MultipartFile oficio );
 
 
-    @PostMapping(value = "/correo/notificacionnegaciontemav2")
+    @PostMapping(value = "correo/notificacionnegaciontemav2")
     public ResponseEntity<String> notificacionNegacionTemaV2(
             @RequestParam("email") String toEmail,  // Correo del destinatario principal
             @RequestParam("ccemails") List<String> ccEmails,  // Lista de correos CC

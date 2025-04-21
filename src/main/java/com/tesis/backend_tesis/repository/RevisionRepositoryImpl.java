@@ -105,7 +105,7 @@ public class RevisionRepositoryImpl implements IRevisionRepository {
     public List<Revision> findByIdPropuesta(Integer idPropuesta) {
         try {
             TypedQuery<Revision> query = this.entityManager.createQuery(
-                    "SELECT r FROM Revision r WHERE r.propuesta = :idPropuesta",
+                    "SELECT r FROM Revision r WHERE r.propuesta.id = :idPropuesta",
                     Revision.class
             );
             query.setParameter("idPropuesta", idPropuesta);

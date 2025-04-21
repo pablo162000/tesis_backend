@@ -749,12 +749,11 @@ public class PropuestaServiceImpl implements IPropuestaService{
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró revision para la propuesta: " + idPropuesta);
         }
 
-        List<Integer> docentesRegistrados = Arrays.asList(revision.getRevisor1().getId(), revision.getRevisor2().getId());
-        List<Integer> docentesIngresados = Arrays.asList(idDocente1, idDocente2);
+
 
 
         // Asignar el docente según el tipo de revisor
-        boolean cambioRealizado;
+        boolean cambioRealizado =true;
 
 
         if (vistaPropuestaExistente.getFirst().getTutorUsuaId() != null){
@@ -767,18 +766,29 @@ public class PropuestaServiceImpl implements IPropuestaService{
             }
         }
 
-        if (new HashSet<>(docentesRegistrados).equals(new HashSet<>(docentesIngresados))) {
-           cambioRealizado = false;
-        }else {
 
-            revision.setRevisor1(
-                    this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente1.getIdUsuario())));
 
-            revision.setRevisor2(
-                    this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente2.getIdUsuario())));
+        if (revision.getRevisor1() != null ||  revision.getRevisor2() !=null){
 
-           cambioRealizado= true;
+
+            List<Integer> docentesRegistrados = Arrays.asList(revision.getRevisor1().getId(), revision.getRevisor2().getId());
+            List<Integer> docentesIngresados = Arrays.asList(idDocente1, idDocente2);
+
+            if (new HashSet<>(docentesRegistrados).equals(new HashSet<>(docentesIngresados))) {
+                cambioRealizado = false;
+            }else {
+
+                revision.setRevisor1(
+                        this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente1.getIdUsuario())));
+
+                revision.setRevisor2(
+                        this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente2.getIdUsuario())));
+
+                cambioRealizado= true;
+            }
+
         }
+
 
 
         // Si hubo cambios, actualizar la base de datos
@@ -826,11 +836,15 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
             ccEmails.add(primer.getCorreo());
             nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
+            System.out.println("ver si esta: " + vistaPropuestaExistente.getFirst().getSegundoEstuId());
 
-            if (vistaPropuestaExistente.getFirst().getSegundoEstuId()!=null){
+            if (vistaPropuestaExistente.getFirst().getSegundoEstuId()!= null){
+
                 segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
-                ccEmails.add(segundo.getCorreo());  }
+                ccEmails.add(segundo.getCorreo());
                 nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
+
+            }
         }
 
         List<String> posiblesNombres = new ArrayList<String>();
@@ -849,6 +863,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
                     vistaPropuestaExistente.getFirst().getTutorDocenteId()).getCorreo());
         }
 
+
         try{
             if (!revisionGuardada) {
 
@@ -863,33 +878,37 @@ public class PropuestaServiceImpl implements IPropuestaService{
                     vistaPropuestaExistente.getFirst().getId());
 
             this.correoRestClient.asignacionrtevisores(toEmails,
-                                                        ccEmails,
-                                                        nombresRevisores,
-                                                        nombresEstudiantes,
-                                                        revision.getArchivoSubidoEstudiantes().getUrl(),
-                                                        vistaPropuestaExistente.getFirst().getTema(),
-                                                        correoDireccion,
-                                                        fechaEntrega,
-                                                        rubrica,
-                                                        oficio);
+                    ccEmails,
+                    nombresRevisores,
+                    nombresEstudiantes,
+                    revision.getArchivoSubidoEstudiantes().getUrl(),
+                    vistaPropuestaExistente.getFirst().getTema(),
+                    correoDireccion,
+                    fechaEntrega,
+                    rubrica,
+                    oficio);
 
             logger.info("Correo enviado exitosamente a {} con copia {}", toEmails, ccEmails);
 
         }catch (Exception e){
             logger.error("Error en el proceso: {}", e.getMessage(), e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de procesos o correo.");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de correo.");
         }
 
 
-            Map<String, Object> variables = new HashMap<>();
-            variables.put("idRevisor1", idDocente1);
-            variables.put("idRevisor2", idDocente2);
+        Map<String, Object> variables = new HashMap<>();
+        //variables.put("idRevisor1", idDocente1);
+       // variables.put("idRevisor2", idDocente2);
 
-            try {
-                this.motorRestClient.completarTarea(taskID, variables);
-            } catch (Exception e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN.");
-            }
+
+        variables.put("idRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getIdUsuario());
+        variables.put("idRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getIdUsuario());
+
+        try {
+            this.motorRestClient.completarTarea(taskID, variables);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN.");
+        }
 
 
         return revisionGuardada;
