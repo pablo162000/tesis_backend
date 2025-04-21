@@ -92,12 +92,12 @@ public class PropuestaRestFulController {
                                                     @RequestParam("idDocente1") Integer idDocente1,
                                                     @RequestParam("idDocente2") Integer idDocente2,
                                                     @RequestPart("rubrica") MultipartFile rubrica,
-                                                    @RequestPart("archivo") MultipartFile archivo ,
-                                                    @RequestPart("oficio") MultipartFile oficio, @RequestPart("taskID") String taskID
+                                                    @RequestPart("oficio") MultipartFile oficio,
+                                                    @RequestPart("taskID") String taskID
 
     ) {
 
-        Boolean exito = this.propuestaService.asignarRevisor(idPropuesta, idDocente1, idDocente2, rubrica, archivo, oficio, taskID);
+        Boolean exito = this.propuestaService.asignarRevisor(idPropuesta, idDocente1, idDocente2,rubrica, oficio, taskID);
 
         return ResponseEntity.ok(exito);
     }

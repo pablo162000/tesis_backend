@@ -105,15 +105,11 @@ public class MailRestController {
                                             @RequestParam("correoDireccion")String correoDireccion,
                                             @RequestParam("fechaEntrega")String fechaEntrega,
                                             @RequestPart("rubrica") MultipartFile rubrica,
-                                            @RequestPart("archivo") MultipartFile archivo ,
                                             @RequestPart("oficio") MultipartFile oficio ) throws UnirestException, IOException  {
 
 
         InputStream fileInputStreamRubrica = rubrica.getInputStream();
         String fileNameRubrica = rubrica.getOriginalFilename();
-
-        InputStream fileInputStreamArchivo = archivo.getInputStream();
-        String fileNameArchivo = archivo.getOriginalFilename();
 
         InputStream fileInputStreamOficio = oficio.getInputStream();
         String fileNameOficio = oficio.getOriginalFilename();
@@ -130,8 +126,6 @@ public class MailRestController {
                     fechaEntrega,
                     fileInputStreamRubrica,
                     fileNameRubrica,
-                    fileInputStreamArchivo,
-                    fileNameArchivo,
                     fileInputStreamOficio,
                     fileNameOficio);
             return ResponseEntity.ok("Correo enviado exitosamente a " + toEmails);
@@ -139,6 +133,28 @@ public class MailRestController {
             return ResponseEntity.status(500).body("Error al enviar el correo: " + e.getMessage());
         }
 
+    }
+
+    @PostMapping(value = "/notificacionnegaciontemav2")
+    public ResponseEntity<String> notificacionNegacionTemaV2(
+            @RequestParam("email") String toEmail,  // Correo del destinatario principal
+            @RequestParam("ccemails") List<String> ccEmails,  // Lista de correos CC
+            @RequestParam("estudiante") String estudiante,  // Información del estudiante
+            @RequestParam("tema") String tema,  // Tema del correo
+            @RequestParam("correodireccion") String correoDireccion,  // Dirección del correo (si es necesario)
+            @RequestParam("observaciones") String observaciones
+    ) {
+        try {
+
+
+            // Llamar al servicio para enviar el correo
+            this.mailGunServices.sendEmaiNegacionTema(toEmail, ccEmails, estudiante, tema, correoDireccion, observaciones);
+
+            // Si todo va bien, respondemos con un mensaje de éxito
+            return ResponseEntity.status(HttpStatus.OK).body("Correo enviado exitosamente de negacion tema.");
+        }  catch (UnirestException e) {
+            return ResponseEntity.status(500).body("Error al enviar el correo de negacion tema: " + e.getMessage());
+        }
     }
 
 

@@ -540,7 +540,11 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
     @Override
     @Transactional
-    public Boolean validarPropuesta(Integer idPropuesta, Boolean estadoValidacion, String obsercvaciones, Integer idUsuarioSecretaria, String taskID) {
+    public Boolean validarPropuesta(Integer idPropuesta,
+                                    Boolean estadoValidacion,
+                                    String obsercvaciones,
+                                    Integer idUsuarioSecretaria,
+                                    String taskID) {
         if (estadoValidacion == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La respuesta de validación no puede ser nula.");
         }
@@ -617,12 +621,20 @@ public class PropuestaServiceImpl implements IPropuestaService{
             }
 
 
+
+
             List<String> posiblesNombres = new ArrayList<String>();
 
             List<String> ccEmails = new ArrayList<>();
             Stream.of(segundoCorreo, tercerCorreo)
                     .filter(Objects::nonNull) // Filtra solo los que no son null
                     .forEach(ccEmails::add);
+
+            if (propuestaExistente.getTutor()!=null){
+
+                ccEmails.add( this.vistasEntidadesService.buscarDocentePorIdDocente(
+                        propuestaExistente.getTutor().getId()).getCorreo());
+            }
 
 
             posiblesNombres.add(primerEstudiante);
@@ -638,7 +650,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
             seGuardo= this.propuestaRepository.update(propuestaExistente);
             try {
 
-                this.correoRestClient.notificacionNegacionTema(
+                this.correoRestClient.notificacionNegacionTemaV2(
                         primerEstudianteDTO.getCorreo(),
                         ccEmails,
                         nombres,
@@ -673,10 +685,12 @@ public class PropuestaServiceImpl implements IPropuestaService{
     }
 
     @Override
-    public Boolean asignarRevisor(Integer idPropuesta, Integer idDocente1, Integer idDocente2,
+    public Boolean asignarRevisor(Integer idPropuesta,
+                                  Integer idDocente1,
+                                  Integer idDocente2,
                                   MultipartFile rubrica,
-                                  MultipartFile archivo,
-                                  MultipartFile oficio, String taskID) {
+                                  MultipartFile oficio,
+                                  String taskID) {
         // Validar entrada
         if (idPropuesta == null || idPropuesta < 1 ||
                 idDocente1 == null || idDocente1 < 1 ||
@@ -684,7 +698,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Los parámetros no pueden ser nulos o vacíos.");
         }
 
-        this.validaciones.validarArchivo(archivo, "archivo propuesta", List.of("application/pdf"));
+        //this.validaciones.validarArchivo(archivo, "archivo propuesta", List.of("application/pdf"));
         this.validaciones.validarArchivo(oficio, "oficio de desiganción", List.of("application/pdf"));
 
         if (rubrica==null || rubrica.isEmpty()) {
@@ -741,6 +755,17 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
         // Asignar el docente según el tipo de revisor
         boolean cambioRealizado;
+
+
+        if (vistaPropuestaExistente.getFirst().getTutorUsuaId() != null){
+
+
+            List<Integer> posiblesTutores = Arrays.asList(idDocente1, idDocente2);
+            // Verificar que ningun revisor sea el mismo tutor si ya esta asignado
+            if (posiblesTutores.contains(vistaPropuestaExistente.getFirst().getTutorDocenteId())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El tutor no puede ser un revisor");
+            }
+        }
 
         if (new HashSet<>(docentesRegistrados).equals(new HashSet<>(docentesIngresados))) {
            cambioRealizado = false;
@@ -817,6 +842,13 @@ public class PropuestaServiceImpl implements IPropuestaService{
         String correoDireccion = this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaPropuestaExistente.getFirst().getCarrera()).getCorreoDireccion();
         String fechaEntrega = this.validaciones.sumarDiasLaborables(LocalDate.now(), 10);
         ccEmails.add(correoDireccion);
+
+        if (vistaPropuestaExistente.getFirst().getTutorDocenteId()!=null){
+
+            ccEmails.add( this.vistasEntidadesService.buscarDocentePorIdDocente(
+                    vistaPropuestaExistente.getFirst().getTutorDocenteId()).getCorreo());
+        }
+
         try{
             if (!revisionGuardada) {
 
@@ -834,12 +866,11 @@ public class PropuestaServiceImpl implements IPropuestaService{
                                                         ccEmails,
                                                         nombresRevisores,
                                                         nombresEstudiantes,
-                                                        "fsadf",
+                                                        revision.getArchivoSubidoEstudiantes().getUrl(),
                                                         vistaPropuestaExistente.getFirst().getTema(),
                                                         correoDireccion,
                                                         fechaEntrega,
                                                         rubrica,
-                                                        archivo,
                                                         oficio);
 
             logger.info("Correo enviado exitosamente a {} con copia {}", toEmails, ccEmails);
