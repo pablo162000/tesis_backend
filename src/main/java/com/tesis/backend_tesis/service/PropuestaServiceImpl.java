@@ -386,7 +386,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
         Integer idUsuarioCarrera =
         this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaEstudiantePrimero.getCarrera()).getIdUsuarioCarrera();
 
-
+/*
         try {
             if (revisionGuardada == null || guardada == null ||
                     this.revisionRepository.findById(revisionGuardada.getId()) == null ||
@@ -406,7 +406,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
             logger.error("Error en el proceso: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al procesar propuesta.");
         }
-
+*/
 
 
 
