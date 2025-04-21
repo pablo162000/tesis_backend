@@ -73,7 +73,6 @@ public class MailGunService {
                                            String correoDireccion,
                                            String fechaEntrega,
                                            InputStream rubrica, String fileNameRubrica,
-                                           InputStream archivo, String fileNameArchivo,
                                            InputStream oficio, String fileNameOficio) throws UnirestException {
 
         // Crear el mapa de variables dinámicas
@@ -118,9 +117,6 @@ public class MailGunService {
         try {
             if (rubrica != null && fileNameRubrica != null)
                 request.field("attachment", new ByteArrayInputStream(rubrica.readAllBytes()), fileNameRubrica);
-
-            if (archivo != null && fileNameArchivo != null)
-                request.field("attachment", new ByteArrayInputStream(archivo.readAllBytes()), fileNameArchivo);
 
             if (oficio != null && fileNameOficio != null)
                 request.field("attachment", new ByteArrayInputStream(oficio.readAllBytes()), fileNameOficio);

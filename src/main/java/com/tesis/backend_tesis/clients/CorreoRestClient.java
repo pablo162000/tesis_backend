@@ -88,7 +88,6 @@ public interface CorreoRestClient {
             @RequestParam("correoDireccion")String correoDireccion,
             @RequestParam("fechaEntrega")String fechaEntrega,
             @RequestPart("rubrica") MultipartFile rubrica,
-            @RequestPart("archivo") MultipartFile archivo ,
             @RequestPart("oficio") MultipartFile oficio );
 
 

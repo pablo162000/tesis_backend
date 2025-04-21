@@ -105,15 +105,11 @@ public class MailRestController {
                                             @RequestParam("correoDireccion")String correoDireccion,
                                             @RequestParam("fechaEntrega")String fechaEntrega,
                                             @RequestPart("rubrica") MultipartFile rubrica,
-                                            @RequestPart("archivo") MultipartFile archivo ,
                                             @RequestPart("oficio") MultipartFile oficio ) throws UnirestException, IOException  {
 
 
         InputStream fileInputStreamRubrica = rubrica.getInputStream();
         String fileNameRubrica = rubrica.getOriginalFilename();
-
-        InputStream fileInputStreamArchivo = archivo.getInputStream();
-        String fileNameArchivo = archivo.getOriginalFilename();
 
         InputStream fileInputStreamOficio = oficio.getInputStream();
         String fileNameOficio = oficio.getOriginalFilename();
@@ -130,8 +126,6 @@ public class MailRestController {
                     fechaEntrega,
                     fileInputStreamRubrica,
                     fileNameRubrica,
-                    fileInputStreamArchivo,
-                    fileNameArchivo,
                     fileInputStreamOficio,
                     fileNameOficio);
             return ResponseEntity.ok("Correo enviado exitosamente a " + toEmails);

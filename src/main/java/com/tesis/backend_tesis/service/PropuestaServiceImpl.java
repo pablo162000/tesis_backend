@@ -540,7 +540,11 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
     @Override
     @Transactional
-    public Boolean validarPropuesta(Integer idPropuesta, Boolean estadoValidacion, String obsercvaciones, Integer idUsuarioSecretaria, String taskID) {
+    public Boolean validarPropuesta(Integer idPropuesta,
+                                    Boolean estadoValidacion,
+                                    String obsercvaciones,
+                                    Integer idUsuarioSecretaria,
+                                    String taskID) {
         if (estadoValidacion == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La respuesta de validación no puede ser nula.");
         }
@@ -681,10 +685,13 @@ public class PropuestaServiceImpl implements IPropuestaService{
     }
 
     @Override
-    public Boolean asignarRevisor(Integer idPropuesta, Integer idDocente1, Integer idDocente2,
+    public Boolean asignarRevisor(Integer idPropuesta,
+                                  Integer idDocente1,
+                                  Integer idDocente2,
+                                  String linkPropuesta,
                                   MultipartFile rubrica,
-                                  MultipartFile archivo,
-                                  MultipartFile oficio, String taskID) {
+                                  MultipartFile oficio,
+                                  String taskID) {
         // Validar entrada
         if (idPropuesta == null || idPropuesta < 1 ||
                 idDocente1 == null || idDocente1 < 1 ||
@@ -692,7 +699,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Los parámetros no pueden ser nulos o vacíos.");
         }
 
-        this.validaciones.validarArchivo(archivo, "archivo propuesta", List.of("application/pdf"));
+        //this.validaciones.validarArchivo(archivo, "archivo propuesta", List.of("application/pdf"));
         this.validaciones.validarArchivo(oficio, "oficio de desiganción", List.of("application/pdf"));
 
         if (rubrica==null || rubrica.isEmpty()) {
@@ -860,12 +867,11 @@ public class PropuestaServiceImpl implements IPropuestaService{
                                                         ccEmails,
                                                         nombresRevisores,
                                                         nombresEstudiantes,
-                                                        "fsadf",
+                                                        revision.getArchivoSubidoEstudiantes().getUrl(),
                                                         vistaPropuestaExistente.getFirst().getTema(),
                                                         correoDireccion,
                                                         fechaEntrega,
                                                         rubrica,
-                                                        archivo,
                                                         oficio);
 
             logger.info("Correo enviado exitosamente a {} con copia {}", toEmails, ccEmails);
