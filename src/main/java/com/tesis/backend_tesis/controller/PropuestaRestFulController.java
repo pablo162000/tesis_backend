@@ -57,7 +57,7 @@ public class PropuestaRestFulController {
     public ResponseEntity<Boolean> validarPropuesta(@PathVariable Integer idPropuesta,
                                                     @RequestParam("respuesta") Boolean respuesta,
                                                     @RequestParam(value="observaciones", required = false) String observaciones,
-                                                    @RequestParam("idUsuarioSecretaria") Integer idUsuarioSecretaria,
+                                                    @RequestParam(value="idUsuarioSecretaria", required = false) Integer idUsuarioSecretaria,
                                                     @RequestParam("taskID") String taskID) {
 
 

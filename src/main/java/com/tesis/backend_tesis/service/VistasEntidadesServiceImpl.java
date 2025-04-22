@@ -541,6 +541,8 @@ public class VistasEntidadesServiceImpl implements IVistasEntidadesService {
 
         List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findById(idPropuesta);
 
+        System.out.println(vistaPropuestas);
+
         if (vistaPropuestas.isEmpty()) {
             logger.warn("No se encontraron registros de VistaPropuesta con idPropuesta '{}'.", idPropuesta);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron registros con  idPropuesta proporcionados.");

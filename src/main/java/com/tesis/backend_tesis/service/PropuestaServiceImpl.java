@@ -665,19 +665,33 @@ public class PropuestaServiceImpl implements IPropuestaService{
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo.");
             }
 
+            try {
+                Map<String, Object> variables = new HashMap<>();
+                variables.put("validacionAprobada", estadoValidacion);
+
+                this.motorRestClient.completarTarea(taskID, variables);
+
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN sin secretaria.");
+            }
+
+
+        }else{
+            // ✅ Hasta aquí sabemos que todo salió bien, así que completamos la tarea BPMN
+            try {
+                Map<String, Object> variables = new HashMap<>();
+                variables.put("validacionAprobada", estadoValidacion);
+                variables.put("idSecretaria", idUsuarioSecretaria);
+
+                this.motorRestClient.completarTarea(taskID, variables);
+
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN.");
+            }
+
         }
 
-        // ✅ Hasta aquí sabemos que todo salió bien, así que completamos la tarea BPMN
-        try {
-            Map<String, Object> variables = new HashMap<>();
-            variables.put("validacionAprobada", estadoValidacion);
-            variables.put("idSecretaria", idUsuarioSecretaria);
 
-            this.motorRestClient.completarTarea(taskID, variables);
-
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN.");
-        }
 
         // Guardar los cambios
         return seGuardo;
