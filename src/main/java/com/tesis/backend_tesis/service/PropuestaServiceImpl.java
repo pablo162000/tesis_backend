@@ -208,13 +208,16 @@ public class PropuestaServiceImpl implements IPropuestaService{
                 } else if (categoria.equals("multimodal")) {
 
 
-                    if (estudiantePrimero != null || estudianteSegundo != null || estudianteTercero != null) {
+                    if (estudiantePrimero == null || estudianteSegundo == null || estudianteTercero == null) {
+
+
 
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                 "Se necesitan 3 estudiantes.");
                     }
 
                     if (!diferentesCarreras(estudiantePrimero.getIdCarrera(), estudianteSegundo.getIdCarrera(), estudianteTercero.getIdCarrera())) {
+
 
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                 "Dificultad de carreras 2 estudinates deben pertener a la misma carrera.");
@@ -242,12 +245,12 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
                 }
 
-                if (estudianteSegundo != null && !puedeEnviarPropuestas(estudianteSegundo.getId(), "Proyecto de Integración")) {
+                if (estudianteSegundo != null && !puedeEnviarPropuestas(estudianteSegundo.getId(), "Proyecto de Investigación")) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El segundo estudiante tiene propuestas vigentes en Proyecto de Investigación.");
 
                 }
 
-                if (estudianteTercero != null && !puedeEnviarPropuestas(estudianteTercero.getId(), "Proyecto de Integración")) {
+                if (estudianteTercero != null && !puedeEnviarPropuestas(estudianteTercero.getId(), "Proyecto de Investigación")) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El tercer estudiante tiene propuestas vigentes en Proyecto de Investigación.");
 
                 }
@@ -276,7 +279,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
                 } else if (categoria.equals("multimodal")) {
 
 
-                    if (primerCorreo != null || segundoCorreo != null || tercerCorreo != null) {
+                    if (primerCorreo == null || segundoCorreo == null || tercerCorreo == null) {
 
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                 "Se necesitan 3 estudiantes.");
@@ -285,7 +288,8 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
 
 
-                        if (!diferentesCarreras(estudiantePrimero.getId(), estudianteSegundo.getId(), estudianteTercero.getId())) {
+                        if (!diferentesCarreras(estudiantePrimero.getIdCarrera(), estudianteSegundo.getIdCarrera(),estudianteTercero.getIdCarrera())) {
+
 
                             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                     "Dificultad de carreras 2 estudinates deben pertener a la misma carrera. Proyecto de Integración.");
@@ -534,7 +538,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
         Set<Integer> carrerasUnicas = new HashSet<>(Arrays.asList(idCarreraEstudiante1, idCarreraEstudiante2, idCarreraEstudiante3));
 
-        // Solo es válido si hay exactamente 2 carreras distintas (1 diferente y 2 iguales)
+
         return carrerasUnicas.size() == 2;
     }
 
@@ -698,6 +702,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
     }
 
+    @Transactional
     @Override
     public Boolean asignarRevisor(Integer idPropuesta,
                                   Integer idDocente1,
@@ -798,8 +803,24 @@ public class PropuestaServiceImpl implements IPropuestaService{
                 revision.setRevisor2(
                         this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente2.getIdUsuario())));
 
+                System.out.println("revisor 1..."+revision.getRevisor1());
+                System.out.println("revisor 2..."+revision.getRevisor2());
+
                 cambioRealizado= true;
             }
+
+        }else {
+
+            revision.setRevisor1(
+                    this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente1.getIdUsuario())));
+
+            revision.setRevisor2(
+                    this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente2.getIdUsuario())));
+
+            System.out.println("revisor 1..."+revision.getRevisor1());
+            System.out.println("revisor 2..."+revision.getRevisor2());
+
+            cambioRealizado= true;
 
         }
 
