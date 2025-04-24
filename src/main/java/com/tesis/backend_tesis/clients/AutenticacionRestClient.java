@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface AutenticacionRestClient {
 
 
-    @PostMapping(value = "/validacion/generar-token")
+    @PostMapping(value = "validacion/generar-token")
     ResponseEntity<String> crearToken(@RequestParam(value = "correo") String correo);
 
-    @GetMapping(value = "/validacion/validar-token")
+    @GetMapping(value = "validacion/validar-token")
     ResponseEntity<String> validarToken(@RequestParam(value = "token") String token);
 
 }
