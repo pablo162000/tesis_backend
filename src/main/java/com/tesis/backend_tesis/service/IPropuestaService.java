@@ -39,4 +39,22 @@ public interface IPropuestaService {
                                   MultipartFile oficio,
                                   String taskID);
 
+    public Boolean calificarPropuestaRevisor(Integer idPropuesta,
+                                             Double nota,
+                                             String observaciones,
+                                             Integer idDocente,
+                                             MultipartFile rubrica,
+                                             String taskID)throws IOException;
+
+    public Boolean aprobarPropuesta(Integer idPropuesta,
+                                    String observaciones,
+                                    Integer idTutor,
+                                    MultipartFile archivo,
+                                    String taskID) throws IOException ;
+
+    public Boolean negacionPropuesta(Integer idPropuesta,
+                                    String observaciones,
+                                    String taskID);
+
+
 }

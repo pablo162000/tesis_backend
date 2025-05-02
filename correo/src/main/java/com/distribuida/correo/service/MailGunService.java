@@ -280,5 +280,214 @@ public class MailGunService {
     }
 
 
+    public void sendEmailCalificacionRevisor(List<String> toEmails,
+                                           List<String> ccEmails,
+                                           String nombreRevisor,
+                                           String nombreEstudiantes,
+                                           String linkRevision,
+                                           String temaPropuesta,
+                                           String correoDireccion,
+                                           InputStream rubrica, String fileNameRubrica
+                                           ) throws UnirestException {
+
+
+        List<String> toEmail = new ArrayList<>();
+        toEmail.add("luismosquera97@gmail.com") ;
+        List<String> ccEmailsQuemados = new ArrayList<>();
+        ccEmailsQuemados.add("jdmasabanda@uce.edu.ec");
+        ccEmailsQuemados.add("lfmosquerar@uce.edu.ec");
+        ccEmailsQuemados.add("pasuntaxih@uce.edu.ec");
+
+        // Crear el mapa de variables dinámicas
+        Map<String, String> variablesMap = new HashMap<>();
+        variablesMap.put("nombreRevisor", nombreRevisor);
+        variablesMap.put("nombreEstudiantes", nombreEstudiantes);
+        variablesMap.put("temaPropuesta", temaPropuesta);
+        variablesMap.put("linkRevision", linkRevision);
+        variablesMap.put("correoDireccion", correoDireccion);
+
+        String variablesJson;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            variablesJson = objectMapper.writeValueAsString(variablesMap);
+        } catch (Exception e) {
+            throw new UnirestException("Error al generar JSON de variables", e);
+        }
+
+        MultipartBody request = Unirest.post("https://api.mailgun.net/v3/" + sandboxDomain + "/messages")
+                .basicAuth("api", apiKey)
+                .field("from", fromEmail)
+                .field("subject", "Calificacion Propuesta")
+                .field("template", "calificacionrevisores")
+                .field("h:X-Mailgun-Variables", variablesJson);
+
+        // Agregar destinatarios principales
+        if (toEmail != null && !toEmail.isEmpty()) {
+            for (String email : toEmail) {
+                request.field("to", email);
+            }
+        }
+
+        // Agregar destinatarios en copia (CC)
+        if (ccEmailsQuemados != null && !ccEmailsQuemados.isEmpty()) {
+            for (String cc : ccEmailsQuemados) {
+                request.field("cc", cc);
+            }
+        }
+
+        // Adjuntar archivos si existen
+        try {
+            if (rubrica != null && fileNameRubrica != null)
+                request.field("attachment", new ByteArrayInputStream(rubrica.readAllBytes()), fileNameRubrica);
+
+        } catch (IOException e) {
+            throw new UnirestException("Error al leer archivos adjuntos", e);
+        }
+
+        HttpResponse<JsonNode> response = request.asJson();
+
+        if (response.getStatus() != 200) {
+            throw new UnirestException("Error al enviar el correo: " + response.getStatus() + " " + response.getBody());
+        }
+    }
+
+
+    public void sendEmailAprobacion(List<String> toEmails,
+                                             List<String> ccEmails,
+                                             String nombreTutor,
+                                             String nombreEstudiantes,
+                                             String linkRevision,
+                                             String temaPropuesta,
+                                             String correoDireccion,
+                                             InputStream oficio, String fileNameOficio
+    ) throws UnirestException {
+
+
+        List<String> toEmail = new ArrayList<>();
+        toEmail.add("luismosquera97@gmail.com") ;
+        List<String> ccEmailsQuemados = new ArrayList<>();
+        ccEmailsQuemados.add("jdmasabanda@uce.edu.ec");
+        ccEmailsQuemados.add("lfmosquerar@uce.edu.ec");
+        ccEmailsQuemados.add("pasuntaxih@uce.edu.ec");
+
+        // Crear el mapa de variables dinámicas
+        Map<String, String> variablesMap = new HashMap<>();
+        variablesMap.put("nombreTutor", nombreTutor);
+        variablesMap.put("nombreEstudiantes", nombreEstudiantes);
+        variablesMap.put("tema", temaPropuesta);
+        variablesMap.put("link", linkRevision);
+        variablesMap.put("correoDireccion", correoDireccion);
+
+        String variablesJson;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            variablesJson = objectMapper.writeValueAsString(variablesMap);
+        } catch (Exception e) {
+            throw new UnirestException("Error al generar JSON de variables", e);
+        }
+
+        MultipartBody request = Unirest.post("https://api.mailgun.net/v3/" + sandboxDomain + "/messages")
+                .basicAuth("api", apiKey)
+                .field("from", fromEmail)
+                .field("subject", "Aprobación")
+                .field("template", "aprobacionpropuesta")
+                .field("h:X-Mailgun-Variables", variablesJson);
+
+        // Agregar destinatarios principales
+        if (toEmail != null && !toEmail.isEmpty()) {
+            for (String email : toEmail) {
+                request.field("to", email);
+            }
+        }
+
+        // Agregar destinatarios en copia (CC)
+        if (ccEmailsQuemados != null && !ccEmailsQuemados.isEmpty()) {
+            for (String cc : ccEmailsQuemados) {
+                request.field("cc", cc);
+            }
+        }
+
+        // Adjuntar archivos si existen
+        try {
+            if (oficio != null && fileNameOficio != null)
+                request.field("attachment", new ByteArrayInputStream(oficio.readAllBytes()), fileNameOficio);
+
+        } catch (IOException e) {
+            throw new UnirestException("Error al leer archivos adjuntos", e);
+        }
+
+        HttpResponse<JsonNode> response = request.asJson();
+
+        if (response.getStatus() != 200) {
+            throw new UnirestException("Error al enviar el correo: " + response.getStatus() + " " + response.getBody());
+        }
+    }
+
+
+
+    public void sendEmailNegacion(List<String> toEmails,
+                                    List<String> ccEmails,
+                                    String nombreEstudiantes,
+                                    String temaPropuesta,
+                                    String correoDireccion
+    ){
+
+
+        List<String> toEmail = new ArrayList<>();
+        toEmail.add("luismosquera97@gmail.com") ;
+        List<String> ccEmailsQuemados = new ArrayList<>();
+        ccEmailsQuemados.add("jdmasabanda@uce.edu.ec");
+        ccEmailsQuemados.add("lfmosquerar@uce.edu.ec");
+        ccEmailsQuemados.add("pasuntaxih@uce.edu.ec");
+
+        // Crear el mapa de variables dinámicas
+        Map<String, String> variablesMap = new HashMap<>();
+        variablesMap.put("nombreEstudiantes", nombreEstudiantes);
+        variablesMap.put("tema", temaPropuesta);
+        variablesMap.put("correoDireccion", correoDireccion);
+
+        String variablesJson;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            variablesJson = objectMapper.writeValueAsString(variablesMap);
+        } catch (Exception e) {
+            throw new UnirestException("Error al generar JSON de variables", e);
+        }
+
+        MultipartBody request = Unirest.post("https://api.mailgun.net/v3/" + sandboxDomain + "/messages")
+                .basicAuth("api", apiKey)
+                .field("from", fromEmail)
+                .field("subject", "Rechazo")
+                .field("template", "rechazoaprobacionpropuesta")
+                .field("h:X-Mailgun-Variables", variablesJson);
+
+        // Agregar destinatarios principales
+        if (toEmail != null && !toEmail.isEmpty()) {
+            for (String email : toEmail) {
+                request.field("to", email);
+            }
+        }
+
+        // Agregar destinatarios en copia (CC)
+        if (ccEmailsQuemados != null && !ccEmailsQuemados.isEmpty()) {
+            for (String cc : ccEmailsQuemados) {
+                request.field("cc", cc);
+            }
+        }
+
+
+        HttpResponse<JsonNode> response = request.asJson();
+
+        if (response.getStatus() != 200) {
+            throw new UnirestException("Error al enviar el correo: " + response.getStatus() + " " + response.getBody());
+        }
+    }
+
+
+
+
+
+
+
 
 }

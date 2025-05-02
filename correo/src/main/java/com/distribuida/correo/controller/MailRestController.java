@@ -135,6 +135,96 @@ public class MailRestController {
 
     }
 
+
+    @PostMapping(value="/notificacioncalificacionv2", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> sendEmailCalificacion(
+            @RequestParam("toemails") List<String> toEmails,
+            @RequestParam("ccemails") List<String> ccEmails,
+            @RequestParam("nombreRevisor")String nombreRevisor,
+            @RequestParam("nombreEstudiantes")String nombreEstudiantes,
+            @RequestParam("linkRevision")String linkRevision,
+            @RequestParam("tema")String temaPropuesta,
+            @RequestParam("correoDireccion")String correoDireccion,
+            @RequestPart("rubrica") MultipartFile rubrica) throws UnirestException, IOException  {
+
+
+        InputStream fileInputStreamRubrica = rubrica.getInputStream();
+        String fileNameRubrica = rubrica.getOriginalFilename();
+
+        try {
+            this.mailGunServices.sendEmailCalificacionRevisor(toEmails,
+                    ccEmails,
+                    nombreRevisor,
+                    nombreEstudiantes,
+                    linkRevision,
+                    temaPropuesta,
+                    correoDireccion,
+                    fileInputStreamRubrica,
+                    fileNameRubrica);
+            return ResponseEntity.ok("Correo enviado exitosamente a " + toEmails);
+        } catch (UnirestException e) {
+            return ResponseEntity.status(500).body("Error al enviar el correo: " + e.getMessage());
+        }
+
+    }
+
+
+    @PostMapping(value="/notificacionaprobacionv2", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> sendEmailAprobacion(
+            @RequestParam("toemails") List<String> toEmails,
+            @RequestParam("ccemails") List<String> ccEmails,
+            @RequestParam("nombreTutor")String nombreTutor,
+            @RequestParam("nombreEstudiantes")String nombreEstudiantes,
+            @RequestParam("linkRevision")String linkRevision,
+            @RequestParam("tema")String temaPropuesta,
+            @RequestParam("correoDireccion")String correoDireccion,
+            @RequestPart("oficio") MultipartFile oficio) throws UnirestException, IOException  {
+
+
+        InputStream fileInputStreamOficio= oficio.getInputStream();
+        String fileNameoficio = oficio.getOriginalFilename();
+
+        try {
+            this.mailGunServices.sendEmailAprobacion(toEmails,
+                    ccEmails,
+                    nombreTutor,
+                    nombreEstudiantes,
+                    linkRevision,
+                    temaPropuesta,
+                    correoDireccion,
+                    fileInputStreamOficio,
+                    fileNameoficio);
+            return ResponseEntity.ok("Correo enviado exitosamente a " + toEmails);
+        } catch (UnirestException e) {
+            return ResponseEntity.status(500).body("Error al enviar el correo: " + e.getMessage());
+        }
+
+    }
+
+    @PostMapping(value="/notificacionnegacionv2")
+    public ResponseEntity<String> sendEmailNegacion(
+            @RequestParam("toemails") List<String> toEmails,
+            @RequestParam("ccemails") List<String> ccEmails,
+            @RequestParam("nombreEstudiantes")String nombreEstudiantes,
+            @RequestParam("tema")String temaPropuesta,
+            @RequestParam("correoDireccion")String correoDireccion){
+
+        try {
+            this.mailGunServices.sendEmailNegacion(toEmails,
+                    ccEmails,
+                    nombreEstudiantes,
+                    temaPropuesta,
+                    correoDireccion);
+            return ResponseEntity.ok("Correo enviado exitosamente a " + toEmails);
+        } catch (UnirestException e) {
+            return ResponseEntity.status(500).body("Error al enviar el correo: " + e.getMessage());
+        }
+
+    }
+
+
+
+
     @PostMapping(value = "/notificacionnegaciontemav2")
     public ResponseEntity<String> notificacionNegacionTemaV2(
             @RequestParam("email") String toEmail,  // Correo del destinatario principal

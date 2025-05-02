@@ -436,15 +436,17 @@ public class AuthServiceImpl implements IAuthService {
 
         String direccion= null;
 
-        if(registroRequest.getIdCarrera()==null || registroRequest.getIdCarrera().describeConstable().isEmpty()){
+        if(registroRequest.getIdCarrera()!=null && registroRequest.getIdCarrera()>=1){
 
             direccion = this.facultadService.buscarFacultadPorId(registroRequest.getIdFacultad()).getCorreo();
         }
 
-        if (registroRequest.getIdFacultad()==null || registroRequest.getIdFacultad().describeConstable().isEmpty()){
+        if (registroRequest.getIdFacultad()!=null && registroRequest.getIdFacultad()>=1){
             direccion = this.carreraRepository.findById(idCarrera).getUsuario().getCorreo();
 
         }
+
+        System.out.print( direccion );
 
         try {
             this.correoRestClient.registrarUsuariov2(usuarioGuardado.getCorreo(), usuarioCreado,enlace,
