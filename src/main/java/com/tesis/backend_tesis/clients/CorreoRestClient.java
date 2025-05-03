@@ -100,6 +100,39 @@ public interface CorreoRestClient {
             @RequestParam("correodireccion") String correoDireccion,  // Dirección del correo (si es necesario)
             @RequestParam("observaciones") String observaciones
     );
+
+    @PostMapping(value="correo/notificacioncalificacionv2", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> calificacionRevisor(
+            @RequestParam("toemails") List<String> toEmails,
+            @RequestParam("ccemails") List<String> ccEmails,
+            @RequestParam("nombreRevisor")String nombreRevisor,
+            @RequestParam("nombreEstudiantes")String nombreEstudiantes,
+            @RequestParam("linkRevision")String linkRevision,
+            @RequestParam("tema")String temaPropuesta,
+            @RequestParam("correoDireccion")String correoDireccion,
+            @RequestPart("rubrica") MultipartFile rubrica);
+
+
+
+    @PostMapping(value="correo/notificacionaprobacionv2", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> aprobacionPropuesta(
+            @RequestParam("toemails") List<String> toEmails,
+            @RequestParam("ccemails") List<String> ccEmails,
+            @RequestParam("nombreTutor")String nombreTutor,
+            @RequestParam("nombreEstudiantes")String nombreEstudiantes,
+            @RequestParam("linkRevision")String linkRevision,
+            @RequestParam("tema")String temaPropuesta,
+            @RequestParam("correoDireccion")String correoDireccion,
+            @RequestPart("oficio") MultipartFile oficio);
+
+
+    @PostMapping(value="correo/notificacionnegacionv2")
+    public ResponseEntity<String> negacionPropuesta(
+            @RequestParam("toemails") List<String> toEmails,
+            @RequestParam("ccemails") List<String> ccEmails,
+            @RequestParam("nombreEstudiantes")String nombreEstudiantes,
+            @RequestParam("tema")String temaPropuesta,
+            @RequestParam("correoDireccion")String correoDireccion);
 }
 
 

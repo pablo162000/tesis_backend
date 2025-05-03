@@ -72,121 +72,7 @@ public class AuthServiceImpl implements IAuthService {
     @Autowired
     private Converter converter;
 
-/*
-    @Override
-    public Integer registroEstudiante(RegistroRequest registroRequest) {
-        var flag = 0;
-        if (registroRequest.getCorreo() != null && !registroRequest.getCorreo().isEmpty()
-                && registroRequest.getPassword() != null && !registroRequest.getPassword().isEmpty()) {
-            if (!this.usuariosRepository.existeUsuarioConEmail(registroRequest.getCorreo())) {
-                try {
 
-                    Usuarios usua = Usuarios.builder()
-                            .username(registroRequest.getPrimerNombre() + ' ' + registroRequest.getPrimerApellido())
-                            .correo(registroRequest.getCorreo())
-                            .password(this.encriptionService.encriptPass(registroRequest.getPassword()))
-                            .fechaCreacion(LocalDateTime.now())//cambie del original
-                            .rol("estudiante")
-                            .activo(false)
-                            .build();
-                    Usuarios usuarioGuardado = this.usuariosRepository.insertar(usua);
-
-                    if (usuarioGuardado == null || usuarioGuardado.getId() == null) {
-                        throw new RuntimeException("Error al guardar el usuario");
-                    }
-
-                    Estudiantes estu = Estudiantes.builder()
-                            .primer_nombre(registroRequest.getPrimerNombre())
-                            .segundo_nombre(registroRequest.getSegundoNombre())
-                            .primer_apellido(registroRequest.getPrimerApellido())
-                            .segundo_apellido(registroRequest.getSegundoApellido())
-                            .cedula(registroRequest.getCedula())
-                            //.activo(registroRequest.getActivo())
-                            .usuario(usuarioGuardado)  // ASIGNAR ID DEL USUARIO
-                            .build();
-
-
-                    this.estudiantesRepository.insertar(estu);
-                    flag = usua.getId();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-        return flag;
-    }
-
-
-
-
-
-    public AuthResponse loginUsuario(LoginRequest loginRequest) {
-        Usuarios usua = this.usuariosRepository.buscarPorEmail(loginRequest.getCorreo());
-
-        // Validar si el usuario existe
-        if (usua == null) {
-            throw new RuntimeException("El usuario no está registrado.");
-        }
-
-        // Verificar la contraseña encriptada
-        if (!this.encriptionService.verificarEncriptedText(usua.getPassword(), loginRequest.getPassword())) {
-            throw new RuntimeException("Credenciales incorrectas.");
-        }
-
-        // Determinar el rol y obtener la información correspondiente
-        String rol = usua.getRol();
-        if ("estudiante".equals(rol)) {
-            Estudiantes estu = this.estudiantesRepository.findByIdUsuario(usua.getId());
-
-            return AuthResponse.builder()
-                    .id(estu.getId())
-                    .primer_nombre(estu.getPrimer_nombre())
-                    .segundo_nombre(estu.getSegundo_nombre())
-                    .primer_apellido(estu.getPrimer_apellido())
-                    .segundo_apellido(estu.getSegundo_apellido())
-                    .rol("estudiante")
-                    .activo(true)
-                    .build();
-
-        } else if ("docente".equals(rol)) {
-            /*
-            Docentes doc = this.docentesRepository.findByIdUsuario(usua.getId());
-
-            return AuthResponse.builder()
-                    .id(doc.getId())
-                    .primer_nombre(doc.getPrimer_nombre())
-                    .segundo_nombre(doc.getSegundo_nombre())
-                    .primer_apellido(doc.getPrimer_apellido())
-                    .segundo_apellido(doc.getSegundo_apellido())
-                    .rol("docente")
-                    .activo(true)
-                    .build();
-
-
-
-        } else if ("administrativo".equals(rol)) {
-
-
-            Administrativos admin = this.administrativosRepository.findByIdUsuario(usua.getId());
-
-            return AuthResponse.builder()
-                    .id(admin.getId())
-                    .primer_nombre(admin.getPrimer_nombre())
-                    .segundo_nombre(admin.getSegundo_nombre())
-                    .primer_apellido(admin.getPrimer_apellido())
-                    .segundo_apellido(admin.getSegundo_apellido())
-                    .rol("administrativo")
-                    .activo(true)
-                    .build();
-
-
-        }
-
-        // Si el rol no es reconocido, lanzar excepción
-        throw new RuntimeException("Rol de usuario desconocido.");
-    }
-
-    */
 
     @Transactional
     @Override
@@ -436,18 +322,17 @@ public class AuthServiceImpl implements IAuthService {
 
         String direccion= null;
 
-
-        if(registroRequest.getIdCarrera()!=null || registroRequest.getIdCarrera()<1){
+        if(registroRequest.getIdCarrera()!=null && registroRequest.getIdCarrera()>=1){
 
             direccion = this.facultadService.buscarFacultadPorId(registroRequest.getIdFacultad()).getCorreo();
         }
 
-        if (registroRequest.getIdFacultad()!=null || registroRequest.getIdFacultad()<1){
+        if (registroRequest.getIdFacultad()!=null && registroRequest.getIdFacultad()>=1){
             direccion = this.carreraRepository.findById(idCarrera).getUsuario().getCorreo();
 
         }
 
-
+        System.out.print( direccion );
 
         try {
             this.correoRestClient.registrarUsuariov2(usuarioGuardado.getCorreo(), usuarioCreado,enlace,
@@ -461,109 +346,7 @@ public class AuthServiceImpl implements IAuthService {
         return Boolean.TRUE;
     }
 
-    /*
-        @Override
-        @Transactional
-        public AuthResponse login(LoginRequest loginRequest) {
-
-            if (loginRequest == null ||
-                    loginRequest.getCorreo() == null || loginRequest.getCorreo().isEmpty() ||
-                    loginRequest.getPassword() == null || loginRequest.getPassword().isEmpty()) {
-                logger.error("Login inválido. Datos faltantes: {}", loginRequest);
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Los datos del login son inválidos. Verifique correo, contraseña.");
-            }
-
-            Usuario usua = this.usuarioRepository.buscarPorEmail(loginRequest.getCorreo());
-
-            // Validar si el usuario existe
-            if (usua == null) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no está registrado.");
-            }
-            // Verificar la contraseña encriptada
-            if (!this.encriptionService.verificarEncriptedText(usua.getPassword(), loginRequest.getPassword())) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciales incorrectas.");
-            }
-
-            if (!Boolean.TRUE.equals(usua.getActivo())) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario no activado.");
-            }
-
-            if (!Boolean.TRUE.equals(usua.getCorreoValido())) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Correo no validado.");
-            }
-
-            String usuarioRol = this.usuarioRolRepository.findByIdUsuario(usua.getId()).getRol().getNombre();
-
-            String nombreFacultad= null;
-
-            CarreraDTO carreraDTO =null;
-
-
-            switch (usuarioRol) {
-                case "estudiante":
-
-                    EstudianteDTO estudianteRecuperadoDTO = this.estudianteService.buscarPorIdUsuario(usua.getId());
-                    if (estudianteRecuperadoDTO == null) {
-                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante no encontrado.");
-                    }
-
-                    carreraDTO = this.carreraService.buscarCarreraPorId(estudianteRecuperadoDTO.getIdCarrera());
-                    nombreFacultad =  this.facultadService.buscarFacultadPorId(carreraDTO.getIdFacultad()).getNombre();
-
-                    return construirAuthResponse(usua, usuarioRol, carreraDTO.getNombre(), nombreFacultad);
-
-
-                case "docente":
-                    DocenteDTO docenteRecuperadoDTO = this.docenteService.buscarPorIdUsuario(usua.getId());
-                    if (docenteRecuperadoDTO == null) {
-                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Docente no encontrado.");
-                    }
-
-                    nombreFacultad =  this.facultadService.buscarFacultadPorId(docenteRecuperadoDTO.getIdFacultad()).getNombre();
-
-                    return construirAuthResponse(usua, usuarioRol, "MultiCarrera", nombreFacultad);
-
-                case "dirección":
-
-                    return null;
-
-                case "secretaria":
-
-                    SecretariaDTO secretariaRecuperadoDTO = this.secretariaService.buscarPorIdUsuario(usua.getId());
-                    if (secretariaRecuperadoDTO == null) {
-                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Secretaria no encontrado.");
-                    }
-
-                    carreraDTO = this.carreraService.buscarCarreraPorId(secretariaRecuperadoDTO.getIdCarrera());
-                    nombreFacultad =  this.facultadService.buscarFacultadPorId(carreraDTO.getIdFacultad()).getNombre();
-
-                    return construirAuthResponse(usua, usuarioRol, carreraDTO.getNombre(), nombreFacultad);
-
-                default:
-                    throw new RuntimeException("Rol de usuario desconocido.");
-            }
-
-        }
-
-        private AuthResponse construirAuthResponse(Usuario usuario, String rol, String carrera, String facultad) {
-            return AuthResponse.builder()
-                    .primerNombre(usuario.getPrimerNombre())
-                    .segundoNombre(usuario.getSegundoNombre())
-                    .primerApellido(usuario.getPrimerApellido())
-                    .segundoApellido(usuario.getSegundoApellido())
-                    .correo(usuario.getCorreo())
-                    .rol(rol)
-                    .idUsuario(usuario.getId())
-                    .nombreCarrera(carrera)
-                    .nombrefacultad(facultad)
-                    .activo(usuario.getActivo())
-                    .validdo(usuario.getCorreoValido())
-                    .build();
-        }
-
-
-     */
+  
     @Override
     @Transactional
     public AuthResponse login(LoginRequest loginRequest) {
@@ -695,86 +478,6 @@ public class AuthServiceImpl implements IAuthService {
                 .build();
     }
 
-    /*
-
-    @Override
-    @Transactional
-    public AuthResponse seleccionarRol(Integer idUsuario, String rolSeleccionado) {
-        Usuario usua = this.usuarioRepository.findById(idUsuario);
-
-        if (usua == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado.");
-        }
-
-        List<UsuarioRol> rolesUsuario = this.usuarioRolRepository.findByIdUsuario(usua.getId());
-
-        boolean tieneRol = rolesUsuario.stream()
-                .anyMatch(usuarioRol -> usuarioRol.getRol().getNombre().equalsIgnoreCase(rolSeleccionado));
-
-        if (!tieneRol) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no tiene este rol asignado.");
-        }
-
-        String nombreFacultad = null;
-        String nombreCarrera = null;
-
-        switch (rolSeleccionado.toLowerCase()) {
-            case "estudiante":
-                EstudianteDTO estudianteDTO = this.estudianteService.buscarPorIdUsuario(usua.getId());
-                if (estudianteDTO == null) {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante no encontrado.");
-                }
-
-                CarreraDTO carreraDTO = this.carreraService.buscarCarreraPorId(estudianteDTO.getIdCarrera());
-                nombreFacultad = this.facultadService.buscarFacultadPorId(carreraDTO.getIdFacultad()).getNombre();
-                nombreCarrera = carreraDTO.getNombre();
-                break;
-
-            case "docente":
-                DocenteDTO docenteDTO = this.docenteService.buscarPorIdUsuario(usua.getId());
-                if (docenteDTO == null) {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Docente no encontrado.");
-                }
-
-                nombreFacultad = this.facultadService.buscarFacultadPorId(docenteDTO.getIdFacultad()).getNombre();
-                nombreCarrera = "MultiCarrera";
-                break;
-
-            case "secretaria":
-                SecretariaDTO secretariaDTO = this.secretariaService.buscarPorIdUsuario(usua.getId());
-                if (secretariaDTO == null) {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Secretaria no encontrada.");
-                }
-
-                CarreraDTO carreraSec = this.carreraService.buscarCarreraPorId(secretariaDTO.getIdCarrera());
-                nombreFacultad = this.facultadService.buscarFacultadPorId(carreraSec.getIdFacultad()).getNombre();
-                nombreCarrera = carreraSec.getNombre();
-                break;
-
-            case "direccion":
-                nombreFacultad = "Administración General";
-                nombreCarrera = "Administrativo";
-                break;
-
-            default:
-                throw new RuntimeException("Rol desconocido: " + rolSeleccionado);
-        }
-
-        return AuthResponse.builder()
-                .primerNombre(usua.getPrimerNombre())
-                .segundoNombre(usua.getSegundoNombre())
-                .primerApellido(usua.getPrimerApellido())
-                .segundoApellido(usua.getSegundoApellido())
-                .correo(usua.getCorreo())
-                .rolSeleccionado(rolSeleccionado)
-                .idUsuario(usua.getId())
-                .nombreCarrera(nombreCarrera)
-                .nombreFacultad(nombreFacultad)
-                .activo(usua.getActivo())
-                .validdo(usua.getCorreoValido())
-                .build();
-    }
-
-     */
+    
 
 }

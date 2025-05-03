@@ -10,6 +10,7 @@ import com.tesis.backend_tesis.service.dto.EstudianteDTO;
 import com.tesis.backend_tesis.service.dto.UsuarioDTO;
 import com.tesis.backend_tesis.service.dto.utils.Converter;
 import com.tesis.backend_tesis.utilitarios.Validaciones;
+import feign.FeignException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -947,6 +949,510 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
 
         return revisionGuardada;
+    }
+
+    @Override
+    @Transactional
+    public Boolean calificarPropuestaRevisor(Integer idPropuesta,
+                                             Double nota,
+                                             String observaciones,
+                                             Integer idDocente,
+                                             MultipartFile rubrica,
+                                             String taskID) throws IOException{
+        // Validaciones de parámetros nulos
+        if (idPropuesta == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID de la propuesta no puede ser nulo.");
+        }
+        if (nota == null || Double.isNaN(nota) || nota < 0 || nota > 20) {
+            System.out.println("Nota inválida: " + nota);  // Verifica el valor de la nota
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La nota debe estar entre 0 y 20.");
+        }
+
+        if (rubrica==null || rubrica.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se ha seleccionado ningún archivo de la rúbrica.");
+        }
+
+        this.validaciones.validarArchivo(rubrica, "rúbrica de calificación", List.of("application/pdf"));
+
+
+        // Obtener la propuesta
+        List<VistaPropuesta> vistaPropuestaExistente = this.vistasEntidadesService.buscarPropuestaPorIdPropuesta(idPropuesta);
+        if (vistaPropuestaExistente.get(0) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró una propuesta con el ID: " + idPropuesta);
+        }
+        if (vistaPropuestaExistente == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la propuesta.");
+        }
+
+        // Obtener el ID del revisor
+        Revision revision = this.revisionRepository.findByIdPropuesta(vistaPropuestaExistente.getFirst().getId()).getFirst();
+
+        /*
+        List<Integer> docentesRegistrados = Arrays.asList(revision.getRevisor1().getId(), revision.getRevisor2().getId());
+
+        if(!docentesRegistrados.contains(idDocente)){
+
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El docente revisor no es el mismo.");
+        }
+
+         */
+
+        Integer idUsuarioDocente = this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente).getIdUsuario();
+
+        // Guardar el archivo
+        Archivo archivoGuardado = this.archivoService.guardar(rubrica, idUsuarioDocente);
+        if (archivoGuardado == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar el archivo.");
+        }
+
+        String nombresRevisor = null;
+
+        if (revision.getRevisor1().getId().equals(idDocente)){
+
+            revision.setNota1(nota);
+            revision.setArchivoRevisado1(archivoGuardado);
+            revision.setObservaciones1(observaciones);
+            nombresRevisor = revision.getRevisor1().getUsuario().getPrimerApellido() + " "
+                    + revision.getRevisor1().getUsuario().getSegundoApellido() + " "
+                    + revision.getRevisor1().getUsuario().getPrimerNombre() + " "
+                    + revision.getRevisor1().getUsuario().getSegundoNombre();
+
+        }else if(revision.getRevisor2().getId().equals(idDocente)){
+
+            revision.setNota2(nota);
+            revision.setArchivoRevisado2(archivoGuardado);
+            revision.setObservaciones2(observaciones);
+            nombresRevisor = revision.getRevisor2().getUsuario().getPrimerApellido() + " "
+                    + revision.getRevisor2().getUsuario().getSegundoApellido() + " "
+                    + revision.getRevisor2().getUsuario().getPrimerNombre() + " "
+                    + revision.getRevisor2().getUsuario().getSegundoNombre();
+        }else {
+
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El docente revisor no es el mismo.");
+
+        }
+
+        // Actualizar la propuesta
+        Boolean revisionGuardada =this.revisionRepository.update(revision);
+
+        List<String> toEmails = new ArrayList<>();
+        List<String> ccEmails =  new ArrayList<>();
+
+
+        VistaEstudiante primer =null;
+        VistaEstudiante segundo =null;
+        VistaEstudiante tercero =null;
+
+        String nombresPrimerEstudiante =null;
+        String nombresSegundoEstudiante =null;
+        String nombresTercerEstudiante =null;
+
+        if (vistaPropuestaExistente.getFirst().getCategoria().equals("multimodal")){
+
+            primer =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
+            segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
+            tercero =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getTercerEstuId());
+
+            ccEmails.add(primer.getCorreo());
+            ccEmails.add(segundo.getCorreo());
+            ccEmails.add(tercero.getCorreo());
+
+            nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
+            nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
+            nombresTercerEstudiante =tercero.getApellidos() +" "+tercero.getNombres();
+
+
+        } else if (vistaPropuestaExistente.getFirst().getCategoria().equals("unimodal")) {
+            primer =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
+
+            ccEmails.add(primer.getCorreo());
+            nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
+            System.out.println("ver si esta: " + vistaPropuestaExistente.getFirst().getSegundoEstuId());
+
+            if (vistaPropuestaExistente.getFirst().getSegundoEstuId()!= null){
+
+                segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
+                ccEmails.add(segundo.getCorreo());
+                nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
+
+            }
+        }
+
+        List<String> posiblesNombres = new ArrayList<String>();
+        posiblesNombres.add(nombresPrimerEstudiante);
+        posiblesNombres.add(nombresSegundoEstudiante);
+        posiblesNombres.add(nombresTercerEstudiante);
+
+        String nombresEstudiantes = this.validaciones.obtenerNombresEstudiantes(posiblesNombres);
+        String correoDireccion = this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaPropuestaExistente.getFirst().getCarrera()).getCorreoDireccion();
+        toEmails.add(correoDireccion);
+
+        if (vistaPropuestaExistente.getFirst().getTutorDocenteId()!=null){
+
+            ccEmails.add( this.vistasEntidadesService.buscarDocentePorIdDocente(
+                    vistaPropuestaExistente.getFirst().getTutorDocenteId()).getCorreo());
+        }
+
+
+        try{
+
+            if (!revisionGuardada) {
+
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo asiganr la calificación.");
+
+            }
+
+
+            this.correoRestClient.calificacionRevisor(toEmails,
+                    ccEmails,
+                    nombresRevisor,
+                    nombresEstudiantes,
+                    "urlSistema",
+                    vistaPropuestaExistente.getFirst().getTema(),
+                    correoDireccion,
+                    rubrica);
+
+            logger.info("Correo enviado exitosamente a {} con copia {}", toEmails, ccEmails);
+
+        }catch (Exception e){
+            logger.error("Error en el proceso: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de correo.");
+        }
+/*
+        Map<String, Object> variables = new HashMap<>();
+        //variables.put("idRevisor1", idDocente1);
+        // variables.put("idRevisor2", idDocente2);
+
+
+        variables.put("idRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getIdUsuario());
+        variables.put("idRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getIdUsuario());
+
+        try {
+            this.motorRestClient.completarTarea(taskID, variables);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN.");
+        }
+
+ */
+        System.out.print("Service......:   "+observaciones);
+
+        return revisionGuardada;
+    }
+
+    @Override
+    @Transactional
+    public Boolean aprobarPropuesta(Integer idPropuesta,
+                                    String observaciones,
+                                    Integer idTutor,
+                                    MultipartFile oficio,
+                                    String taskID) throws IOException {
+        if (idPropuesta ==null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID de la propuesta no puede ser nulo.");
+        }
+
+
+        List<VistaPropuesta> vistaPropuestaExistente = this.vistasEntidadesService.buscarPropuestaPorIdPropuesta(idPropuesta);
+
+        if (vistaPropuestaExistente.getFirst() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se ha encontrado la propuesta.");
+        }
+        if (oficio == null || oficio.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se ha seleccionado ningún archivo.");
+        }
+
+        this.validaciones.validarArchivo(oficio, "designación tutor", List.of("application/pdf"));
+
+        Revision revision = this.revisionRepository.findByIdPropuesta(vistaPropuestaExistente.getFirst().getId()).getFirst();
+
+
+
+        if (revision.getNota1()==null || revision.getArchivoRevisado1()==null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El primer revisor aún no ha calificado.");
+        }
+
+        if (revision.getNota2()==null || revision.getArchivoRevisado2()==null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El segundo revisor aún no ha calificado.");
+        }
+
+        Double notaFinal = (revision.getNota1() + revision.getNota2()) / 2.0;
+
+        if (notaFinal < 11) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El promedio simple de las calificaciones es menor a 11, se obtuvo: " + notaFinal);
+        }
+
+        Propuesta propuesta = propuestaRepository.buscarPorId(idPropuesta);
+
+        Integer tutorActualId = vistaPropuestaExistente.getFirst().getTutorDocenteId();
+
+        // Solo asigna el tutor si aún no ha sido asignado
+        if (tutorActualId != null) {
+            // Ya hay un tutor asignado
+            if (idTutor != null && !idTutor.equals(tutorActualId)) {
+                // Se quiere cambiar el tutor
+                DocenteDTO nuevoTutor = this.docenteService.buscarPorIdUsuario(idTutor);
+                if (nuevoTutor == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró un docente con el ID: " + idTutor);
+                }
+                propuesta.setTutor(this.converter.toEntity(nuevoTutor));
+            }
+            // Si idTutor es null o igual al actual, no se hace nada (se mantiene el tutor existente)
+        } else {
+            // No hay tutor asignado aún
+            if (idTutor == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID del tutor no puede ser nulo.");
+            }
+
+            DocenteDTO nuevoTutor = this.docenteService.buscarPorIdUsuario(idTutor);
+            if (nuevoTutor == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró un docente con el ID: " + idTutor);
+            }
+            propuesta.setTutor(this.converter.toEntity(nuevoTutor));
+        }
+
+        // Guardar el archivo y actualizar la propuesta
+
+        Integer idUsuarioCarrera =
+                this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaPropuestaExistente.getFirst().getCarrera()).getIdUsuarioCarrera();
+
+        Archivo archivoGuardado = archivoService.guardar(oficio, idUsuarioCarrera);
+        propuesta.setEstadoAprobacion(EstadoAprobacion.APROBADO);
+        //propuesta.set(archivoGuardado);
+        propuesta.setObservaciones(observaciones);
+
+
+        Boolean propuestaGuardada = this.propuestaRepository.update(propuesta);
+
+
+        List<String> toEmails = new ArrayList<>();
+        List<String> ccEmails =  new ArrayList<>();
+
+
+        VistaEstudiante primer =null;
+        VistaEstudiante segundo =null;
+        VistaEstudiante tercero =null;
+
+        String nombresPrimerEstudiante =null;
+        String nombresSegundoEstudiante =null;
+        String nombresTercerEstudiante =null;
+
+        if (vistaPropuestaExistente.getFirst().getCategoria().equals("multimodal")){
+
+            primer =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
+            segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
+            tercero =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getTercerEstuId());
+
+            ccEmails.add(primer.getCorreo());
+            ccEmails.add(segundo.getCorreo());
+            ccEmails.add(tercero.getCorreo());
+
+            nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
+            nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
+            nombresTercerEstudiante =tercero.getApellidos() +" "+tercero.getNombres();
+
+
+        } else if (vistaPropuestaExistente.getFirst().getCategoria().equals("unimodal")) {
+            primer =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
+
+            ccEmails.add(primer.getCorreo());
+            nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
+
+            if (vistaPropuestaExistente.getFirst().getSegundoEstuId()!= null){
+
+                segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
+                ccEmails.add(segundo.getCorreo());
+                nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
+
+            }
+        }
+
+        List<String> posiblesNombres = new ArrayList<String>();
+        posiblesNombres.add(nombresPrimerEstudiante);
+        posiblesNombres.add(nombresSegundoEstudiante);
+        posiblesNombres.add(nombresTercerEstudiante);
+
+        String nombresEstudiantes = this.validaciones.obtenerNombresEstudiantes(posiblesNombres);
+        String correoDireccion = this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaPropuestaExistente.getFirst().getCarrera()).getCorreoDireccion();
+        VistaDocente docenteTutor = this.vistasEntidadesService.buscarDocentePorIdDocente(propuesta.getTutor().getId());
+        toEmails.add(docenteTutor.getCorreo());
+
+        String nombreTutor = docenteTutor.getApellidos() +" "+docenteTutor.getNombres();
+
+
+        try{
+
+            if (!propuestaGuardada) {
+
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo asiganr la calificación.");
+
+            }
+
+
+            this.correoRestClient.aprobacionPropuesta(toEmails,
+                    ccEmails,
+                    nombreTutor,
+                    nombresEstudiantes,
+                    "urlSistema",
+                    vistaPropuestaExistente.getFirst().getTema(),
+                    correoDireccion,
+                    oficio);
+
+            logger.info("Correo enviado exitosamente a {} con copia {}", toEmails, ccEmails);
+
+        }catch (Exception e){
+            logger.error("Error en el proceso: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de correo.");
+        }
+/*
+        Map<String, Object> variables = new HashMap<>();
+        //variables.put("idRevisor1", idDocente1);
+        // variables.put("idRevisor2", idDocente2);
+
+
+        variables.put("idRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getIdUsuario());
+        variables.put("idRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getIdUsuario());
+
+        try {
+            this.motorRestClient.completarTarea(taskID, variables);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN.");
+        }
+
+ */
+
+        return propuestaGuardada;
+    }
+
+    @Override
+    public Boolean negacionPropuesta(Integer idPropuesta,
+                                     String observaciones,
+                                     String taskID) {
+
+        if (idPropuesta ==null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID de la propuesta no puede ser nulo.");
+        }
+
+
+        List<VistaPropuesta> vistaPropuestaExistente = this.vistasEntidadesService.buscarPropuestaPorIdPropuesta(idPropuesta);
+
+
+
+        if (vistaPropuestaExistente.getFirst() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se ha encontrado la propuesta.");
+        }
+
+        Revision revision = this.revisionRepository.findByIdPropuesta(vistaPropuestaExistente.getFirst().getId()).getFirst();
+        if (revision.getNota1()==null || revision.getArchivoRevisado1()==null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El primer revisor aún no ha calificado.");
+        }
+
+        if (revision.getNota2()==null || revision.getArchivoRevisado2()==null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El segundo revisor aún no ha calificado.");
+        }
+
+        Double notaFinal = (revision.getNota1() + revision.getNota2()) / 2.0;
+
+        if (notaFinal >= 11) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El promedio simple de las calificaciones es mayor a 11, se obtuvo: " + notaFinal);
+        }
+
+        Propuesta propuesta = propuestaRepository.buscarPorId(idPropuesta);
+
+        propuesta.setEstadoAprobacion(EstadoAprobacion.NO_APROBADO);
+        propuesta.setObservaciones(observaciones);
+
+
+        Boolean propuestaGuardada = this.propuestaRepository.update(propuesta);
+
+        List<String> toEmails = new ArrayList<>();
+        List<String> ccEmails =  new ArrayList<>();
+
+
+        VistaEstudiante primer =null;
+        VistaEstudiante segundo =null;
+        VistaEstudiante tercero =null;
+
+        String nombresPrimerEstudiante =null;
+        String nombresSegundoEstudiante =null;
+        String nombresTercerEstudiante =null;
+
+        if (vistaPropuestaExistente.getFirst().getCategoria().equals("multimodal")){
+
+            primer =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
+            segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
+            tercero =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getTercerEstuId());
+
+            toEmails.add(primer.getCorreo());
+            toEmails.add(segundo.getCorreo());
+            toEmails.add(tercero.getCorreo());
+
+            nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
+            nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
+            nombresTercerEstudiante =tercero.getApellidos() +" "+tercero.getNombres();
+
+
+        } else if (vistaPropuestaExistente.getFirst().getCategoria().equals("unimodal")) {
+            primer =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
+
+            toEmails.add(primer.getCorreo());
+            nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
+            System.out.println("ver si esta: " + vistaPropuestaExistente.getFirst().getSegundoEstuId());
+
+            if (vistaPropuestaExistente.getFirst().getSegundoEstuId()!= null){
+
+                segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
+                toEmails.add(segundo.getCorreo());
+                nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
+
+            }
+        }
+
+        List<String> posiblesNombres = new ArrayList<String>();
+        posiblesNombres.add(nombresPrimerEstudiante);
+        posiblesNombres.add(nombresSegundoEstudiante);
+        posiblesNombres.add(nombresTercerEstudiante);
+
+        String nombresEstudiantes = this.validaciones.obtenerNombresEstudiantes(posiblesNombres);
+        String correoDireccion = this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaPropuestaExistente.getFirst().getCarrera()).getCorreoDireccion();
+
+        try{
+
+            if (!propuestaGuardada) {
+
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo asiganr la calificación.");
+            }
+
+            this.correoRestClient.negacionPropuesta(toEmails,
+                    ccEmails,
+                    nombresEstudiantes,
+                    vistaPropuestaExistente.getFirst().getTema(),
+                    correoDireccion);
+
+            logger.info("Correo enviado exitosamente a {} con copia {}", toEmails, ccEmails);
+
+        }catch (Exception e){
+            logger.error("Error en el proceso: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de correo.");
+        }
+/*
+        Map<String, Object> variables = new HashMap<>();
+        //variables.put("idRevisor1", idDocente1);
+        // variables.put("idRevisor2", idDocente2);
+
+
+        variables.put("idRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getIdUsuario());
+        variables.put("idRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getIdUsuario());
+
+        try {
+            this.motorRestClient.completarTarea(taskID, variables);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN.");
+        }
+
+ */
+
+        return propuestaGuardada;
     }
 
 
