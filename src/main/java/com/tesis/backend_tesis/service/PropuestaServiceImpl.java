@@ -713,9 +713,9 @@ public class PropuestaServiceImpl implements IPropuestaService{
                                   MultipartFile oficio,
                                   String taskID) {
         // Validar entrada
-        if (idPropuesta == null || idPropuesta < 1 ||
-                idDocente1 == null || idDocente1 < 1 ||
-                idDocente2 == null || idDocente2 <1 ) {
+        if (idPropuesta == null || idPropuesta < 0 ||
+                idDocente1 == null || idDocente1 < 0 ||
+                idDocente2 == null || idDocente2 <0 ) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Los parámetros no pueden ser nulos o vacíos.");
         }
 
@@ -1453,6 +1453,114 @@ public class PropuestaServiceImpl implements IPropuestaService{
  */
 
         return propuestaGuardada;
+    }
+
+    @Override
+    public void recordatorioRevisores(Integer idPropuesta, Integer idUsuario) {
+
+        if (idPropuesta ==null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID de la propuesta no puede ser nulo.");
+        }
+
+
+        List<VistaPropuesta> vistaPropuestaExistente = this.vistasEntidadesService.buscarPropuestaPorIdPropuesta(idPropuesta);
+
+
+
+        if (vistaPropuestaExistente.getFirst() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se ha encontrado la propuesta.");
+        }
+
+
+
+        Revision revision = this.revisionRepository.findByIdPropuesta(vistaPropuestaExistente.getFirst().getId()).getFirst();
+
+        Integer idDocente = this.vistasEntidadesService.buscarDocentePorIdUsuario(idUsuario).getIdDocente();
+
+        String nombresRevisor = null;
+        String toEmail = null;
+        String correoDireccion = this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaPropuestaExistente.getFirst().getCarrera()).getCorreoDireccion();
+
+        String tema = vistaPropuestaExistente.getFirst().getTema();
+
+        if (revision.getRevisor1().getId().equals(idDocente)){
+
+            toEmail= revision.getRevisor1().getUsuario().getCorreo();
+
+            nombresRevisor = revision.getRevisor1().getUsuario().getPrimerApellido() + " "
+                    + revision.getRevisor1().getUsuario().getSegundoApellido() + " "
+                    + revision.getRevisor1().getUsuario().getPrimerNombre() + " "
+                    + revision.getRevisor1().getUsuario().getSegundoNombre();
+
+        }else if(revision.getRevisor2().getId().equals(idDocente)){
+
+            toEmail= revision.getRevisor2().getUsuario().getCorreo();
+
+            nombresRevisor = revision.getRevisor2().getUsuario().getPrimerApellido() + " "
+                    + revision.getRevisor2().getUsuario().getSegundoApellido() + " "
+                    + revision.getRevisor2().getUsuario().getPrimerNombre() + " "
+                    + revision.getRevisor2().getUsuario().getSegundoNombre();
+        }else {
+
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El docente revisor no es el mismo.");
+
+        }
+
+        try{
+
+            if (toEmail == null || toEmail.isEmpty() ) {
+
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo enviar correo por falta de toEmail.");
+
+            }
+            if (nombresRevisor == null || nombresRevisor.isEmpty()) {
+
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo enviar correo por falta de nombrerevisoir.");
+
+            }
+            if ( tema ==null || tema.isEmpty() ) {
+
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo enviar correo por falta de tema.");
+
+            }
+
+            if ( correoDireccion == null || correoDireccion.isEmpty()) {
+
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo enviar correo por falta de correo direccion.");
+
+            }
+
+
+
+            this.correoRestClient.notificacionRecordatorioRevisor(toEmail,
+                    nombresRevisor,
+                    tema,
+                    correoDireccion);
+
+            logger.info("Correo enviado exitosamente a ", toEmail);
+
+        }catch (Exception e){
+            logger.error("Error en el proceso: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de correo.");
+        }
+
+        /*
+        Map<String, Object> variables = new HashMap<>();
+        //variables.put("idRevisor1", idDocente1);
+        // variables.put("idRevisor2", idDocente2);
+
+
+        variables.put("idRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getIdUsuario());
+        variables.put("idRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getIdUsuario());
+
+        try {
+            this.motorRestClient.completarTarea(taskID, variables);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN.");
+        }
+
+ */
+
     }
 
 

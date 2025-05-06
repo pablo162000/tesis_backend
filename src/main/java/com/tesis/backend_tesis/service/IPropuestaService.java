@@ -56,5 +56,7 @@ public interface IPropuestaService {
                                     String observaciones,
                                     String taskID);
 
+    public void recordatorioRevisores(Integer idPropuesta,
+                                         Integer idDocente);
 
 }

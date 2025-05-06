@@ -484,6 +484,44 @@ public class MailGunService {
     }
 
 
+    public void sendNotificacionRevision(String toEmail,
+                                         String revisor,
+                                         String tema,
+                                         String correoDireccion) throws UnirestException {
+        toEmail = "luismosquera97@gmail.com"; //FORZADO SOLO PARA PRUEBAS
+        String link = "www.sistema.com";
+
+        //Crear el mapa de variables dinámicas
+        Map<String, String> variablesMap = new HashMap<>();
+        variablesMap.put("revisor", revisor);
+        variablesMap.put("link", link);
+        variablesMap.put("tema", tema);
+        variablesMap.put("correoDireccion", correoDireccion);
+
+
+        //Convertir el mapa a JSON
+        String variablesJson;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            variablesJson = objectMapper.writeValueAsString(variablesMap);
+        } catch (Exception e) {
+            throw new UnirestException("Error al generar JSON de variables", e);
+        }
+
+        HttpResponse<JsonNode> response = Unirest.post("https://api.mailgun.net/v3/" + sandboxDomain + "/messages")
+                .basicAuth("api", apiKey)
+                .queryString("from", fromEmail)
+                .queryString("to", toEmail)
+                .queryString("subject", "Revisión Pendiente")
+                .queryString("template", "notificacionrevision") // 🔹 Nombre de la plantilla
+                .queryString("h:X-Mailgun-Variables", variablesJson) // 🔹 Enviar JSON bien formateado
+                .asJson();
+
+        if (response.getStatus() != 200) {
+            throw new UnirestException("Error al enviar el correo: " + response.getStatus() + " " + response.getBody());
+        }
+    }
+
 
 
 

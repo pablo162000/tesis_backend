@@ -248,6 +248,24 @@ public class MailRestController {
     }
 
 
+    @PostMapping("/notificacionrecordatoriov2")
+    public ResponseEntity<String> notificacionRecordatorioRevisor(
+            @RequestParam String toEmail,
+            @RequestParam String revisor,
+            @RequestParam String tema,
+            @RequestParam String correoDireccion) {
+
+
+        try {
+            this.mailGunServices.sendNotificacionRevision(toEmail, revisor, tema,
+                    correoDireccion);
+            return ResponseEntity.ok("Correo enviado exitosamente a " + toEmail);
+        } catch (UnirestException e) {
+            return ResponseEntity.status(500).body("Error al enviar el correo: " + e.getMessage());
+        }
+    }
+
+
 
 
     @PostMapping("/registro")

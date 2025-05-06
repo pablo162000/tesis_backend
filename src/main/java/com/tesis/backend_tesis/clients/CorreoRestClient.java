@@ -133,6 +133,14 @@ public interface CorreoRestClient {
             @RequestParam("nombreEstudiantes")String nombreEstudiantes,
             @RequestParam("tema")String temaPropuesta,
             @RequestParam("correoDireccion")String correoDireccion);
+
+
+
+    @PostMapping("correo/notificacionrecordatoriov2")
+    String notificacionRecordatorioRevisor( @RequestParam String toEmail,
+                               @RequestParam String revisor,
+                               @RequestParam String tema,
+                               @RequestParam String correoDireccion);
 }
 
 
