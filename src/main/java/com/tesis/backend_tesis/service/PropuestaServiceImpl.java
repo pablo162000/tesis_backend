@@ -940,6 +940,11 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
         variables.put("idRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getIdUsuario());
         variables.put("idRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getIdUsuario());
+        variables.put("correoRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getCorreo());
+        variables.put("correoRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getCorreo());
+        variables.put("nombreRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getNombres() + " "+ this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getApellidos());
+        variables.put("nombreRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getNombres() + " "+ this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getApellidos());
+        variables.put("temaPropuesta", this.vistasEntidadesService.buscarPropuestaPorIdPropuesta(idPropuesta).getFirst().getTema());
 
         try {
             this.motorRestClient.completarTarea(taskID, variables);
