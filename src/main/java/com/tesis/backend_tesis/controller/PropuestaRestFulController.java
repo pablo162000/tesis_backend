@@ -91,9 +91,9 @@ public class PropuestaRestFulController {
     public ResponseEntity<Boolean> asignarRevisores(@PathVariable Integer idPropuesta,
                                                     @RequestParam("idDocente1") Integer idDocente1,
                                                     @RequestParam("idDocente2") Integer idDocente2,
-                                                    @RequestPart("rubrica") MultipartFile rubrica,
-                                                    @RequestPart("oficio") MultipartFile oficio,
-                                                    @RequestPart("taskID") String taskID
+                                                    @RequestParam("rubrica") MultipartFile rubrica,
+                                                    @RequestParam("oficio") MultipartFile oficio,
+                                                    @RequestParam("taskID") String taskID
 
     ) {
 
@@ -108,13 +108,10 @@ public class PropuestaRestFulController {
                                                        @RequestParam("nota")  Double nota,
                                                        @RequestParam(value="observaciones", required = false) String observaciones,
                                                        @RequestParam("idDocente") Integer idDocente,
-                                                       @RequestPart("rubrica") MultipartFile rubrica,
-                                                       @RequestPart("taskID") String taskID)throws IOException   {
+                                                       @RequestParam("rubrica") MultipartFile rubrica,
+                                                       @RequestParam("taskID") String taskID)throws IOException   {
 
         Boolean exito = this.propuestaService.calificarPropuestaRevisor(idPropuesta,nota, observaciones, idDocente,rubrica, taskID);
-
-        System.out.print("controlleer......:  "+observaciones);
-
         return ResponseEntity.ok(exito);
     }
 
@@ -123,8 +120,8 @@ public class PropuestaRestFulController {
     public ResponseEntity<Boolean> aprobarPropuesta(@PathVariable Integer idPropuesta,
                                                        @RequestParam(value="observaciones", required = false) String observaciones,
                                                        @RequestParam("idTutor") Integer idTutor,
-                                                       @RequestPart("rubrica") MultipartFile archivo,
-                                                       @RequestPart("taskID") String taskID)throws IOException   {
+                                                       @RequestParam("rubrica") MultipartFile archivo,
+                                                       @RequestParam("taskID") String taskID)throws IOException   {
 
         Boolean exito = this.propuestaService.aprobarPropuesta(idPropuesta, observaciones, idTutor,archivo, taskID);
 
@@ -134,7 +131,7 @@ public class PropuestaRestFulController {
     @PutMapping(value = "/{idPropuesta}/negar")
     public ResponseEntity<Boolean> negarPropuesta(@PathVariable Integer idPropuesta,
                                                     @RequestParam(value="observaciones", required = false) String observaciones,
-                                                    @RequestPart("taskID") String taskID){
+                                                    @RequestParam("taskID") String taskID){
 
         Boolean exito = this.propuestaService.negacionPropuesta(idPropuesta, observaciones, taskID);
 
