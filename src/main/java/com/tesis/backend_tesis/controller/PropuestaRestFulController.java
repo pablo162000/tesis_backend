@@ -142,5 +142,14 @@ public class PropuestaRestFulController {
     }
 
 
+    @PostMapping(value = "/{idPropuesta}/recordatorio")
+    public void recordatorioRevisor(@PathVariable Integer idPropuesta,
+                                                  @RequestParam("idUsuario") Integer idUsuario){
+
+        this.propuestaService.recordatorioRevisores(idPropuesta, idUsuario);
+
+    }
+
+
 
 }
