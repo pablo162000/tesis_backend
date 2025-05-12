@@ -945,7 +945,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
         variables.put("nombreRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getNombres() + " "+ this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getApellidos());
         variables.put("nombreRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getNombres() + " "+ this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getApellidos());
         variables.put("temaPropuesta", this.vistasEntidadesService.buscarPropuestaPorIdPropuesta(idPropuesta).getFirst().getTema());
-        variables.put("direccionCarrera", correoDireccion);
+        variables.put("c", correoDireccion);
 
 
 
@@ -1291,9 +1291,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
         try{
 
             if (!propuestaGuardada) {
-
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo asiganr la calificación.");
-
             }
 
 
@@ -1312,14 +1310,14 @@ public class PropuestaServiceImpl implements IPropuestaService{
             logger.error("Error en el proceso: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de correo.");
         }
-/*
+
         Map<String, Object> variables = new HashMap<>();
         //variables.put("idRevisor1", idDocente1);
         // variables.put("idRevisor2", idDocente2);
 
 
-        variables.put("idRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getIdUsuario());
-        variables.put("idRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getIdUsuario());
+        //variables.put("idRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getIdUsuario());
+        //variables.put("idRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getIdUsuario());
 
         try {
             this.motorRestClient.completarTarea(taskID, variables);
@@ -1327,7 +1325,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN.");
         }
 
- */
+
 
         return propuestaGuardada;
     }

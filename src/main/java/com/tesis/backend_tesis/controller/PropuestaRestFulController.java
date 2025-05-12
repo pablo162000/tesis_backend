@@ -134,7 +134,6 @@ public class PropuestaRestFulController {
     public ResponseEntity<Boolean> negarPropuesta(@PathVariable Integer idPropuesta,
                                                     @RequestParam(value="observaciones", required = false) String observaciones,
                                                     @RequestParam("taskID") String taskID){
-
         Boolean exito = this.propuestaService.negacionPropuesta(idPropuesta, observaciones, taskID);
 
         return ResponseEntity.ok(exito);
