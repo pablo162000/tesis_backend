@@ -116,6 +116,8 @@ public class PropuestaRestFulController {
     }
 
 
+
+
     @PutMapping(value = "/{idPropuesta}/aprobar")
     public ResponseEntity<Boolean> aprobarPropuesta(@PathVariable Integer idPropuesta,
                                                        @RequestParam(value="observaciones", required = false) String observaciones,

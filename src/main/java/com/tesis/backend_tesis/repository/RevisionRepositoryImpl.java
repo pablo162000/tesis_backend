@@ -67,7 +67,7 @@ public class RevisionRepositoryImpl implements IRevisionRepository {
 
             if (revision1 != null) {
                 // Si la propuesta existe, solo guardamos los cambios sin necesidad de modificar el estado de validación nuevamente
-                this.entityManager.merge(revision1); // Guarda los cambios en la base de datos
+                this.entityManager.merge(revision); // Guarda los cambios en la base de datos
 
                 return true; // Indicamos que la actualización fue exitosa
             } else {

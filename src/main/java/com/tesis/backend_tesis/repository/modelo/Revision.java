@@ -39,7 +39,7 @@ public class Revision {
     @ToString.Exclude
     private Archivo archivoRevisado1;
 
-    @Column(name = "revi_observaciones_1")
+    @Column(name = "revi_observaciones_1", length = 500)
     private String observaciones1;
 
     @Column(name = "revi_nota_1")
@@ -55,7 +55,7 @@ public class Revision {
     @ToString.Exclude
     private Archivo archivoRevisado2;
 
-    @Column(name = "revi_observaciones_2")
+    @Column(name = "revi_observaciones_2", length = 500)
     private String observaciones2;
 
     @Column(name = "revi_nota_2")

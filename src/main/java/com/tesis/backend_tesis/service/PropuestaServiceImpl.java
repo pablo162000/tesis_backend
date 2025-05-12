@@ -967,6 +967,10 @@ public class PropuestaServiceImpl implements IPropuestaService{
                                              Integer idDocente,
                                              MultipartFile rubrica,
                                              String taskID) throws IOException{
+
+        if (observaciones != null && observaciones.length() > 255) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las observaciones no deben exceder los 255 caracteres.");
+        }
         // Validaciones de parámetros nulos
         if (idPropuesta == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID de la propuesta no puede ser nulo.");
@@ -1014,6 +1018,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
         }
 
         String nombresRevisor = null;
+        Map<String, Object> variables = new HashMap<>();
 
         if (revision.getRevisor1().getId().equals(idDocente)){
 
@@ -1024,6 +1029,8 @@ public class PropuestaServiceImpl implements IPropuestaService{
                     + revision.getRevisor1().getUsuario().getSegundoApellido() + " "
                     + revision.getRevisor1().getUsuario().getPrimerNombre() + " "
                     + revision.getRevisor1().getUsuario().getSegundoNombre();
+            variables.put("NotaRevisor1", nota);
+
 
         }else if(revision.getRevisor2().getId().equals(idDocente)){
 
@@ -1034,14 +1041,24 @@ public class PropuestaServiceImpl implements IPropuestaService{
                     + revision.getRevisor2().getUsuario().getSegundoApellido() + " "
                     + revision.getRevisor2().getUsuario().getPrimerNombre() + " "
                     + revision.getRevisor2().getUsuario().getSegundoNombre();
+            variables.put("NotaRevisor2", nota);
+
         }else {
 
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El docente revisor no es el mismo.");
 
         }
 
-        // Actualizar la propuesta
-        Boolean revisionGuardada =this.revisionRepository.update(revision);
+        Boolean revisionGuardada = false;
+        try {
+            revisionGuardada = this.revisionRepository.update(revision);
+            if (!revisionGuardada) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo asignar la calificación.");
+            }
+        } catch (Exception e) {
+            logger.error("Error al actualizar la revisión: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar la calificación.");
+        }
 
         List<String> toEmails = new ArrayList<>();
         List<String> ccEmails =  new ArrayList<>();
@@ -1104,11 +1121,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
         try{
 
-            if (!revisionGuardada) {
-
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo asiganr la calificación.");
-
-            }
 
 
             this.correoRestClient.calificacionRevisor(toEmails,
@@ -1126,24 +1138,13 @@ public class PropuestaServiceImpl implements IPropuestaService{
             logger.error("Error en el proceso: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de correo.");
         }
-/*
-        Map<String, Object> variables = new HashMap<>();
-        //variables.put("idRevisor1", idDocente1);
-        // variables.put("idRevisor2", idDocente2);
 
-
-        variables.put("idRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getIdUsuario());
-        variables.put("idRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getIdUsuario());
 
         try {
             this.motorRestClient.completarTarea(taskID, variables);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN.");
         }
-
- */
-        System.out.print("Service......:   "+observaciones);
-
         return revisionGuardada;
     }
 
@@ -1443,14 +1444,14 @@ public class PropuestaServiceImpl implements IPropuestaService{
             logger.error("Error en el proceso: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de correo.");
         }
-/*
+
         Map<String, Object> variables = new HashMap<>();
         //variables.put("idRevisor1", idDocente1);
         // variables.put("idRevisor2", idDocente2);
 
 
-        variables.put("idRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getIdUsuario());
-        variables.put("idRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getIdUsuario());
+      //  variables.put("idRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getIdUsuario());
+       // variables.put("idRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getIdUsuario());
 
         try {
             this.motorRestClient.completarTarea(taskID, variables);
@@ -1458,7 +1459,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN.");
         }
 
- */
+
 
         return propuestaGuardada;
     }
