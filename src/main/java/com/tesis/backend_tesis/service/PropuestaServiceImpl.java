@@ -1312,12 +1312,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
         }
 
         Map<String, Object> variables = new HashMap<>();
-        //variables.put("idRevisor1", idDocente1);
-        // variables.put("idRevisor2", idDocente2);
-
-
-        //variables.put("idRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getIdUsuario());
-        //variables.put("idRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getIdUsuario());
 
         try {
             this.motorRestClient.completarTarea(taskID, variables);
@@ -1444,20 +1438,11 @@ public class PropuestaServiceImpl implements IPropuestaService{
         }
 
         Map<String, Object> variables = new HashMap<>();
-        //variables.put("idRevisor1", idDocente1);
-        // variables.put("idRevisor2", idDocente2);
-
-
-      //  variables.put("idRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getIdUsuario());
-       // variables.put("idRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getIdUsuario());
-
         try {
             this.motorRestClient.completarTarea(taskID, variables);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al completar la tarea en el motor BPMN.");
         }
-
-
 
         return propuestaGuardada;
     }
