@@ -8,6 +8,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,6 +59,26 @@ public class Validaciones {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         return fecha.format(formatter);
     }
+
+    public String diasTimer(LocalDate fechaInicio, String fechaFin) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        LocalDate fechaFinal = LocalDate.parse(fechaFin, formatter);
+
+        long diasEntre = ChronoUnit.DAYS.between(fechaInicio, fechaFinal);
+
+        if (diasEntre < 0) {
+            throw new IllegalArgumentException("La fecha final debe ser posterior a la fecha de inicio.");
+        }
+
+        String formato = "P" + diasEntre + "D";
+        return formato;
+    }
+
+
+
+
 
     public void validarArchivo(MultipartFile archivo, String nombreCampo, List<String> tiposPermitidos) {
         if (archivo == null || archivo.isEmpty()) {

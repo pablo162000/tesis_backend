@@ -103,7 +103,7 @@ public class MailGunService {
         MultipartBody request = Unirest.post("https://api.mailgun.net/v3/" + sandboxDomain + "/messages")
                 .basicAuth("api", apiKey)
                 .field("from", fromEmail)
-                .field("subject", "Registro Exitoso")
+                .field("subject", "Asignación Exitosa")
                 .field("template", "asignacionrevisor")
                 .field("h:X-Mailgun-Variables", variablesJson);
 

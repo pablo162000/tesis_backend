@@ -577,6 +577,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
         // Actualizar el estado de validación
         propuestaExistente.setEstadoValidacion(estadoValidacion ? EstadoValidacion.VALIDADO : EstadoValidacion.NO_VALIDADO);
+        propuestaExistente.setEstadoAprobacion(estadoValidacion ? EstadoAprobacion.EN_REVISON : EstadoAprobacion.NO_APROBADO);
         propuestaExistente.setObservaciones(obsercvaciones);
 
         Boolean seGuardo= false;
@@ -892,6 +893,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
         String nombresEstudiantes = this.validaciones.obtenerNombresEstudiantes(posiblesNombres);
         String correoDireccion = this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaPropuestaExistente.getFirst().getCarrera()).getCorreoDireccion();
         String fechaEntrega = this.validaciones.sumarDiasLaborables(LocalDate.now(), 10);
+        String timer = this.validaciones.diasTimer(LocalDate.now(), fechaEntrega);
         ccEmails.add(correoDireccion);
 
         if (vistaPropuestaExistente.getFirst().getTutorDocenteId()!=null){
@@ -945,7 +947,10 @@ public class PropuestaServiceImpl implements IPropuestaService{
         variables.put("nombreRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getNombres() + " "+ this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getApellidos());
         variables.put("nombreRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getNombres() + " "+ this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getApellidos());
         variables.put("temaPropuesta", this.vistasEntidadesService.buscarPropuestaPorIdPropuesta(idPropuesta).getFirst().getTema());
+        variables.put("duracionTimerRevisor", timer);
         variables.put("c", correoDireccion);
+
+        System.out.print("valor timer...: " + timer);
 
 
 
