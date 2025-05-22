@@ -15,7 +15,7 @@ public class JwUtil {
 
 
 
-    // Método para generar el token
+    // Método para generar el token -- validar correo
     public static String generateToken(String username) {
         return JWT.create()
                 .withSubject(username)
@@ -23,6 +23,7 @@ public class JwUtil {
                 .sign(Algorithm.HMAC256(SECRET_KEY));
     }
 
+    // Metodo generar token desde el login
     public static String generateTokenSesion(String username, List<String> roles) {
 
         System.out.println("Generando token sesion en jutil " + username );
@@ -31,7 +32,7 @@ public class JwUtil {
         return JWT.create()
                 .withSubject(username)
                 .withClaim("roles", roles)
-                .withExpiresAt(new Date(System.currentTimeMillis() + 600000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 1200000))
                 .sign(Algorithm.HMAC256(SECRET_KEY_SESION));
     }
 
