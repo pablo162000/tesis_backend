@@ -26,7 +26,6 @@ public class ValidarCorreoServiceImpl implements IValidarCorreoService{
 
  */
 
-
         String token = JwUtil.generateToken(correo.toLowerCase());
 
         return token;

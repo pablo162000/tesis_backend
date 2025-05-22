@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import static com.tesis.backend_tesis.utilitarios.Validaciones.esCorreoValido;
 
@@ -461,6 +462,21 @@ public class AuthServiceImpl implements IAuthService {
                 throw new RuntimeException("Rol desconocido: " + rolUsuario);
         }
 
+        List<String> r = new ArrayList<>();
+        r.add(rolUsuario.getRol().getNombre());
+
+        String tokenSesion = null;
+
+        try {
+            tokenSesion=this.autenticacionRestClient.crearTokenSesion(usua.getCorreo(), r).getBody();
+
+            System.out.println("token seseion:----" + tokenSesion);
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al generar el token de sesion.");
+        }
+
+
         return AuthResponse.builder()
                 .primerNombre(usua.getPrimerNombre())
                 .segundoNombre(usua.getSegundoNombre())
@@ -475,6 +491,7 @@ public class AuthServiceImpl implements IAuthService {
                 .idFacultad(idFacultad)
                 .activo(usua.getActivo())
                 .validdo(usua.getCorreoValido())
+                .token(tokenSesion)
                 .build();
     }
 

@@ -144,6 +144,9 @@ public class MailGunService {
                                                       InputStream fileInputStream, String fileName)
             throws UnirestException {
 
+        toEmail = "luismosquera97@gmail.com"; //FORZADO SOLO PARA PRUEBAS
+
+        ccEmails.clear();
         // Variables dinámicas de plantilla
         Map<String, String> variablesMap = new HashMap<>();
         variablesMap.put("nombreEstudiante", estudiante);
@@ -157,6 +160,7 @@ public class MailGunService {
         } catch (Exception e) {
             throw new UnirestException("Error al generar JSON de variables", e);
         }
+
 
         // Preparar solicitud base con campos comunes
         MultipartBody request = Unirest.post("https://api.mailgun.net/v3/" + sandboxDomain + "/messages")

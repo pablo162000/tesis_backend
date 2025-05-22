@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @FeignClient(name = "autenticacionRestClient"
             ,url = "http://localhost:5050/API/tesis/")
 public interface AutenticacionRestClient {
@@ -17,5 +19,10 @@ public interface AutenticacionRestClient {
 
     @GetMapping(value = "validacion/validar-token")
     ResponseEntity<String> validarToken(@RequestParam(value = "token") String token);
+
+    @PostMapping(value = "sesion/generar-token")
+    ResponseEntity<String> crearTokenSesion(@RequestParam(value = "username") String username,
+                                            @RequestParam(value = "roles") List<String> roles);
+
 
 }

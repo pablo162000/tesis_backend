@@ -4,6 +4,7 @@ package com.tesis.backend_tesis.controller;
 import com.tesis.backend_tesis.service.IUsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -32,6 +33,7 @@ public class UsuarioRestFulController {
 
         return ResponseEntity.ok(resultado);
     }
+
 
     @PostMapping("/recuperar")
     public ResponseEntity<Boolean> recuperarCuenta(@RequestParam(value = "correo") String correo) {
@@ -68,6 +70,7 @@ public class UsuarioRestFulController {
         return ResponseEntity.ok(resultado);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/actualizar")
     public ResponseEntity<Boolean> actulizarContrasena(@RequestParam(value = "correo") String correo,
                                                        @RequestParam(value = "password") String password) {
@@ -86,6 +89,7 @@ public class UsuarioRestFulController {
     }
 
 
+    @PreAuthorize("hasAnyRole('dirección', 'secretaria', 'ADMIN')")
     @PutMapping("/activardesactivar/{idUsuario}")
     public ResponseEntity<Boolean>  activarDesactivarUsuario(@PathVariable("idUsuario") Integer idUsuario,
                                                              @RequestParam("accion") Boolean accion) {

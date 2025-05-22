@@ -6,6 +6,6 @@ import java.io.IOException;
 
 public interface IBucket {
 
-    BucketObject uploadFile(MultipartFile multipartFile) throws IOException;
+    BucketObject uploadFile(MultipartFile multipartFile, String nombre) throws IOException;
 
 }

@@ -3,6 +3,7 @@ package com.tesis.backend_tesis.controller;
 import com.tesis.backend_tesis.service.IPropuestaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -15,6 +16,7 @@ public class PropuestaRestFulController {
     @Autowired
     private IPropuestaService propuestaService;
 
+    @PreAuthorize("hasRole('estudiante') ")
     @PostMapping
     public ResponseEntity<String> guardarPropuesta(
             @RequestParam String tipo,
@@ -52,8 +54,9 @@ public class PropuestaRestFulController {
     }
 
  */
-
+    @PreAuthorize("hasAnyRole('dirección', 'coordinador')")
     @PutMapping("/{idPropuesta}/validar")
+    //@PreAuthorize("hasRole('dirección')")
     public ResponseEntity<Boolean> validarPropuesta(@PathVariable Integer idPropuesta,
                                                     @RequestParam("respuesta") Boolean respuesta,
                                                     @RequestParam(value="observaciones", required = false) String observaciones,
@@ -87,6 +90,7 @@ public class PropuestaRestFulController {
  */
 
 
+    @PreAuthorize("hasRole('secretaria')")
     @PutMapping(value = "/{idPropuesta}/asignarrevisores")
     public ResponseEntity<Boolean> asignarRevisores(@PathVariable Integer idPropuesta,
                                                     @RequestParam("idDocente1") Integer idDocente1,
@@ -103,6 +107,7 @@ public class PropuestaRestFulController {
     }
 
 
+    @PreAuthorize("hasRole('docente')")
     @PutMapping(value = "/{idPropuesta}/calificar")
     public ResponseEntity<Boolean> asignarCalificacion(@PathVariable Integer idPropuesta,
                                                        @RequestParam("nota")  Double nota,
@@ -117,7 +122,7 @@ public class PropuestaRestFulController {
 
 
 
-
+    @PreAuthorize("hasAnyRole('dirección', 'coordinador')")
     @PutMapping(value = "/{idPropuesta}/aprobar")
     public ResponseEntity<Boolean> aprobarPropuesta(@PathVariable Integer idPropuesta,
                                                        @RequestParam(value="observaciones", required = false) String observaciones,
@@ -130,6 +135,7 @@ public class PropuestaRestFulController {
         return ResponseEntity.ok(exito);
     }
 
+    @PreAuthorize("hasAnyRole('dirección', 'coordinador')")
     @PutMapping(value = "/{idPropuesta}/negar")
     public ResponseEntity<Boolean> negarPropuesta(@PathVariable Integer idPropuesta,
                                                     @RequestParam(value="observaciones", required = false) String observaciones,

@@ -58,9 +58,12 @@ public class AwsConfig implements IBucket {
     }
 
     @Override
-    public BucketObject uploadFile(MultipartFile multipartFile) throws IOException {
+    public BucketObject uploadFile(MultipartFile multipartFile, String nombre) throws IOException {
         String bucketName = "my-first-bucket"; // Nombre del bucket
-        String fileName = multipartFile.getOriginalFilename();
+
+
+        String fileName = nombre;
+
 
         if (fileName == null || fileName.isEmpty()) {
             throw new IOException("El archivo no tiene un nombre válido.");

@@ -6,6 +6,7 @@ import com.tesis.backend_tesis.service.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,22 +24,30 @@ public class FileUploadController {
 
 
 
-
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/list-buckets")
     public void listBuckets() {
         s3Service.listBuckets();
     }
 
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("idUsuario") Integer idUsuario) throws IOException {
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("idUsuario") Integer idUsuario, @RequestParam("nombre") String nombre) throws IOException {
 
         // Verificar si el archivo está vacío
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("No se ha seleccionado ningún archivo.");
         }
 
+        if (nombre == null || nombre.isEmpty()) {
+            return ResponseEntity.badRequest().body("No se ha seleccionado ningún nombre.");
+        }
+
+
+
         // Intentar guardar el archivo
-        Archivo ar = archivoService.guardar(file, idUsuario);
+        Archivo ar = archivoService.guardar(file, idUsuario, nombre);
 
         // Si no se pudo guardar el archivo, devolver un error
         if (ar == null) {

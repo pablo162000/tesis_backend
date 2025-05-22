@@ -1,4 +1,4 @@
-package com.distribuida.autenticacion.security;
+package com.tesis.backend_tesis.security;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.FilterChain;
@@ -8,25 +8,27 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
 
-public class JwtFilter extends UsernamePasswordAuthenticationFilter {
+public class JwtFilter extends OncePerRequestFilter {
 
 
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        // Lógica para verificar el token JWT
+
         String token = getTokenFromRequest(request);
         if (token != null) {
-            DecodedJWT decodedJWT = JwUtil.verifyToken(token); // Verificar el token
+            DecodedJWT decodedJWT = JwUtil.verifyTokenSesion(token);
             if (decodedJWT != null) {
                 String username = decodedJWT.getSubject();
                 List<String> roles = decodedJWT.getClaim("roles").asList(String.class);
+
                 List<SimpleGrantedAuthority> authorities = roles.stream()
-                        .map(SimpleGrantedAuthority::new)
+                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                         .toList();
 
                 UsernamePasswordAuthenticationToken authentication =
@@ -35,6 +37,7 @@ public class JwtFilter extends UsernamePasswordAuthenticationFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
+
         chain.doFilter(request, response);
     }
 

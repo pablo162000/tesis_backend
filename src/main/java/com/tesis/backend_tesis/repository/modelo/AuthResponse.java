@@ -31,5 +31,6 @@ public class AuthResponse implements Serializable {
     private Integer idCarrera;
     private List<String> rolesDisponibles;
     private String rol;
+    private String token;
 
 }

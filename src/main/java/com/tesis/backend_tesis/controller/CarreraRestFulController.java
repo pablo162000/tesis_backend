@@ -6,6 +6,7 @@ import com.tesis.backend_tesis.repository.modelo.RegistroRequest;
 import com.tesis.backend_tesis.service.ICarreraService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,7 +18,7 @@ public class CarreraRestFulController {
     @Autowired
     private ICarreraService carreraService;
 
-
+    @PreAuthorize("hasAnyRole('dirección', 'secretaria', 'ADMIN')")
     @PostMapping("/registro")
     public ResponseEntity<Boolean> registroUsuario(@RequestBody CarreraRequest carreraRequest) {
         Boolean registro = this.carreraService.insertar(carreraRequest);
@@ -25,7 +26,7 @@ public class CarreraRestFulController {
 
     }
 
-
+    @PreAuthorize("hasAnyRole('dirección', 'secretaria', 'ADMIN')")
     @PutMapping("/registrousuario")
     public ResponseEntity<Boolean> registroUsarioCarrera(@RequestBody RegistroRequest RegistroRequest) {
         Boolean registro = this.carreraService.insertarUsuarioCarrera(RegistroRequest);
@@ -42,7 +43,7 @@ public class CarreraRestFulController {
         return ResponseEntity.ok(registro);
     }
      */
-
+    @PreAuthorize("hasAnyRole('dirección', 'secretaria', 'ADMIN')")
     @PutMapping("/{idCarrera}/autoridades/{idUsuario}")
     public ResponseEntity<Boolean> registroAutoridades(@PathVariable Integer idCarrera,
                                                        @PathVariable Integer idUsuario) {

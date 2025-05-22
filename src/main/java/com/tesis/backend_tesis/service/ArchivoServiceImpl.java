@@ -26,9 +26,9 @@ public class ArchivoServiceImpl implements IArchivoService{
     IBucket bucketDataSource;
 
     @Override
-    public Archivo guardar(MultipartFile file, Integer idUsuario)throws IOException {
+    public Archivo guardar(MultipartFile file, Integer idUsuario, String nombre)throws IOException {
 
-        BucketObject bucketObject =  bucketDataSource.uploadFile(file);
+        BucketObject bucketObject =  bucketDataSource.uploadFile(file, nombre);
 
         Archivo archivo = new Archivo(bucketObject.getFileName(), bucketObject.getFileUrl(), this.usuarioRepository.findById(idUsuario));
 

@@ -22,7 +22,10 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.tesis.backend_tesis.utilitarios.Validaciones.esCorreoValido;
@@ -227,6 +230,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
                     }
 
 
+
                     if (!puedeEnviarPropuestasMultimodal(estudiantePrimero.getId(), estudianteSegundo.getId(), estudianteTercero.getId(), "Proyecto de Investigación")) {
 
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -259,6 +263,30 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
                 if (categoria.equals("unimodal")) {
 
+                    if (estudiantePrimero!=null && estudianteSegundo!=null && estudianteTercero != null){
+
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                "Para la Unimodal solo es de 2 estudiantes de la misma carrera.");
+
+                    }
+
+                    if (estudiantePrimero!=null && estudianteSegundo!=null){
+
+
+                        Set<Integer> carrerasUnicas = new HashSet<>(
+                                Arrays.asList(
+                                        estudiantePrimero.getIdCarrera(),
+                                        estudianteSegundo.getIdCarrera()));
+
+                        if (carrerasUnicas.size() != 1){
+                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                    "Para la Unimodal solo es de 2 estudiantes de la misma carrera.");
+
+                        }
+
+                    }
+
+
                     if (estudiantePrimero != null && !puedeEnviarPropuestasTipoCategoria(estudiantePrimero.getId(), "Proyecto de Integración", "unimodal")) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                 "El primer estudiante tiene propuestas vigentes en Proyecto de Integración categoria unimodal.");
@@ -268,12 +296,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
                     if (estudianteSegundo != null && !puedeEnviarPropuestasTipoCategoria(estudianteSegundo.getId(), "Proyecto de Integración", "unimodal")) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                 "El segundo estudiante tiene propuestas vigentes en Proyecto de Integración categoria unimodal.");
-
-                    }
-
-                    if (estudianteTercero != null && !puedeEnviarPropuestasTipoCategoria(estudianteTercero.getId(), "Proyecto de Integración", "unimodal")) {
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                "El tercer estudiante tiene propuestas vigentes en Proyecto de Integración categoria unimodal.");
 
                     }
 
@@ -298,7 +320,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
                         }
 
-                        if (!puedeEnviarPropuestasMultimodal(estudiantePrimero.getId(), estudianteSegundo.getId(), estudianteTercero.getId(), "Proyecto de Investigación")) {
+                        if (!puedeEnviarPropuestasMultimodal(estudiantePrimero.getId(), estudianteSegundo.getId(), estudianteTercero.getId(), "Proyecto de Integración")) {
 
                             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                     "Conflicto en los estudiantes solo puede existir dos propuestas una en cada carrera. Proyecto de Integración.");
@@ -328,8 +350,13 @@ public class PropuestaServiceImpl implements IPropuestaService{
             tutor = this.docenteService.buscarPorIdUsuario(vistaDocente.getIdUsuario());
         }
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        String nombreArchivo = "prop-"+ tipo+"-"+categoria+"-"+vistaEstudiantePrimero.getCarrera()+"-"+tema+"-"+LocalDate.now().format(formatter);
+
+
         // 5. Guardar el archivo
-        Archivo ar = this.archivoService.guardar(archivo, estudiantePrimero.getIdUsuario());
+        Archivo ar = this.archivoService.guardar(archivo, estudiantePrimero.getIdUsuario(),nombreArchivo);
         if (Objects.isNull(ar)) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar el archivo.");
         }
@@ -412,8 +439,9 @@ public class PropuestaServiceImpl implements IPropuestaService{
             logger.error("Error en el proceso: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al procesar propuesta.");
         }
-*/
 
+
+ */
 
 
 
@@ -461,11 +489,18 @@ public class PropuestaServiceImpl implements IPropuestaService{
         List<Propuesta> propuestasValidas2 = propuestaRepository.findPropuestasByCompleta(idEstudiante2, tipo, "multimodal");
         List<Propuesta> propuestasValidas3 = propuestaRepository.findPropuestasByCompleta(idEstudiante3, tipo, "multimodal");
 
+        System.out.println("propuestasValidas1:"+propuestasValidas1);
+
+        System.out.println("propuestasValidas2:"+propuestasValidas2);
+        System.out.println("propuestasValidas3:"+propuestasValidas3);
+
         if (propuestasValidas1.isEmpty() && propuestasValidas2.isEmpty() && propuestasValidas3.isEmpty()){
+
             return true;
         }
 
-        if (propuestasValidas1.size() > 1 || propuestasValidas2.size() > 1 || propuestasValidas3.size() > 1) {
+        if (propuestasValidas1.size() >= 2 || propuestasValidas2.size() >= 2 || propuestasValidas3.size() >= 2) {
+
             return false;
         }
 
@@ -479,6 +514,8 @@ public class PropuestaServiceImpl implements IPropuestaService{
             propuestaExistente = propuestasValidas3.get(0);
         }
 
+
+
         if (propuestaExistente != null) {
             // Obtener los estudiantes de la propuesta existente
             Integer e1 = propuestaExistente.getEstudiante1().getId();
@@ -489,9 +526,28 @@ public class PropuestaServiceImpl implements IPropuestaService{
             List<Integer> estudiantesRegistrados = Arrays.asList(e1, e2, e3);
             List<Integer> estudiantesIngresados = Arrays.asList(idEstudiante1, idEstudiante2, idEstudiante3);
 
+
+            EstudianteDTO estudiantePrimero = this.estudianteService.buscarPorIdUsuario(this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(e1).getIdUsuario());
+            EstudianteDTO estudianteSegundo = this.estudianteService.buscarPorIdUsuario(this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(e2).getIdUsuario());
+            EstudianteDTO estudianteTercero = this.estudianteService.buscarPorIdUsuario(this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(e3).getIdUsuario());
+
+
+
+
+            String nombreCarreraIngresada = propuestaExistente.getCarrera();
+
+
+            if (nombreCarreraIngresada.equals(this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(idEstudiante1).getCarrera())){
+
+                return false;
+
+            }
+
+
             if (new HashSet<>(estudiantesRegistrados).equals(new HashSet<>(estudiantesIngresados))) {
                 return true;  // Se permite enviar porque es la misma propuesta
             }
+
         }
 
         return false; // No se puede enviar una nueva propuesta
@@ -1017,10 +1073,8 @@ public class PropuestaServiceImpl implements IPropuestaService{
         Integer idUsuarioDocente = this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente).getIdUsuario();
 
         // Guardar el archivo
-        Archivo archivoGuardado = this.archivoService.guardar(rubrica, idUsuarioDocente);
-        if (archivoGuardado == null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar el archivo.");
-        }
+        Archivo archivoGuardado = null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         String nombresRevisor = null;
         Map<String, Object> variables = new HashMap<>();
@@ -1037,6 +1091,16 @@ public class PropuestaServiceImpl implements IPropuestaService{
             variables.put("NotaRevisor1", nota);
 
 
+            String nombreArchivo = "revision-"+
+                    vistaPropuestaExistente.getFirst().getTema()+"-"+
+                    "revisor1-"+
+                    revision.getRevisor1().getUsuario().getPrimerApellido()+"-"+
+                    revision.getRevisor1().getUsuario().getSegundoApellido()+"-"+
+                    LocalDate.now().format(formatter);
+
+            archivoGuardado=this.archivoService.guardar(rubrica, idUsuarioDocente, nombreArchivo);
+
+
         }else if(revision.getRevisor2().getId().equals(idDocente)){
 
             revision.setNota2(nota);
@@ -1048,10 +1112,24 @@ public class PropuestaServiceImpl implements IPropuestaService{
                     + revision.getRevisor2().getUsuario().getSegundoNombre();
             variables.put("NotaRevisor2", nota);
 
+            String nombreArchivo = "revision-"+
+                    vistaPropuestaExistente.getFirst().getTema()+"-"+
+                    "revisor2-"+
+                    revision.getRevisor2().getUsuario().getPrimerApellido()+"-"+
+                    revision.getRevisor2().getUsuario().getSegundoApellido()+"-"+
+                    LocalDate.now().format(formatter);
+
+
+            archivoGuardado=this.archivoService.guardar(rubrica, idUsuarioDocente, nombreArchivo);
+
         }else {
 
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El docente revisor no es el mismo.");
 
+        }
+
+        if (archivoGuardado == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar el archivo.");
         }
 
         Boolean revisionGuardada = false;
@@ -1224,12 +1302,31 @@ public class PropuestaServiceImpl implements IPropuestaService{
             propuesta.setTutor(this.converter.toEntity(nuevoTutor));
         }
 
-        // Guardar el archivo y actualizar la propuesta
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+           // Guardar el archivo y actualizar la propuesta
 
         Integer idUsuarioCarrera =
                 this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaPropuestaExistente.getFirst().getCarrera()).getIdUsuarioCarrera();
 
-        Archivo archivoGuardado = archivoService.guardar(oficio, idUsuarioCarrera);
+        String nombreArchivo = "oficioTutor-"+
+                vistaPropuestaExistente.getFirst().getTipo()+"-"+
+                vistaPropuestaExistente.getFirst().getCategoria()+"-"+
+                vistaPropuestaExistente.getFirst().getCarrera()+"-"+
+                vistaPropuestaExistente.getFirst().getTema()+"-"+
+                propuesta.getTutor().getUsuario().getPrimerApellido()+"-"+
+                propuesta.getTutor().getUsuario().getSegundoApellido()+"-"+
+                LocalDate.now().format(formatter);
+
+
+
+        Archivo archivoGuardado = archivoService.guardar(oficio, idUsuarioCarrera, nombreArchivo);
+
+        if (archivoGuardado == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar el archivo.");
+        }
+
         propuesta.setEstadoAprobacion(EstadoAprobacion.APROBADO);
         //propuesta.set(archivoGuardado);
         propuesta.setObservaciones(observaciones);
