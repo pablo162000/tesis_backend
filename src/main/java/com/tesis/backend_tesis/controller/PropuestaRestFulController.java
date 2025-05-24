@@ -37,23 +37,7 @@ public class PropuestaRestFulController {
             return ResponseEntity.ok(respuesta);
 
     }
-/*
-    @PutMapping("/validar")
-    public ResponseEntity<Boolean> validarPropuesta(@RequestParam("idPropuesta") Integer idPropuesta,
-                                                    @RequestParam("idDocenteDirector")  Integer idDocenteDirector,
-                                                    @RequestParam("respuesta") Boolean respuesta,
-                                                    @RequestParam(value="observaciones", required = false) String observaciones) {
 
-
-        Boolean exito = this.propuestaService.validarPropuesta(idPropuesta,
-                respuesta,
-                observaciones);
-
-            return ResponseEntity.ok(exito); // Retorna un HTTP 200 con true si fue exitoso
-
-    }
-
- */
     @PreAuthorize("hasAnyRole('dirección', 'coordinador')")
     @PutMapping("/{idPropuesta}/validar")
     //@PreAuthorize("hasRole('dirección')")
@@ -71,24 +55,6 @@ public class PropuestaRestFulController {
         return ResponseEntity.ok(exito); // Retorna un HTTP 200 con true si fue exitoso
 
     }
-/*
-    @PutMapping(value = "/asignarrevisores")
-    public ResponseEntity<Boolean> asignarRevisores(@RequestParam("idPropuesta") Integer idPropuesta,
-                                                   @RequestParam("idDocente1") Integer idDocente1,
-                                                   @RequestParam("idDocente2") Integer idDocente2,
-                                                    @RequestPart("rubrica") MultipartFile rubrica,
-                                                    @RequestPart("archivo") MultipartFile archivo ,
-                                                    @RequestPart("oficio") MultipartFile oficio
-
-    ) {
-
-        Boolean exito = this.propuestaService.asignarRevisor(idPropuesta, idDocente1, idDocente2, rubrica, archivo, oficio);
-
-        return ResponseEntity.ok(exito);
-    }
-
- */
-
 
     @PreAuthorize("hasRole('secretaria')")
     @PutMapping(value = "/{idPropuesta}/asignarrevisores")
