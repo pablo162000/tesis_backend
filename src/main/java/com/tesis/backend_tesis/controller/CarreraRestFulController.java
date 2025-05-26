@@ -20,7 +20,7 @@ public class CarreraRestFulController {
 
     @PreAuthorize("hasAnyRole('dirección', 'secretaria', 'ADMIN')")
     @PostMapping("/registro")
-    public ResponseEntity<Boolean> registroUsuario(@RequestBody CarreraRequest carreraRequest) {
+    public ResponseEntity<Boolean> registroCarrera(@RequestBody CarreraRequest carreraRequest) {
         Boolean registro = this.carreraService.insertar(carreraRequest);
         return ResponseEntity.ok(registro);
 

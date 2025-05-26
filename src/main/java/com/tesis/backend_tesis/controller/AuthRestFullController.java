@@ -19,13 +19,10 @@ public class AuthRestFullController {
     @Autowired
     private IAuthService authService;
 
-    //
-
     @PostMapping("/registro")
     public ResponseEntity<Boolean> registroUsuario(@RequestBody RegistroRequest registroRequest) {
         Boolean registro = this.authService.registroNuevoUsuario(registroRequest);
         return ResponseEntity.ok(registro);
-
     }
 
     @PostMapping("/login")
@@ -33,27 +30,6 @@ public class AuthRestFullController {
         AuthResponse response = this.authService.login(loginRequest);
         return ResponseEntity.ok(response);
     }
-
-    /*
-    @PostMapping("/seleccionar-rol")
-    public ResponseEntity<AuthResponse> seleccionarRol(@RequestParam Integer idUsuario, @RequestParam String rol) {
-        AuthResponse authResponse = this.authService.seleccionarRol(idUsuario, rol);
-        return ResponseEntity.ok(authResponse);
-    }
-     */
-    /*
-    @PutMapping("/usuarios/{idUsuario}/rol")
-    public ResponseEntity<AuthResponse> seleccionarRol(@PathVariable Integer idUsuario,
-                                                       @RequestBody Map<String, String> body) {
-        AuthResponse authResponse = this.authService.seleccionarRol(idUsuario, body.get("rol"));
-        return ResponseEntity.ok(authResponse);
-    }
-
-     */
-
-    //{
-    //  "rol": "Director"
-    //}
 
 
 

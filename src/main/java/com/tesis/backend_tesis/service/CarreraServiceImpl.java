@@ -67,7 +67,7 @@ public class CarreraServiceImpl implements ICarreraService {
             }
 
             if (carreraRequest.getNombre() == null || carreraRequest.getNombre().isEmpty() ||
-                carreraRequest.getIdFacultad() == null){
+                    carreraRequest.getIdFacultad() == null) {
 
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Todos los datos son oblogatorios.");
 
@@ -91,9 +91,9 @@ public class CarreraServiceImpl implements ICarreraService {
 
             // Guardar usuario
             Carrera carreraGuardada = this.carreraRepository.insert(carrera);
-            logger.info("Usuario con correo {} insertado correctamente en la facultad {}.", carrera.getNombre(),carrera.getFacultad().getNombre());
-            System.out.println("service de usuario insertado correctamente."+this.carreraRepository.insert(carrera));
-            return carreraGuardada!=null;
+            logger.info("Usuario con correo {} insertado correctamente en la facultad {}.", carrera.getNombre(), carrera.getFacultad().getNombre());
+            System.out.println("service de usuario insertado correctamente." + this.carreraRepository.insert(carrera));
+            return carreraGuardada != null;
 
         } catch (Exception e) {
             logger.error("Error al insertar usuario con correo {}: {}", carreraRequest.getNombre(), e.getMessage(), e);
@@ -131,83 +131,78 @@ public class CarreraServiceImpl implements ICarreraService {
     @Override
     public Boolean insertarUsuarioCarrera(RegistroRequest registroRequest) {
 
-            if (registroRequest == null) {
-                logger.warn("Intento de insertar un usuarioDireccion en carrera NULL.");
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CarreraRequest esta vacio.");
-            }
+        if (registroRequest == null) {
+            logger.warn("Intento de insertar un usuarioDireccion en carrera NULL.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CarreraRequest esta vacio.");
+        }
 
-            if (registroRequest.getCorreo() == null || registroRequest.getCorreo().isEmpty() ||
-                    registroRequest.getIdCarrera() == null) {
+        if (registroRequest.getCorreo() == null || registroRequest.getCorreo().isEmpty() ||
+                registroRequest.getIdCarrera() == null) {
 
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Todos los datos son oblogatorios.");
-            }
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Todos los datos son oblogatorios.");
+        }
 
-            Carrera carreraExistente = this.carreraRepository.findById(registroRequest.getIdCarrera());
+        Carrera carreraExistente = this.carreraRepository.findById(registroRequest.getIdCarrera());
 
-            if (carreraExistente == null) {
-                logger.warn("La carrera con ID {} no existe.", registroRequest.getIdCarrera());
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "La carrea ya está registrada con ese nombre.");
-            }
+        if (carreraExistente == null) {
+            logger.warn("La carrera con ID {} no existe.", registroRequest.getIdCarrera());
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La carrea ya está registrada con ese nombre.");
+        }
 
-            if (this.usuarioRepository.existeUsuarioConEmail(registroRequest.getCorreo().trim())) {
-                logger.error("El correo ya está registrado: {}", registroRequest.getCorreo());
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "El correo ya está registrado.");
-            }
-
-
-            //--------------------------------------
-            UsuarioDTO usuarioDTO = UsuarioDTO.builder()
-                    .primerNombre(carreraExistente.getNombre().trim())
-                    .segundoNombre(carreraExistente.getNombre().trim())
-                    .primerApellido(carreraExistente.getNombre().trim())
-                    .segundoApellido(carreraExistente.getNombre().trim())
-                    .correo(registroRequest.getCorreo().trim())
-                    .password(this.encriptionService.encriptPass("claveSecreta123"))
-                    .fechaCreacion(LocalDateTime.now())
-                    .correoValido(Boolean.FALSE)
-                    .activo(Boolean.FALSE)
-                    .build();
-
-            UsuarioDTO usuarioGuardado = this.usuarioService.insertar(usuarioDTO);
-
-            if (usuarioGuardado == null || usuarioGuardado.getId() == null) {
-                logger.error("Error al guardar el usuario con correo: {}", registroRequest.getCorreo());
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al guardar el usuario.");
-            }
+        if (this.usuarioRepository.existeUsuarioConEmail(registroRequest.getCorreo().trim())) {
+            logger.error("El correo ya está registrado: {}", registroRequest.getCorreo());
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El correo ya está registrado.");
+        }
 
 
-            // Asignar rol según tipo de usuario
-            Rol rol = this.rolRepository.findByNombre("dirección");
+        //--------------------------------------
+        UsuarioDTO usuarioDTO = UsuarioDTO.builder()
+                .primerNombre(carreraExistente.getNombre().trim())
+                .segundoNombre(carreraExistente.getNombre().trim())
+                .primerApellido(carreraExistente.getNombre().trim())
+                .segundoApellido(carreraExistente.getNombre().trim())
+                .correo(registroRequest.getCorreo().trim())
+                .password(this.encriptionService.encriptPass("claveSecreta123"))
+                .fechaCreacion(LocalDateTime.now())
+                .correoValido(Boolean.FALSE)
+                .activo(Boolean.FALSE)
+                .build();
 
-            Usuario usuarioEntidadGuardado = this.converter.toEntity(usuarioGuardado);
+        UsuarioDTO usuarioGuardado = this.usuarioService.insertar(usuarioDTO);
 
-            UsuarioRol usuarioRolEstudiante = new UsuarioRol().builder()
-                    .usuario(usuarioEntidadGuardado)
-                    .rol(rol)
-                    .build();
-            UsuarioRol usuarioRolGuaradado = this.usuarioRolRepository.insert(usuarioRolEstudiante);
-
-
-            if (usuarioRolGuaradado == null || usuarioRolGuaradado.getId() == null) {
-                logger.error("Error al guardar el usuario guaradado: {}", usuarioGuardado);
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al guardar usuario y rol.");
-            }
-
-
-            //--------------------------------------
-
-            if (carreraExistente.getUsuario() != null) {
-
-                this.usuarioRolRepository.deleteUsuarioRolbyIdUsuario(carreraExistente.getUsuario().getId());
-                carreraExistente.setUsuario(null);
-
-            }
+        if (usuarioGuardado == null || usuarioGuardado.getId() == null) {
+            logger.error("Error al guardar el usuario con correo: {}", registroRequest.getCorreo());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al guardar el usuario.");
+        }
 
 
-            carreraExistente.setUsuario(usuarioEntidadGuardado);
+        // Asignar rol según tipo de usuario
+        Rol rol = this.rolRepository.findByNombre("dirección");
 
-            Carrera actualizada = this.carreraRepository.update(carreraExistente);
+        Usuario usuarioEntidadGuardado = this.converter.toEntity(usuarioGuardado);
 
+        UsuarioRol usuarioRolEstudiante = new UsuarioRol().builder()
+                .usuario(usuarioEntidadGuardado)
+                .rol(rol)
+                .build();
+        UsuarioRol usuarioRolGuaradado = this.usuarioRolRepository.insert(usuarioRolEstudiante);
+
+
+        if (usuarioRolGuaradado == null || usuarioRolGuaradado.getId() == null) {
+            logger.error("Error al guardar el usuario guaradado: {}", usuarioGuardado);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al guardar usuario y rol.");
+        }
+
+
+        //--------------------------------------
+
+        if (carreraExistente.getUsuario() != null) {
+            this.usuarioRolRepository.deleteUsuarioRolbyIdUsuario(carreraExistente.getUsuario().getId());
+            carreraExistente.setUsuario(null);
+        }
+
+        carreraExistente.setUsuario(usuarioEntidadGuardado);
+        Carrera actualizada = this.carreraRepository.update(carreraExistente);
 
         String token = null;
         try {
@@ -217,23 +212,21 @@ public class CarreraServiceImpl implements ICarreraService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al generar token para validar correo.");
         }
 
-        String usuarioCreado = "Dirección de la carrera de " +usuarioGuardado.getPrimerNombre();
+        String usuarioCreado = "Dirección de la carrera de " + usuarioGuardado.getPrimerNombre();
         String enlace = "http://localhost:4200/vista-verificacion-correo/" + token;
 
         try {
-            this.correoRestClient.registrarUsuariov2(usuarioGuardado.getCorreo(), usuarioCreado,enlace,
-                    carreraExistente.getFacultad().getCorreo() ,"direccion");
+            this.correoRestClient.registrarUsuariov2(usuarioGuardado.getCorreo(), usuarioCreado, enlace,
+                    carreraExistente.getFacultad().getCorreo(), "direccion");
         } catch (FeignException.Conflict ex) {
             logger.error("Error al enviar el correo de validación al correo: {}", usuarioGuardado.getCorreo(), ex);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo de validación.");
         }
 
         logger.info("Usuario de carrea registrado exitosamente: {}", registroRequest.getCorreo());
+        return actualizada != null;
 
-
-            return actualizada != null;
-
-        }
+    }
 
     @Override
     public CarreraDTO buscarPorIDUsuario(Integer idUsuario) {

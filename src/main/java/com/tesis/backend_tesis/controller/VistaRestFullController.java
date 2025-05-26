@@ -144,7 +144,7 @@ public class VistaRestFullController {
 
     //------------------------ Rutas para VistaUsuarioRol ------------------------
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'dirección') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'dirección', 'ADMIN') ")
     @GetMapping("/usuarioRol/{idUsuarioRol}")
     public VistaUsuarioRol buscarUsuarioRolPorIdUsuarioRol(@PathVariable Integer idUsuarioRol) {
         return this.vistasEntidadesService.buscarUsuarioRolPorIdUsuarioRol(idUsuarioRol);
@@ -156,13 +156,13 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarUsuarioRolPorCorreo(correo);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'dirección') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'dirección', 'ADMIN') ")
     @GetMapping("/usuarioRol/rol/{idRol}")
     public List<VistaUsuarioRol> buscarUsuarioRolPorIdRol(@PathVariable Integer idRol) {
         return this.vistasEntidadesService.buscarUsuarioRolPorIdRol(idRol);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'dirección') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'dirección', 'ADMIN') ")
     @GetMapping("/usuarioRol/rol/nombre/{nombreRol}")
     public List<VistaUsuarioRol> buscarUsuarioRolPorNombreRol(@PathVariable String nombreRol) {
         return this.vistasEntidadesService.buscarUsuarioRolPorNombreRol(nombreRol);

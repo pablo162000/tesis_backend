@@ -198,8 +198,6 @@ public class AuthServiceImpl implements IAuthService {
             logger.error("Correo no válido: {}", registroRequest.getCorreo());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo no es válido.");
         }
-
-
  */
 
         if (this.usuarioRepository.existeUsuarioConEmail(registroRequest.getCorreo().trim())) {
@@ -255,6 +253,7 @@ public class AuthServiceImpl implements IAuthService {
                 .usuario(this.converter.toEntity(usuarioGuardado))
                 .rol(rol)
                 .build();
+
         UsuarioRol usuarioRolGuardado = this.usuarioRolRepository.insert(usuarioRol);
 
         if (usuarioRolGuardado == null || usuarioRolGuardado.getId() == null) {
@@ -457,6 +456,11 @@ public class AuthServiceImpl implements IAuthService {
                 idCarrera=coordinadorDTO.getId();
                 idFacultad=coordinadorDTO.getIdFacultad();
                 break;
+
+
+            case "ADMIN":
+                break;
+
 
             default:
                 throw new RuntimeException("Rol desconocido: " + rolUsuario);

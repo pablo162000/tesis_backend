@@ -34,5 +34,8 @@ public class VistaUsuarioRol {
     @Column(name = "apellidos")
     private String apellidos;
 
+    @Column(name = "carr_nombre")
+    private String carrera;
+
 
 }
