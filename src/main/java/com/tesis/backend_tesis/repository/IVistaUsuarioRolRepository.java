@@ -15,6 +15,7 @@ public interface IVistaUsuarioRolRepository {
     public List<VistaUsuarioRol> findByApellidos(String apellidos);
     public List<VistaUsuarioRol> findByNombres(String nombres);
     public List<VistaUsuarioRol> findAll();
+    public List<VistaUsuarioRol> findByNombreRolAndEstado(String nombreRol, Boolean estado);
 
 
 

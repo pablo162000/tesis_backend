@@ -51,6 +51,7 @@ public interface IVistasEntidadesService {
     public List<VistaUsuarioRol> buscarUsuarioRolPorApellidos(String apellidos);
     public List<VistaUsuarioRol> buscarUsuarioRolPorNombres(String nombres);
     public List<VistaUsuarioRol> buscarTodosUsuarioRol();
+    public List<VistaUsuarioRol> buscarUsuarioRolPorNombreRolYEstado(String nombreRol, Boolean estado);
 
     //------------------Propuesta--------------------------------------
 

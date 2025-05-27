@@ -22,6 +22,12 @@ public class VistaUsuarioRol {
     @Column(name = "rol_nombre")
     private String nombreRol;
 
+    @Column(name = "usua_activo")
+    private Boolean activo;
+
+    @Column(name = "usua_correo_valido")
+    private Boolean correoValido;
+
     @Column(name = "usua_correo")
     private String correoUsuario;
 

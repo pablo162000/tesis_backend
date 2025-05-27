@@ -207,4 +207,29 @@ public class VistaUsuarioRolRepositoryImpl implements IVistaUsuarioRolRepository
             return Collections.emptyList();
         }
     }
+
+    @Override
+    public List<VistaUsuarioRol> findByNombreRolAndEstado(String nombreRol, Boolean estado) {
+        try {
+            TypedQuery<VistaUsuarioRol> query = this.entityManager.createQuery(
+                    "SELECT u FROM VistaUsuarioRol u WHERE u.nombreRol = :nombreRol AND u.activo =: estado",
+                    VistaUsuarioRol.class
+            );
+            query.setParameter("nombreRol", nombreRol);
+            query.setParameter("estado", estado);
+
+            List<VistaUsuarioRol> vistaUsuarioRols = query.getResultList();
+
+            if (vistaUsuarioRols.isEmpty()) {
+                logger.debug("No se encontraron UsuarioRol en VistaUsuarioRol con nombreRol {} y estado {}.", nombreRol, estado);
+            } else {
+                logger.debug("Se encontraron {} UsuarioRol en VistaUsuarioRol con nombreRol {} y estado{}.", vistaUsuarioRols.size(), nombreRol, estado);
+            }
+
+            return vistaUsuarioRols;
+        } catch (Exception e) {
+            logger.error("Error al buscarVistaUsuarioRol con nombreRol y estado: {}", e.getMessage(), e);
+            return Collections.emptyList();
+        }
+    }
 }

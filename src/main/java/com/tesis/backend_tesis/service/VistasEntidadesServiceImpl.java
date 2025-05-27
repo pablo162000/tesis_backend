@@ -533,6 +533,29 @@ public class VistasEntidadesServiceImpl implements IVistasEntidadesService {
     }
 
     @Override
+    public List<VistaUsuarioRol> buscarUsuarioRolPorNombreRolYEstado(String nombreRol, Boolean estado) {
+        if (nombreRol == null || nombreRol.trim().isEmpty()) {
+            logger.warn("El nombre del rol no puede ser nulo o vacío.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre del rol no puede ser nulo o vacío.");
+        }
+        if (estado == null ) {
+            logger.warn("El estado del rol no puede ser nulo.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El estado del rol no puede ser nulo.");
+        }
+
+
+        List<VistaUsuarioRol> usuariosRol = this.vistaUsuarioRolRepository.findByNombreRolAndEstado(nombreRol.trim(), estado);
+
+        if (usuariosRol.isEmpty()) {
+            logger.warn("No se encontraron registros de VistaUsuarioRol con el nombre de rol '{}' y estado '{}'.", nombreRol, estado);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron registros con el nombre del rol y estado proporcionado.");
+        }
+
+        logger.info("Se encontraron {} registros de VistaUsuarioRol con el nombre de rol '{}' y estado '{}'.", usuariosRol.size(), nombreRol, estado);
+        return usuariosRol;
+    }
+
+    @Override
     public List<VistaPropuesta> buscarPropuestaPorIdPropuesta(Integer idPropuesta) {
         if (idPropuesta == null || idPropuesta <= 0) {
             logger.warn("El idPropuesta no puede ser nulo, 0 o negativo.");
