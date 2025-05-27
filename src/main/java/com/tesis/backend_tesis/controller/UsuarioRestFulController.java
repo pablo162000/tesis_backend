@@ -51,7 +51,7 @@ public class UsuarioRestFulController {
     }
 
 
-    @PreAuthorize("hasAnyRole('dirección', 'secretaria', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('direccion', 'secretaria', 'ADMIN')")
     @PutMapping("/activardesactivar/{idUsuario}")
     public ResponseEntity<Boolean>  activarDesactivarUsuario(@PathVariable("idUsuario") Integer idUsuario,
                                                              @RequestParam("accion") Boolean accion) {

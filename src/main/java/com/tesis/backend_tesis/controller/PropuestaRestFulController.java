@@ -38,9 +38,9 @@ public class PropuestaRestFulController {
 
     }
 
-    @PreAuthorize("hasAnyRole('dirección', 'coordinador')")
+    @PreAuthorize("hasAnyRole('direccion', 'coordinador')")
     @PutMapping("/{idPropuesta}/validar")
-    //@PreAuthorize("hasRole('dirección')")
+    //@PreAuthorize("hasRole('direccion')")
     public ResponseEntity<Boolean> validarPropuesta(@PathVariable Integer idPropuesta,
                                                     @RequestParam("respuesta") Boolean respuesta,
                                                     @RequestParam(value="observaciones", required = false) String observaciones,
@@ -88,7 +88,7 @@ public class PropuestaRestFulController {
 
 
 
-    @PreAuthorize("hasAnyRole('dirección', 'coordinador')")
+    @PreAuthorize("hasAnyRole('direccion', 'coordinador')")
     @PutMapping(value = "/{idPropuesta}/aprobar")
     public ResponseEntity<Boolean> aprobarPropuesta(@PathVariable Integer idPropuesta,
                                                        @RequestParam(value="observaciones", required = false) String observaciones,
@@ -101,7 +101,7 @@ public class PropuestaRestFulController {
         return ResponseEntity.ok(exito);
     }
 
-    @PreAuthorize("hasAnyRole('dirección', 'coordinador')")
+    @PreAuthorize("hasAnyRole('direccion', 'coordinador')")
     @PutMapping(value = "/{idPropuesta}/negar")
     public ResponseEntity<Boolean> negarPropuesta(@PathVariable Integer idPropuesta,
                                                     @RequestParam(value="observaciones", required = false) String observaciones,

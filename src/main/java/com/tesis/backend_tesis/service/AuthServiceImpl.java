@@ -433,10 +433,10 @@ public class AuthServiceImpl implements IAuthService {
                 idFacultad=carreraSec.getIdFacultad();
                 break;
 
-            case "dirección":
+            case "direccion":
                 CarreraDTO carreraDTO = this.carreraService.buscarPorIDUsuario(usua.getId());
                 if (carreraDTO == null) {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario dirección no encontrado.");
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario direccion no encontrado.");
                 }
 
                 nombreFacultad = this.facultadService.buscarFacultadPorId(carreraDTO.getIdFacultad()).getNombre();

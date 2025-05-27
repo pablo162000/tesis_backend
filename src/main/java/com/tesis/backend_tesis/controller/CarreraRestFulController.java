@@ -18,7 +18,7 @@ public class CarreraRestFulController {
     @Autowired
     private ICarreraService carreraService;
 
-    @PreAuthorize("hasAnyRole('dirección', 'secretaria', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('direccion', 'secretaria', 'ADMIN')")
     @PostMapping("/registro")
     public ResponseEntity<Boolean> registroCarrera(@RequestBody CarreraRequest carreraRequest) {
         Boolean registro = this.carreraService.insertar(carreraRequest);
@@ -26,7 +26,7 @@ public class CarreraRestFulController {
 
     }
 
-    @PreAuthorize("hasAnyRole('dirección', 'secretaria', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('direccion', 'secretaria', 'ADMIN')")
     @PutMapping("/registrousuario")
     public ResponseEntity<Boolean> registroUsarioCarrera(@RequestBody RegistroRequest RegistroRequest) {
         Boolean registro = this.carreraService.insertarUsuarioCarrera(RegistroRequest);
@@ -43,7 +43,7 @@ public class CarreraRestFulController {
         return ResponseEntity.ok(registro);
     }
      */
-    @PreAuthorize("hasAnyRole('dirección', 'secretaria', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('direccion', 'secretaria', 'ADMIN')")
     @PutMapping("/{idCarrera}/autoridades/{idUsuario}")
     public ResponseEntity<Boolean> registroAutoridades(@PathVariable Integer idCarrera,
                                                        @PathVariable Integer idUsuario) {

@@ -177,7 +177,7 @@ public class CarreraServiceImpl implements ICarreraService {
 
 
         // Asignar rol según tipo de usuario
-        Rol rol = this.rolRepository.findByNombre("dirección");
+        Rol rol = this.rolRepository.findByNombre("direccion");
 
         Usuario usuarioEntidadGuardado = this.converter.toEntity(usuarioGuardado);
 

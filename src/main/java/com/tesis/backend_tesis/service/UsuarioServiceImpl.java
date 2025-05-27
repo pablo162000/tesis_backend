@@ -167,7 +167,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
                 usuario.setActivo(Boolean.TRUE);
                 break;
 
-            case "dirección":
+            case "direccio":
 
                 usuario.setCorreoValido(Boolean.TRUE);
                 usuario.setPassword(this.encriptionService.encriptPass(password).trim());
