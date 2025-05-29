@@ -213,7 +213,7 @@ public class CarreraServiceImpl implements ICarreraService {
         }
 
         String usuarioCreado = "Dirección de la carrera de " + usuarioGuardado.getPrimerNombre();
-        String enlace = "http://localhost:4200/vista-verificacion-correo/" + token;
+        String enlace = "http://localhost:4200/password-docente/" + token;
 
         try {
             this.correoRestClient.registrarUsuariov2(usuarioGuardado.getCorreo(), usuarioCreado, enlace,

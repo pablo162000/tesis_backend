@@ -21,8 +21,6 @@ public class UsuarioRestFulController {
     public ResponseEntity<Boolean> validarCorreo(@RequestParam(value = "token") String token,
                                                 @RequestParam(value = "password") String password) {
         Boolean resultado = this.usuarioService.activarCuenta(token, password);
-
-
         return ResponseEntity.ok(resultado);
     }
 

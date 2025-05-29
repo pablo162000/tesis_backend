@@ -73,7 +73,7 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarTodosDocente();
     }
 
-    @PreAuthorize("hasAnyRole('estudiante','docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('estudiante','docente', 'secretaria', 'direccion', 'ADMIN') ")
     @GetMapping("/docentes/estado/{activo}")
     public List<VistaDocente> buscarDocentesPorEstado(@PathVariable Boolean activo) {
         return this.vistasEntidadesService.buscarDocentesPorEstado(activo);

@@ -31,7 +31,6 @@ public class CarreraRestFulController {
     public ResponseEntity<Boolean> registroUsarioCarrera(@RequestBody RegistroRequest RegistroRequest) {
         Boolean registro = this.carreraService.insertarUsuarioCarrera(RegistroRequest);
         return ResponseEntity.ok(registro);
-
     }
 
     /*
