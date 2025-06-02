@@ -93,25 +93,25 @@ public class VistaRestFullController {
 
     //------------------------ Rutas para VistaSecretaria ------------------------
 
-    @PreAuthorize("hasAnyRole('secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('secretaria', 'direccion', 'ADMIN') ")
     @GetMapping("/secretaria/usuario/{idUsuario}")
     public VistaSecretaria buscarSecretariaPorIdUsuario(@PathVariable Integer idUsuario) {
         return this.vistasEntidadesService.buscarSecretariaPorIdUsuario(idUsuario);
     }
 
-    @PreAuthorize("hasAnyRole('secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('secretaria', 'direccion', 'ADMIN') ")
     @GetMapping("/secretaria/{idSecretaria}")
     public VistaSecretaria buscarSecretariaPorIdSecretaria(@PathVariable Integer idSecretaria) {
         return this.vistasEntidadesService.buscarSecretariaPorIdSecretaria(idSecretaria);
     }
 
-    @PreAuthorize("hasAnyRole('secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole(' ', 'direccion', 'ADMIN') ")
     @GetMapping("/secretarias")
     public List<VistaSecretaria> buscarTodosSecretarias() {
         return this.vistasEntidadesService.buscarTodosSecretarias();
     }
 
-    @PreAuthorize("hasAnyRole('secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('secretaria', 'direccion', 'ADMIN') ")
     @GetMapping("/secretarias/estado/{activo}")
     public List<VistaSecretaria> buscarSecretariasPorEstado(@PathVariable Boolean activo) {
         return this.vistasEntidadesService.buscarSecretariasPorEstado(activo);

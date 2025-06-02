@@ -269,10 +269,10 @@ public class AuthServiceImpl implements IAuthService {
 
         }
 
-
         // Creación de entidades específicas según el tipo de usuario
         switch (registroRequest.getTipoUsuario().toLowerCase()) {
             case "estudiante":
+
                 EstudianteDTO estudianteDTO = EstudianteDTO.builder()
                         .idUsuario(usuarioGuardado.getId())
                         .idCarrera(idCarrera)
@@ -317,8 +317,12 @@ public class AuthServiceImpl implements IAuthService {
         }
 
         String usuarioCreado = registroRequest.getPrimerNombre() + " " + registroRequest.getPrimerApellido();
-        //String enlace = "http://localhost:4200/vista-verificacion-correo/" + token;
-        String enlace = "http://localhost:8080/API/tesis/usuario/activar/"+ nombreRol+ "/"+token;
+       String enlace;
+        if(registroRequest.getTipoUsuario().equalsIgnoreCase("estudiante") ){
+            enlace = "http://localhost:8080/API/tesis/usuario/activar/"+ nombreRol+ "/"+token;
+        }else{
+            enlace = "http://localhost:4200/password-docente/" + token;
+        }
 
         String direccion= null;
 
