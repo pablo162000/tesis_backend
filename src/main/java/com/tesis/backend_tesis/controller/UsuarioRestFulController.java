@@ -19,7 +19,7 @@ public class UsuarioRestFulController {
 
     @PutMapping("/validar")
     public ResponseEntity<Boolean> validarCorreo(@RequestParam(value = "token") String token,
-                                                @RequestParam(value = "password") String password) {
+                                                 @RequestParam(value = "password") String password) {
         Boolean resultado = this.usuarioService.activarCuenta(token, password);
         return ResponseEntity.ok(resultado);
     }
@@ -28,8 +28,6 @@ public class UsuarioRestFulController {
     @PostMapping("/recuperar")
     public ResponseEntity<Boolean> recuperarCuenta(@RequestParam(value = "correo") String correo) {
         Boolean resultado = this.usuarioService.recuperarCuenta(correo);
-
-
         return ResponseEntity.ok(resultado);
     }
 
@@ -54,7 +52,6 @@ public class UsuarioRestFulController {
     public ResponseEntity<Boolean>  activarDesactivarUsuario(@PathVariable("idUsuario") Integer idUsuario,
                                                              @RequestParam("accion") Boolean accion) {
         Boolean exito = this.usuarioService.activarDesactivarCuenta(idUsuario,accion );
-
         return ResponseEntity.ok(exito);
     }
 
