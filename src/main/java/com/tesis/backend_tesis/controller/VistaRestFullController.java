@@ -221,7 +221,7 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarPropuestaPorEstadoValidacion(numero, carrera);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion', 'ADMIN') ")
     @GetMapping("/propuestas/aprobacion/{numero}")
     public List<VistaPropuesta> buscarPropuestaPorEstadoAprobacion(@PathVariable Integer numero,
                                                                    @RequestParam("carrera") String carrera ) {
