@@ -24,7 +24,7 @@ import java.util.Map;
 
 @Service
 public class MailSenderService {
-
+/*
     @Autowired
     private JavaMailSender mailSender;
 
@@ -225,7 +225,7 @@ public class MailSenderService {
 
      */
 
-
+/*
     public void sendNotificacionEnviopropuesta(String toEmail, List<String> ccEmails, String estudiante,
                                                String tema, String correoDireccion, InputStream fileInputStream, String fileName)
             throws MessagingException {
@@ -273,7 +273,9 @@ public class MailSenderService {
         }
     }
 
+    */
 
+/*
     public void sendNotificacionNegacionTema(String toEmail, List<String> ccEmails, String estudiante,
                                                String tema, String correoDireccion, String observaciones)
             throws MessagingException {
@@ -315,6 +317,7 @@ public class MailSenderService {
             throw new MessagingException("Error al procesar la plantilla FreeMarker", e);
         }
     }
+    */
 
 
 

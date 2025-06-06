@@ -2,20 +2,19 @@ package com.tesis.backend_tesis.config;
 
 import com.tesis.backend_tesis.domain.document.BucketObject;
 import com.tesis.backend_tesis.domain.document.IBucket;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
+
 
 @Configuration
 @EnableConfigurationProperties
@@ -36,60 +35,50 @@ public class AwsConfig implements IBucket {
 
  */
 
+
+
+
     private final S3Client s3Client;
 
-    public AwsConfig() {
-        this.s3Client = createS3Client(); // Inicializamos el cliente S3
+    public AwsConfig(S3Client s3Client) {
+        this.s3Client = s3Client;
     }
 
-    @Bean
-    public S3Client s3Client() {
-        return createS3Client();
-    }
-
-    private S3Client createS3Client() {
-        AwsBasicCredentials awsCreds = AwsBasicCredentials.create("test", "test");
-
-        return S3Client.builder()
-                .endpointOverride(URI.create("http://localhost:4566"))
-                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create("test", "test")))
-                .forcePathStyle(true)
-                .build();
+    @PostConstruct
+    public void ensureBucketExists() {
+        String bucketName = "my-first-bucket";
+        try {
+            s3Client.createBucket(CreateBucketRequest.builder().bucket(bucketName).build());
+            System.out.println("✔ Bucket creado: " + bucketName);
+        } catch (Exception e) {
+            System.out.println("⚠ Bucket ya existe o error al crear: " + e.getMessage());
+        }
     }
 
     @Override
     public BucketObject uploadFile(MultipartFile multipartFile, String nombre) throws IOException {
-        String bucketName = "my-first-bucket"; // Nombre del bucket
+        String bucketName = "my-first-bucket";
 
-
-        String fileName = nombre;
-
-
-        if (fileName == null || fileName.isEmpty()) {
+        if (nombre == null || nombre.isEmpty()) {
             throw new IOException("El archivo no tiene un nombre válido.");
         }
 
-        File file = convertMultipartFileToFile(multipartFile); // Convertimos MultipartFile a File
+        File file = convertMultipartFileToFile(multipartFile);
 
         try {
-            // Preparar la solicitud de carga del archivo
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(fileName)
+                    .key(nombre)
                     .build();
 
-            // Subimos el archivo
             s3Client.putObject(putObjectRequest, RequestBody.fromFile(file));
 
-            // Generamos la URL del archivo subido
-            String fileUrl = "http://localhost:4566/" + bucketName + "/" + fileName;
-
-            // Devolvemos el objeto BucketObject con la información relevante
-            return new BucketObject(fileName, bucketName, fileUrl);
+            String fileUrl = "http://localhost:4566/" + bucketName + "/" + nombre;
+            return new BucketObject(nombre, bucketName, fileUrl);
         } catch (Exception e) {
             throw new IOException("Error al subir el archivo a S3", e);
         } finally {
-            file.delete(); // Eliminamos el archivo temporal después de la carga
+            file.delete();
         }
     }
 
@@ -100,6 +89,4 @@ public class AwsConfig implements IBucket {
         }
         return file;
     }
-
 }
-

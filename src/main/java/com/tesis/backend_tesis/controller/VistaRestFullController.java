@@ -192,7 +192,7 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarTodosUsuarioRol();
     }
 
-    //@PreAuthorize("hasAnyRole('docente', 'secretaria', 'dirección', 'ADMIN') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'dirección', 'ADMIN') ")
     @GetMapping("/usuarioRol/rol/nombre/{nombreRol}/estado/{estado}")
     public List<VistaUsuarioRol> buscarUsuarioRolPorNombreRolyEstado(@PathVariable String nombreRol,@PathVariable Boolean estado) {
         return this.vistasEntidadesService.buscarUsuarioRolPorNombreRolYEstado(nombreRol, estado);

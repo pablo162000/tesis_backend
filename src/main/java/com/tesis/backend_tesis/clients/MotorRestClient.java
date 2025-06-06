@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Map;
 
-@FeignClient(name = "motorRestClient", url = "http://localhost:5041/API/tesis")
+//@FeignClient(name = "motorRestClient", url = "http://localhost:5041/API/tesis")
+@FeignClient(name = "motor-procesos", url  = "${motor.url}")
 public interface MotorRestClient {
 
-    @PostMapping("/process/iniciar")
+    @PostMapping("process/iniciar")
     ResponseEntity<String> iniciarProceso(
             @RequestParam("propuestaId") Integer propuestaId,
             @RequestParam(value = "idEstudiante1", required = false) Integer idEstudiante1,
@@ -20,7 +21,7 @@ public interface MotorRestClient {
     );
 
 
-    @PostMapping("/process/tasks/complete")
+    @PostMapping("process/tasks/complete")
     ResponseEntity<String> completarTarea(
             @RequestParam("taskId") String taskId,
             @RequestBody Map<String, Object> variables);

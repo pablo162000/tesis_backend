@@ -21,8 +21,8 @@ import java.util.List;
 @RequestMapping(path = "/correo")
 public class MailRestController {
 
-    @Autowired
-    private MailSenderService mailSenderService;
+    //@Autowired
+    //private MailSenderService mailSenderService;
 
     @Autowired
     private MailGunService mailGunServices;
@@ -266,7 +266,7 @@ public class MailRestController {
     }
 
 
-
+/*
 
     @PostMapping("/registro")
     public String registrarUsuario(@RequestParam String usuario,
@@ -293,6 +293,9 @@ public class MailRestController {
         return "registroExitoso"; // Redirige o muestra una página de éxito
     }
 
+ */
+
+    /*
     @PostMapping("/recuperacion")
     public String recuperacionCuenta(@RequestParam String correoUsuario,
                                    @RequestParam String nombreUsuario,
@@ -308,6 +311,8 @@ public class MailRestController {
     }
 
 
+     */
+/*
     @PostMapping(value = "/notificacionenviopropuesta", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> notificacionEnvioPropuesta(
             @RequestParam("email") String toEmail,  // Correo del destinatario principal
@@ -357,6 +362,8 @@ public class MailRestController {
                     .body("Error al enviar el correo: " + e.getMessage());
         }
     }
+
+ */
 
 
 }

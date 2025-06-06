@@ -29,5 +29,11 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+**/Dockerfile
+traefik/
+docker/
+
 ### VS Code ###
 .vscode/
+*.yaml
+*.yml

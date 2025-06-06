@@ -32,4 +32,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+*.yaml
+*.yml
+
+**/Dockerfile
 traefik/
+docker/

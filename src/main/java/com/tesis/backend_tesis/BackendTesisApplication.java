@@ -1,6 +1,6 @@
 package com.tesis.backend_tesis;
 
-import com.tesis.backend_tesis.service.ICarreraService;
+
 import com.tesis.backend_tesis.service.IPropuestaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;

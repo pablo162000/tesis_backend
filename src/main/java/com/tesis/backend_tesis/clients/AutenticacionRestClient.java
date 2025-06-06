@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(name = "autenticacionRestClient"
-            ,url = "http://localhost:5050/API/tesis/")
+//@FeignClient(name = "autenticacionRestClient"
+//            ,url = "http://localhost:5050/API/tesis/")
+
+@FeignClient(name = "autenticacion"
+            ,url  = "${auth.url}")
 public interface AutenticacionRestClient {
 
 

@@ -12,7 +12,7 @@ import java.io.IOException;
 @CrossOrigin
 @RequestMapping(path = "/correosendgrid")
 public class EmailRestController {
-
+/*
     @Autowired
     private SendGridEmailService sendEmailService;
 
@@ -22,5 +22,7 @@ public class EmailRestController {
         return sendEmailService.sendEmail(emailDetails);
 
     }
+
+ */
 
 }
