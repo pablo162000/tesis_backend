@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,7 +32,7 @@ import static com.tesis.backend_tesis.utilitarios.Validaciones.esCorreoValido;
 
 
 @Service
-public class PropuestaServiceImpl implements IPropuestaService {
+public class PropuestaServiceImpl implements IPropuestaService{
 
     private static final Logger logger = LogManager.getLogger(PropuestaServiceImpl.class);
 
@@ -79,7 +78,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
                           String segundoCorreo,
                           String tercerCorreo,
                           Integer idDocenteTutor,
-                          MultipartFile archivo) throws IOException {
+                          MultipartFile archivo)throws IOException {
 
         // 1. Validar si el archivo está presente
         this.validaciones.validarArchivo(archivo, "archivo propuesta", List.of("application/pdf"));
@@ -87,16 +86,16 @@ public class PropuestaServiceImpl implements IPropuestaService {
 
         // 2. Obtener el estudiante principal (obligatorio)
 
-        if (!esCorreoValido(primerCorreo) || primerCorreo == null || primerCorreo.isEmpty()) {
+        if (!esCorreoValido(primerCorreo) || primerCorreo ==null ||primerCorreo.isEmpty()   ) {
 
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo del estudiante principal es obligatrorio y con dominio @uce.edu.ec.");
         }
 
-        EstudianteDTO estudiantePrimero = null;
+        EstudianteDTO estudiantePrimero= null;
         VistaEstudiante vistaEstudiantePrimero = null;
 
         // variables para buscar el estudiante por el correo
-        vistaEstudiantePrimero = this.vistasEntidadesService.buscarPorCorreoEstudainte(primerCorreo);
+        vistaEstudiantePrimero  = this.vistasEntidadesService.buscarPorCorreoEstudainte(primerCorreo);
         estudiantePrimero = this.estudianteService.buscarPorIdUsuario(vistaEstudiantePrimero.getIdUsuario());
 
         if (vistaEstudiantePrimero == null || !vistaEstudiantePrimero.getActivo() || !vistaEstudiantePrimero.getCorreoValido()) {
@@ -121,12 +120,12 @@ public class PropuestaServiceImpl implements IPropuestaService {
         }
 
         VistaEstudiante vistaEstudianteSegundo = null;
-        EstudianteDTO estudianteSegundo = null;
-        String nombresSegundoEstudiante = "";
+        EstudianteDTO estudianteSegundo= null;
+        String nombresSegundoEstudiante ="";
         if (segundoCorreo != null) {
             vistaEstudianteSegundo = this.vistasEntidadesService.buscarPorCorreoEstudainte(segundoCorreo);
-            estudianteSegundo = this.estudianteService.buscarPorIdUsuario(vistaEstudianteSegundo.getIdUsuario());
-            nombresSegundoEstudiante = vistaEstudianteSegundo.getApellidos() + " " + vistaEstudianteSegundo.getNombres();
+            estudianteSegundo= this.estudianteService.buscarPorIdUsuario(vistaEstudianteSegundo.getIdUsuario());
+            nombresSegundoEstudiante = vistaEstudianteSegundo.getApellidos() + " "+ vistaEstudianteSegundo.getNombres();
             if (vistaEstudianteSegundo == null || !vistaEstudianteSegundo.getActivo() || !vistaEstudianteSegundo.getCorreoValido()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El segundo estudiante con correo " + segundoCorreo + " no existe, no está activo o no tiene rol de estudiante.");
             }
@@ -136,11 +135,11 @@ public class PropuestaServiceImpl implements IPropuestaService {
 
         VistaEstudiante vistaEstudianteTercero = null;
         EstudianteDTO estudianteTercero = null;
-        String nombresTercerEstudiante = "";
+        String nombresTercerEstudiante ="";
         if (tercerCorreo != null) {
             vistaEstudianteTercero = this.vistasEntidadesService.buscarPorCorreoEstudainte(tercerCorreo);
             estudianteTercero = this.estudianteService.buscarPorIdUsuario(vistaEstudianteTercero.getIdUsuario());
-            nombresTercerEstudiante = vistaEstudianteTercero.getApellidos() + " " + vistaEstudianteTercero.getNombres();
+            nombresTercerEstudiante = vistaEstudianteTercero.getApellidos() + " "+ vistaEstudianteTercero.getNombres();
             if (vistaEstudianteTercero == null || !vistaEstudianteTercero.getActivo() || !vistaEstudianteTercero.getCorreoValido()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El segundo estudiante con correo " + tercerCorreo + " no existe, no está activo o no tiene rol de estudiante.");
             }
@@ -174,14 +173,14 @@ public class PropuestaServiceImpl implements IPropuestaService {
             if (categoria.equals("unimodal")) {
 
 
-                if (estudiantePrimero != null && estudianteSegundo != null && estudianteTercero != null) {
+                if (estudiantePrimero!=null && estudianteSegundo!=null && estudianteTercero != null){
 
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                             "Para la Unimodal solo es de 2 estudiantes de la misma carrera.");
 
                 }
 
-                if (estudiantePrimero != null && estudianteSegundo != null) {
+                if (estudiantePrimero!=null && estudianteSegundo!=null){
 
 
                     Set<Integer> carrerasUnicas = new HashSet<>(
@@ -189,7 +188,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
                                     estudiantePrimero.getIdCarrera(),
                                     estudianteSegundo.getIdCarrera()));
 
-                    if (carrerasUnicas.size() != 1) {
+                    if (carrerasUnicas.size() != 1){
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                 "Para la Unimodal solo es de 2 estudiantes de la misma carrera.");
 
@@ -217,6 +216,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
                 if (estudiantePrimero == null || estudianteSegundo == null || estudianteTercero == null) {
 
 
+
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                             "Se necesitan 3 estudiantes.");
                 }
@@ -228,6 +228,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
                             "Dificultad de carreras 2 estudinates deben pertener a la misma carrera.");
 
                 }
+
 
 
                 if (!puedeEnviarPropuestasMultimodal(estudiantePrimero.getId(), estudianteSegundo.getId(), estudianteTercero.getId(), "Proyecto de Investigación")) {
@@ -262,14 +263,14 @@ public class PropuestaServiceImpl implements IPropuestaService {
 
             if (categoria.equals("unimodal")) {
 
-                if (estudiantePrimero != null && estudianteSegundo != null && estudianteTercero != null) {
+                if (estudiantePrimero!=null && estudianteSegundo!=null && estudianteTercero != null){
 
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                             "Para la Unimodal solo es de 2 estudiantes de la misma carrera.");
 
                 }
 
-                if (estudiantePrimero != null && estudianteSegundo != null) {
+                if (estudiantePrimero!=null && estudianteSegundo!=null){
 
 
                     Set<Integer> carrerasUnicas = new HashSet<>(
@@ -277,7 +278,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
                                     estudiantePrimero.getIdCarrera(),
                                     estudianteSegundo.getIdCarrera()));
 
-                    if (carrerasUnicas.size() != 1) {
+                    if (carrerasUnicas.size() != 1){
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                 "Para la Unimodal solo es de 2 estudiantes de la misma carrera.");
 
@@ -310,7 +311,8 @@ public class PropuestaServiceImpl implements IPropuestaService {
                 }
 
 
-                if (!diferentesCarreras(estudiantePrimero.getIdCarrera(), estudianteSegundo.getIdCarrera(), estudianteTercero.getIdCarrera())) {
+
+                if (!diferentesCarreras(estudiantePrimero.getIdCarrera(), estudianteSegundo.getIdCarrera(),estudianteTercero.getIdCarrera())) {
 
 
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -350,11 +352,11 @@ public class PropuestaServiceImpl implements IPropuestaService {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-        String nombreArchivo = "prop-" + tipo + "-" + categoria + "-" + vistaEstudiantePrimero.getCarrera() + "-" + tema + "-" + LocalDate.now().format(formatter);
+        String nombreArchivo = "prop-"+ tipo+"-"+categoria+"-"+vistaEstudiantePrimero.getCarrera()+"-"+tema+"-"+LocalDate.now().format(formatter);
 
 
         // 5. Guardar el archivo
-        Archivo ar = this.archivoService.guardar(archivo, estudiantePrimero.getIdUsuario(), nombreArchivo);
+        Archivo ar = this.archivoService.guardar(archivo, estudiantePrimero.getIdUsuario(),nombreArchivo);
         if (Objects.isNull(ar)) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar el archivo.");
         }
@@ -373,13 +375,13 @@ public class PropuestaServiceImpl implements IPropuestaService {
                     .estudiante1(this.converter.toEntity(estudiantePrimero))
                     .estudiante2(estudianteSegundo != null ? this.converter.toEntity(estudianteSegundo) : null)
                     .estudiante3(estudianteTercero != null ? this.converter.toEntity(estudianteTercero) : null)
-                    .tutor(tutor != null ? this.converter.toEntity(tutor) : null)
+                    .tutor(tutor!= null ? this.converter.toEntity(tutor) : null)
                     .estadoValidacion(EstadoValidacion.NO_REVISADO)
                     .periodo("2024")
                     .estadoAprobacion(EstadoAprobacion.EN_REVISON)
                     .build();
 
-            guardada = this.propuestaRepository.insert(propuesta);
+            guardada =this.propuestaRepository.insert(propuesta);
 
             Revision revision = Revision.builder()
                     .archivoSubidoEstudiantes(ar)
@@ -396,6 +398,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
         }
 
 
+
         List<String> ccEmails = new ArrayList<>();
         Stream.of(segundoCorreo, tercerCorreo)
                 .filter(Objects::nonNull) // Filtra solo los que no son null
@@ -403,7 +406,8 @@ public class PropuestaServiceImpl implements IPropuestaService {
 
 
         String nombresPrimerEstudiante =
-                vistaEstudiantePrimero.getApellidos() + " " + vistaEstudiantePrimero.getNombres();
+                vistaEstudiantePrimero.getApellidos() + " "+ vistaEstudiantePrimero.getNombres();
+
 
 
         List<String> posiblesNombres = new ArrayList<String>();
@@ -440,6 +444,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
  */
 
 
+
         try {
             this.motorRestClient.iniciarProceso(guardada.getId(), guardada.getEstudiante1().getId(), idUsuarioCarrera);
 
@@ -457,6 +462,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
     public Propuesta buscar(Integer id) {
 
         return null;
+
 
 
     }
@@ -478,17 +484,17 @@ public class PropuestaServiceImpl implements IPropuestaService {
     }
 
     @Override
-    public Boolean puedeEnviarPropuestasMultimodal(Integer idEstudiante1, Integer idEstudiante2, Integer idEstudiante3, String tipo) {
+    public Boolean puedeEnviarPropuestasMultimodal(Integer idEstudiante1,Integer idEstudiante2,Integer idEstudiante3, String tipo) {
         List<Propuesta> propuestasValidas1 = propuestaRepository.findPropuestasByCompleta(idEstudiante1, tipo, "multimodal");
         List<Propuesta> propuestasValidas2 = propuestaRepository.findPropuestasByCompleta(idEstudiante2, tipo, "multimodal");
         List<Propuesta> propuestasValidas3 = propuestaRepository.findPropuestasByCompleta(idEstudiante3, tipo, "multimodal");
 
-        System.out.println("propuestasValidas1:" + propuestasValidas1);
+        System.out.println("propuestasValidas1:"+propuestasValidas1);
 
-        System.out.println("propuestasValidas2:" + propuestasValidas2);
-        System.out.println("propuestasValidas3:" + propuestasValidas3);
+        System.out.println("propuestasValidas2:"+propuestasValidas2);
+        System.out.println("propuestasValidas3:"+propuestasValidas3);
 
-        if (propuestasValidas1.isEmpty() && propuestasValidas2.isEmpty() && propuestasValidas3.isEmpty()) {
+        if (propuestasValidas1.isEmpty() && propuestasValidas2.isEmpty() && propuestasValidas3.isEmpty()){
 
             return true;
         }
@@ -509,6 +515,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
         }
 
 
+
         if (propuestaExistente != null) {
             // Obtener los estudiantes de la propuesta existente
             Integer e1 = propuestaExistente.getEstudiante1().getId();
@@ -525,10 +532,12 @@ public class PropuestaServiceImpl implements IPropuestaService {
             EstudianteDTO estudianteTercero = this.estudianteService.buscarPorIdUsuario(this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(e3).getIdUsuario());
 
 
+
+
             String nombreCarreraIngresada = propuestaExistente.getCarrera();
 
 
-            if (nombreCarreraIngresada.equals(this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(idEstudiante1).getCarrera())) {
+            if (nombreCarreraIngresada.equals(this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(idEstudiante1).getCarrera())){
 
                 return false;
 
@@ -548,7 +557,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
     public Boolean puedeEnviarPropuestasUnimodal(Integer idEstudiante1, Integer idEstudiante2, String tipo) {
         List<Propuesta> propuestasValidas1 = propuestaRepository.findPropuestasByCompleta(idEstudiante1, tipo, "unimodal");
         List<Propuesta> propuestasValidas2 = propuestaRepository.findPropuestasByCompleta(idEstudiante2, tipo, "unimodal");
-        if (propuestasValidas1.isEmpty() && propuestasValidas2.isEmpty()) {
+        if (propuestasValidas1.isEmpty() && propuestasValidas2.isEmpty()){
             return true;
         }
 
@@ -627,32 +636,33 @@ public class PropuestaServiceImpl implements IPropuestaService {
         propuestaExistente.setEstadoAprobacion(estadoValidacion ? EstadoAprobacion.EN_REVISON : EstadoAprobacion.NO_APROBADO);
         propuestaExistente.setObservaciones(obsercvaciones);
 
-        Boolean seGuardo = false;
-        seGuardo = this.propuestaRepository.update(propuestaExistente);
+        Boolean seGuardo= false;
+        seGuardo= this.propuestaRepository.update(propuestaExistente);
 
-        if (!seGuardo) {
+        if(!seGuardo){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar la validacion.");
         }
 
-        if (propuestaExistente.getEstadoValidacion().equals(EstadoValidacion.NO_VALIDADO)) {
+        if (propuestaExistente.getEstadoValidacion().equals(EstadoValidacion.NO_VALIDADO)){
+
 
 
             Integer idPrimerEstudiante = propuestaExistente.getEstudiante1().getUsuario().getId();
 
-            UsuarioDTO primerEstudianteDTO = this.usuarioService.buscarPorId(idPrimerEstudiante);
+            UsuarioDTO primerEstudianteDTO =  this.usuarioService.buscarPorId(idPrimerEstudiante);
 
             String primerEstudiante =
-                    primerEstudianteDTO.getPrimerApellido() + " " + primerEstudianteDTO.getPrimerNombre();
+                    primerEstudianteDTO.getPrimerApellido()+ " "+ primerEstudianteDTO.getPrimerNombre();
 
-            UsuarioDTO segundoEstudianteDTO = null;
+            UsuarioDTO segundoEstudianteDTO=null;
             String segundoEstudiante = null;
             String segundoCorreo = null;
-            if (propuestaExistente.getEstudiante2() != null) {
-                segundoEstudianteDTO = this.usuarioService.buscarPorId(propuestaExistente.getEstudiante2().getUsuario().getId());
+            if (propuestaExistente.getEstudiante2()!=null) {
+                segundoEstudianteDTO=   this.usuarioService.buscarPorId(propuestaExistente.getEstudiante2().getUsuario().getId());
 
 
                 segundoEstudiante =
-                        segundoEstudianteDTO.getPrimerApellido() + " " + segundoEstudianteDTO.getPrimerNombre();
+                        segundoEstudianteDTO.getPrimerApellido()+ " "+ segundoEstudianteDTO.getPrimerNombre();
 
                 segundoCorreo = segundoEstudianteDTO.getCorreo();
 
@@ -662,16 +672,18 @@ public class PropuestaServiceImpl implements IPropuestaService {
             UsuarioDTO tercerEstudianteDTO = null;
             String tercerEstudiante = null;
             String tercerCorreo = null;
-            if (propuestaExistente.getEstudiante3() != null) {
+            if (propuestaExistente.getEstudiante3()!=null) {
 
                 tercerEstudianteDTO =
                         this.usuarioService.buscarPorId(propuestaExistente.getEstudiante3().getUsuario().getId());
 
                 tercerEstudiante =
-                        tercerEstudianteDTO.getPrimerApellido() + " " + tercerEstudianteDTO.getPrimerNombre();
+                        tercerEstudianteDTO.getPrimerApellido()+ " "+ tercerEstudianteDTO.getPrimerNombre();
 
                 tercerCorreo = tercerEstudianteDTO.getCorreo();
             }
+
+
 
 
             List<String> posiblesNombres = new ArrayList<String>();
@@ -681,9 +693,9 @@ public class PropuestaServiceImpl implements IPropuestaService {
                     .filter(Objects::nonNull) // Filtra solo los que no son null
                     .forEach(ccEmails::add);
 
-            if (propuestaExistente.getTutor() != null) {
+            if (propuestaExistente.getTutor()!=null){
 
-                ccEmails.add(this.vistasEntidadesService.buscarDocentePorIdDocente(
+                ccEmails.add( this.vistasEntidadesService.buscarDocentePorIdDocente(
                         propuestaExistente.getTutor().getId()).getCorreo());
             }
 
@@ -698,7 +710,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
             System.out.println(ccEmails);
 
 
-            seGuardo = this.propuestaRepository.update(propuestaExistente);
+            seGuardo= this.propuestaRepository.update(propuestaExistente);
             try {
 
                 this.correoRestClient.notificacionNegacionTemaV2(
@@ -706,7 +718,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
                         ccEmails,
                         nombres,
                         propuestaExistente.getTema()
-                        , carrera.getCorreoDireccion()
+                        ,carrera.getCorreoDireccion()
                         , propuestaExistente.getObservaciones()
                 );
 
@@ -727,7 +739,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
             }
 
 
-        } else {
+        }else{
             // ✅ Hasta aquí sabemos que todo salió bien, así que completamos la tarea BPMN
             try {
                 Map<String, Object> variables = new HashMap<>();
@@ -741,6 +753,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
             }
 
         }
+
 
 
         // Guardar los cambios
@@ -759,19 +772,19 @@ public class PropuestaServiceImpl implements IPropuestaService {
         // Validar entrada
         if (idPropuesta == null || idPropuesta < 0 ||
                 idDocente1 == null || idDocente1 < 0 ||
-                idDocente2 == null || idDocente2 < 0) {
+                idDocente2 == null || idDocente2 <0 ) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Los parámetros no pueden ser nulos o vacíos.");
         }
 
         //this.validaciones.validarArchivo(archivo, "archivo propuesta", List.of("application/pdf"));
         this.validaciones.validarArchivo(oficio, "oficio de desiganción", List.of("application/pdf"));
 
-        if (rubrica == null || rubrica.isEmpty()) {
+        if (rubrica==null || rubrica.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se ha seleccionado ningún archivo de la propuesta presentada.");
         }
 
 
-        if (idDocente1.equals(idDocente2)) {
+        if (idDocente1.equals(idDocente2)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Los docentes no pueden ser iguales.");
 
         }
@@ -784,9 +797,9 @@ public class PropuestaServiceImpl implements IPropuestaService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró una propuesta con el ID: " + idPropuesta);
         }
 
-        if (vistaPropuestaExistente.get(0).getEstadoValidacion().equals(EstadoValidacion.NO_VALIDADO)) {
+        if (vistaPropuestaExistente.get(0).getEstadoValidacion().equals(EstadoValidacion.NO_VALIDADO) ) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La propuesta con el ID: " + idPropuesta + " no está validada.");
-        } else if (vistaPropuestaExistente.get(0).getEstadoValidacion().equals(EstadoValidacion.NO_REVISADO)) {
+        }else if (vistaPropuestaExistente.get(0).getEstadoValidacion().equals(EstadoValidacion.NO_REVISADO)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La propuesta con el ID: " + idPropuesta + " no está revisada.");
 
         }
@@ -815,11 +828,13 @@ public class PropuestaServiceImpl implements IPropuestaService {
         }
 
 
+
+
         // Asignar el docente según el tipo de revisor
-        boolean cambioRealizado = true;
+        boolean cambioRealizado =true;
 
 
-        if (vistaPropuestaExistente.getFirst().getTutorUsuaId() != null) {
+        if (vistaPropuestaExistente.getFirst().getTutorUsuaId() != null){
 
 
             List<Integer> posiblesTutores = Arrays.asList(idDocente1, idDocente2);
@@ -830,7 +845,8 @@ public class PropuestaServiceImpl implements IPropuestaService {
         }
 
 
-        if (revision.getRevisor1() != null || revision.getRevisor2() != null) {
+
+        if (revision.getRevisor1() != null ||  revision.getRevisor2() !=null){
 
 
             List<Integer> docentesRegistrados = Arrays.asList(revision.getRevisor1().getId(), revision.getRevisor2().getId());
@@ -838,7 +854,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
 
             if (new HashSet<>(docentesRegistrados).equals(new HashSet<>(docentesIngresados))) {
                 cambioRealizado = false;
-            } else {
+            }else {
 
                 revision.setRevisor1(
                         this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente1.getIdUsuario())));
@@ -846,13 +862,13 @@ public class PropuestaServiceImpl implements IPropuestaService {
                 revision.setRevisor2(
                         this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente2.getIdUsuario())));
 
-                System.out.println("revisor 1..." + revision.getRevisor1());
-                System.out.println("revisor 2..." + revision.getRevisor2());
+                System.out.println("revisor 1..."+revision.getRevisor1());
+                System.out.println("revisor 2..."+revision.getRevisor2());
 
-                cambioRealizado = true;
+                cambioRealizado= true;
             }
 
-        } else {
+        }else {
 
             revision.setRevisor1(
                     this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente1.getIdUsuario())));
@@ -860,12 +876,13 @@ public class PropuestaServiceImpl implements IPropuestaService {
             revision.setRevisor2(
                     this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente2.getIdUsuario())));
 
-            System.out.println("revisor 1..." + revision.getRevisor1());
-            System.out.println("revisor 2..." + revision.getRevisor2());
+            System.out.println("revisor 1..."+revision.getRevisor1());
+            System.out.println("revisor 2..."+revision.getRevisor2());
 
-            cambioRealizado = true;
+            cambioRealizado= true;
 
         }
+
 
 
         // Si hubo cambios, actualizar la base de datos
@@ -873,53 +890,53 @@ public class PropuestaServiceImpl implements IPropuestaService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se realizaron cambios, ya estaba asignado.");
         }
 
-        Boolean revisionGuardada = this.revisionRepository.update(revision);
+        Boolean revisionGuardada= this.revisionRepository.update(revision);
         List<String> toEmails = new ArrayList<>();
         toEmails.add(docenteExistente1.getCorreo());
         toEmails.add(docenteExistente2.getCorreo());
 
-        List<String> ccEmails = new ArrayList<>();
+        List<String> ccEmails =  new ArrayList<>();
 
-        String nombresRevisores = docenteExistente1.getApellidos() + " " + docenteExistente1.getNombres() +
+        String nombresRevisores = docenteExistente1.getApellidos()+" "+ docenteExistente1.getNombres()+
                 " y "
-                + docenteExistente2.getApellidos() + " " + docenteExistente2.getNombres();
+                + docenteExistente2.getApellidos()+" "+ docenteExistente2.getNombres();
 
 
-        VistaEstudiante primer = null;
-        VistaEstudiante segundo = null;
-        VistaEstudiante tercero = null;
+        VistaEstudiante primer =null;
+        VistaEstudiante segundo =null;
+        VistaEstudiante tercero =null;
 
-        String nombresPrimerEstudiante = null;
-        String nombresSegundoEstudiante = null;
-        String nombresTercerEstudiante = null;
+        String nombresPrimerEstudiante =null;
+        String nombresSegundoEstudiante =null;
+        String nombresTercerEstudiante =null;
 
-        if (vistaPropuestaExistente.getFirst().getCategoria().equals("multimodal")) {
+        if (vistaPropuestaExistente.getFirst().getCategoria().equals("multimodal")){
 
-            primer = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
-            segundo = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
-            tercero = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getTercerEstuId());
+            primer =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
+            segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
+            tercero =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getTercerEstuId());
 
             ccEmails.add(primer.getCorreo());
             ccEmails.add(segundo.getCorreo());
             ccEmails.add(tercero.getCorreo());
 
-            nombresPrimerEstudiante = primer.getApellidos() + " " + primer.getNombres();
-            nombresSegundoEstudiante = segundo.getApellidos() + " " + segundo.getNombres();
-            nombresTercerEstudiante = tercero.getApellidos() + " " + tercero.getNombres();
+            nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
+            nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
+            nombresTercerEstudiante =tercero.getApellidos() +" "+tercero.getNombres();
 
 
         } else if (vistaPropuestaExistente.getFirst().getCategoria().equals("unimodal")) {
-            primer = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
+            primer =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
 
             ccEmails.add(primer.getCorreo());
-            nombresPrimerEstudiante = primer.getApellidos() + " " + primer.getNombres();
+            nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
             System.out.println("ver si esta: " + vistaPropuestaExistente.getFirst().getSegundoEstuId());
 
-            if (vistaPropuestaExistente.getFirst().getSegundoEstuId() != null) {
+            if (vistaPropuestaExistente.getFirst().getSegundoEstuId()!= null){
 
-                segundo = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
+                segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
                 ccEmails.add(segundo.getCorreo());
-                nombresSegundoEstudiante = segundo.getApellidos() + " " + segundo.getNombres();
+                nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
 
             }
         }
@@ -935,19 +952,20 @@ public class PropuestaServiceImpl implements IPropuestaService {
         String timer = this.validaciones.diasTimer(LocalDate.now(), fechaEntrega);
         ccEmails.add(correoDireccion);
 
-        if (vistaPropuestaExistente.getFirst().getTutorDocenteId() != null) {
+        if (vistaPropuestaExistente.getFirst().getTutorDocenteId()!=null){
 
-            ccEmails.add(this.vistasEntidadesService.buscarDocentePorIdDocente(
+            ccEmails.add( this.vistasEntidadesService.buscarDocentePorIdDocente(
                     vistaPropuestaExistente.getFirst().getTutorDocenteId()).getCorreo());
         }
 
 
-        try {
+        try{
             if (!revisionGuardada) {
 
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al asiganr los revisores.");
 
             }
+
 
 
             //this.motorRestClient.iniciarProceso(guardada.getId());
@@ -967,7 +985,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
 
             logger.info("Correo enviado exitosamente a {} con copia {}", toEmails, ccEmails);
 
-        } catch (Exception e) {
+        }catch (Exception e){
             logger.error("Error en el proceso: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de correo.");
         }
@@ -982,13 +1000,14 @@ public class PropuestaServiceImpl implements IPropuestaService {
         variables.put("idRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getIdUsuario());
         variables.put("correoRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getCorreo());
         variables.put("correoRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getCorreo());
-        variables.put("nombreRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getNombres() + " " + this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getApellidos());
-        variables.put("nombreRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getNombres() + " " + this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getApellidos());
+        variables.put("nombreRevisor1", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getNombres() + " "+ this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente1).getApellidos());
+        variables.put("nombreRevisor2", this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getNombres() + " "+ this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente2).getApellidos());
         variables.put("temaPropuesta", this.vistasEntidadesService.buscarPropuestaPorIdPropuesta(idPropuesta).getFirst().getTema());
         variables.put("duracionTimerRevisor", timer);
         variables.put("c", correoDireccion);
 
         System.out.print("valor timer...: " + timer);
+
 
 
         try {
@@ -1008,7 +1027,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
                                              String observaciones,
                                              Integer idDocente,
                                              MultipartFile rubrica,
-                                             String taskID) throws IOException {
+                                             String taskID) throws IOException{
 
         if (observaciones != null && observaciones.length() > 255) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las observaciones no deben exceder los 255 caracteres.");
@@ -1022,7 +1041,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La nota debe estar entre 0 y 20.");
         }
 
-        if (rubrica == null || rubrica.isEmpty()) {
+        if (rubrica==null || rubrica.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se ha seleccionado ningún archivo de la rúbrica.");
         }
 
@@ -1060,15 +1079,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
         String nombresRevisor = null;
         Map<String, Object> variables = new HashMap<>();
 
-        if (revision.getRevisor1().getId().equals(idDocente)) {
-            String nombreArchivo = "revision-" +
-                    vistaPropuestaExistente.getFirst().getTema() + "-" +
-                    "revisor1-" +
-                    revision.getRevisor1().getUsuario().getPrimerApellido() + "-" +
-                    revision.getRevisor1().getUsuario().getSegundoApellido() + "-" +
-                    LocalDate.now().format(formatter);
-
-            archivoGuardado = this.archivoService.guardar(rubrica, idUsuarioDocente, nombreArchivo);
+        if (revision.getRevisor1().getId().equals(idDocente)){
 
             revision.setNota1(nota);
             revision.setArchivoRevisado1(archivoGuardado);
@@ -1080,17 +1091,17 @@ public class PropuestaServiceImpl implements IPropuestaService {
             variables.put("NotaRevisor1", nota);
 
 
-
-
-        } else if (revision.getRevisor2().getId().equals(idDocente)) {
-            String nombreArchivo = "revision-" +
-                    vistaPropuestaExistente.getFirst().getTema() + "-" +
-                    "revisor2-" +
-                    revision.getRevisor2().getUsuario().getPrimerApellido() + "-" +
-                    revision.getRevisor2().getUsuario().getSegundoApellido() + "-" +
+            String nombreArchivo = "revision-"+
+                    vistaPropuestaExistente.getFirst().getTema()+"-"+
+                    "revisor1-"+
+                    revision.getRevisor1().getUsuario().getPrimerApellido()+"-"+
+                    revision.getRevisor1().getUsuario().getSegundoApellido()+"-"+
                     LocalDate.now().format(formatter);
 
-            archivoGuardado = this.archivoService.guardar(rubrica, idUsuarioDocente, nombreArchivo);
+            archivoGuardado=this.archivoService.guardar(rubrica, idUsuarioDocente, nombreArchivo);
+
+
+        }else if(revision.getRevisor2().getId().equals(idDocente)){
 
             revision.setNota2(nota);
             revision.setArchivoRevisado2(archivoGuardado);
@@ -1101,9 +1112,17 @@ public class PropuestaServiceImpl implements IPropuestaService {
                     + revision.getRevisor2().getUsuario().getSegundoNombre();
             variables.put("NotaRevisor2", nota);
 
+            String nombreArchivo = "revision-"+
+                    vistaPropuestaExistente.getFirst().getTema()+"-"+
+                    "revisor2-"+
+                    revision.getRevisor2().getUsuario().getPrimerApellido()+"-"+
+                    revision.getRevisor2().getUsuario().getSegundoApellido()+"-"+
+                    LocalDate.now().format(formatter);
 
 
-        } else {
+            archivoGuardado=this.archivoService.guardar(rubrica, idUsuarioDocente, nombreArchivo);
+
+        }else {
 
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El docente revisor no es el mismo.");
 
@@ -1125,44 +1144,44 @@ public class PropuestaServiceImpl implements IPropuestaService {
         }
 
         List<String> toEmails = new ArrayList<>();
-        List<String> ccEmails = new ArrayList<>();
+        List<String> ccEmails =  new ArrayList<>();
 
 
-        VistaEstudiante primer = null;
-        VistaEstudiante segundo = null;
-        VistaEstudiante tercero = null;
+        VistaEstudiante primer =null;
+        VistaEstudiante segundo =null;
+        VistaEstudiante tercero =null;
 
-        String nombresPrimerEstudiante = null;
-        String nombresSegundoEstudiante = null;
-        String nombresTercerEstudiante = null;
+        String nombresPrimerEstudiante =null;
+        String nombresSegundoEstudiante =null;
+        String nombresTercerEstudiante =null;
 
-        if (vistaPropuestaExistente.getFirst().getCategoria().equals("multimodal")) {
+        if (vistaPropuestaExistente.getFirst().getCategoria().equals("multimodal")){
 
-            primer = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
-            segundo = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
-            tercero = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getTercerEstuId());
+            primer =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
+            segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
+            tercero =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getTercerEstuId());
 
             ccEmails.add(primer.getCorreo());
             ccEmails.add(segundo.getCorreo());
             ccEmails.add(tercero.getCorreo());
 
-            nombresPrimerEstudiante = primer.getApellidos() + " " + primer.getNombres();
-            nombresSegundoEstudiante = segundo.getApellidos() + " " + segundo.getNombres();
-            nombresTercerEstudiante = tercero.getApellidos() + " " + tercero.getNombres();
+            nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
+            nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
+            nombresTercerEstudiante =tercero.getApellidos() +" "+tercero.getNombres();
 
 
         } else if (vistaPropuestaExistente.getFirst().getCategoria().equals("unimodal")) {
-            primer = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
+            primer =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
 
             ccEmails.add(primer.getCorreo());
-            nombresPrimerEstudiante = primer.getApellidos() + " " + primer.getNombres();
+            nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
             System.out.println("ver si esta: " + vistaPropuestaExistente.getFirst().getSegundoEstuId());
 
-            if (vistaPropuestaExistente.getFirst().getSegundoEstuId() != null) {
+            if (vistaPropuestaExistente.getFirst().getSegundoEstuId()!= null){
 
-                segundo = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
+                segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
                 ccEmails.add(segundo.getCorreo());
-                nombresSegundoEstudiante = segundo.getApellidos() + " " + segundo.getNombres();
+                nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
 
             }
         }
@@ -1176,14 +1195,15 @@ public class PropuestaServiceImpl implements IPropuestaService {
         String correoDireccion = this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaPropuestaExistente.getFirst().getCarrera()).getCorreoDireccion();
         toEmails.add(correoDireccion);
 
-        if (vistaPropuestaExistente.getFirst().getTutorDocenteId() != null) {
+        if (vistaPropuestaExistente.getFirst().getTutorDocenteId()!=null){
 
-            ccEmails.add(this.vistasEntidadesService.buscarDocentePorIdDocente(
+            ccEmails.add( this.vistasEntidadesService.buscarDocentePorIdDocente(
                     vistaPropuestaExistente.getFirst().getTutorDocenteId()).getCorreo());
         }
 
 
-        try {
+        try{
+
 
 
             this.correoRestClient.calificacionRevisor(toEmails,
@@ -1197,7 +1217,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
 
             logger.info("Correo enviado exitosamente a {} con copia {}", toEmails, ccEmails);
 
-        } catch (Exception e) {
+        }catch (Exception e){
             logger.error("Error en el proceso: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de correo.");
         }
@@ -1218,7 +1238,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
                                     Integer idTutor,
                                     MultipartFile oficio,
                                     String taskID) throws IOException {
-        if (idPropuesta == null) {
+        if (idPropuesta ==null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID de la propuesta no puede ser nulo.");
         }
 
@@ -1237,11 +1257,12 @@ public class PropuestaServiceImpl implements IPropuestaService {
         Revision revision = this.revisionRepository.findByIdPropuesta(vistaPropuestaExistente.getFirst().getId()).getFirst();
 
 
-        if (revision.getNota1() == null || revision.getArchivoRevisado1() == null) {
+
+        if (revision.getNota1()==null || revision.getArchivoRevisado1()==null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El primer revisor aún no ha calificado.");
         }
 
-        if (revision.getNota2() == null || revision.getArchivoRevisado2() == null) {
+        if (revision.getNota2()==null || revision.getArchivoRevisado2()==null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El segundo revisor aún no ha calificado.");
         }
 
@@ -1289,14 +1310,15 @@ public class PropuestaServiceImpl implements IPropuestaService {
         Integer idUsuarioCarrera =
                 this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaPropuestaExistente.getFirst().getCarrera()).getIdUsuarioCarrera();
 
-        String nombreArchivo = "oficioTutor-" +
-                vistaPropuestaExistente.getFirst().getTipo() + "-" +
-                vistaPropuestaExistente.getFirst().getCategoria() + "-" +
-                vistaPropuestaExistente.getFirst().getCarrera() + "-" +
-                vistaPropuestaExistente.getFirst().getTema() + "-" +
-                propuesta.getTutor().getUsuario().getPrimerApellido() + "-" +
-                propuesta.getTutor().getUsuario().getSegundoApellido() + "-" +
+        String nombreArchivo = "oficioTutor-"+
+                vistaPropuestaExistente.getFirst().getTipo()+"-"+
+                vistaPropuestaExistente.getFirst().getCategoria()+"-"+
+                vistaPropuestaExistente.getFirst().getCarrera()+"-"+
+                vistaPropuestaExistente.getFirst().getTema()+"-"+
+                propuesta.getTutor().getUsuario().getPrimerApellido()+"-"+
+                propuesta.getTutor().getUsuario().getSegundoApellido()+"-"+
                 LocalDate.now().format(formatter);
+
 
 
         Archivo archivoGuardado = archivoService.guardar(oficio, idUsuarioCarrera, nombreArchivo);
@@ -1314,43 +1336,43 @@ public class PropuestaServiceImpl implements IPropuestaService {
 
 
         List<String> toEmails = new ArrayList<>();
-        List<String> ccEmails = new ArrayList<>();
+        List<String> ccEmails =  new ArrayList<>();
 
 
-        VistaEstudiante primer = null;
-        VistaEstudiante segundo = null;
-        VistaEstudiante tercero = null;
+        VistaEstudiante primer =null;
+        VistaEstudiante segundo =null;
+        VistaEstudiante tercero =null;
 
-        String nombresPrimerEstudiante = null;
-        String nombresSegundoEstudiante = null;
-        String nombresTercerEstudiante = null;
+        String nombresPrimerEstudiante =null;
+        String nombresSegundoEstudiante =null;
+        String nombresTercerEstudiante =null;
 
-        if (vistaPropuestaExistente.getFirst().getCategoria().equals("multimodal")) {
+        if (vistaPropuestaExistente.getFirst().getCategoria().equals("multimodal")){
 
-            primer = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
-            segundo = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
-            tercero = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getTercerEstuId());
+            primer =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
+            segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
+            tercero =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getTercerEstuId());
 
             ccEmails.add(primer.getCorreo());
             ccEmails.add(segundo.getCorreo());
             ccEmails.add(tercero.getCorreo());
 
-            nombresPrimerEstudiante = primer.getApellidos() + " " + primer.getNombres();
-            nombresSegundoEstudiante = segundo.getApellidos() + " " + segundo.getNombres();
-            nombresTercerEstudiante = tercero.getApellidos() + " " + tercero.getNombres();
+            nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
+            nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
+            nombresTercerEstudiante =tercero.getApellidos() +" "+tercero.getNombres();
 
 
         } else if (vistaPropuestaExistente.getFirst().getCategoria().equals("unimodal")) {
-            primer = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
+            primer =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
 
             ccEmails.add(primer.getCorreo());
-            nombresPrimerEstudiante = primer.getApellidos() + " " + primer.getNombres();
+            nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
 
-            if (vistaPropuestaExistente.getFirst().getSegundoEstuId() != null) {
+            if (vistaPropuestaExistente.getFirst().getSegundoEstuId()!= null){
 
-                segundo = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
+                segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
                 ccEmails.add(segundo.getCorreo());
-                nombresSegundoEstudiante = segundo.getApellidos() + " " + segundo.getNombres();
+                nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
 
             }
         }
@@ -1365,10 +1387,10 @@ public class PropuestaServiceImpl implements IPropuestaService {
         VistaDocente docenteTutor = this.vistasEntidadesService.buscarDocentePorIdDocente(propuesta.getTutor().getId());
         toEmails.add(docenteTutor.getCorreo());
 
-        String nombreTutor = docenteTutor.getApellidos() + " " + docenteTutor.getNombres();
+        String nombreTutor = docenteTutor.getApellidos() +" "+docenteTutor.getNombres();
 
 
-        try {
+        try{
 
             if (!propuestaGuardada) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo asiganr la calificación.");
@@ -1386,7 +1408,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
 
             logger.info("Correo enviado exitosamente a {} con copia {}", toEmails, ccEmails);
 
-        } catch (Exception e) {
+        }catch (Exception e){
             logger.error("Error en el proceso: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de correo.");
         }
@@ -1400,6 +1422,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
         }
 
 
+
         return propuestaGuardada;
     }
 
@@ -1408,7 +1431,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
                                      String observaciones,
                                      String taskID) {
 
-        if (idPropuesta == null) {
+        if (idPropuesta ==null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID de la propuesta no puede ser nulo.");
         }
 
@@ -1416,16 +1439,17 @@ public class PropuestaServiceImpl implements IPropuestaService {
         List<VistaPropuesta> vistaPropuestaExistente = this.vistasEntidadesService.buscarPropuestaPorIdPropuesta(idPropuesta);
 
 
+
         if (vistaPropuestaExistente.getFirst() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se ha encontrado la propuesta.");
         }
 
         Revision revision = this.revisionRepository.findByIdPropuesta(vistaPropuestaExistente.getFirst().getId()).getFirst();
-        if (revision.getNota1() == null || revision.getArchivoRevisado1() == null) {
+        if (revision.getNota1()==null || revision.getArchivoRevisado1()==null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El primer revisor aún no ha calificado.");
         }
 
-        if (revision.getNota2() == null || revision.getArchivoRevisado2() == null) {
+        if (revision.getNota2()==null || revision.getArchivoRevisado2()==null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El segundo revisor aún no ha calificado.");
         }
 
@@ -1445,44 +1469,44 @@ public class PropuestaServiceImpl implements IPropuestaService {
         Boolean propuestaGuardada = this.propuestaRepository.update(propuesta);
 
         List<String> toEmails = new ArrayList<>();
-        List<String> ccEmails = new ArrayList<>();
+        List<String> ccEmails =  new ArrayList<>();
 
 
-        VistaEstudiante primer = null;
-        VistaEstudiante segundo = null;
-        VistaEstudiante tercero = null;
+        VistaEstudiante primer =null;
+        VistaEstudiante segundo =null;
+        VistaEstudiante tercero =null;
 
-        String nombresPrimerEstudiante = null;
-        String nombresSegundoEstudiante = null;
-        String nombresTercerEstudiante = null;
+        String nombresPrimerEstudiante =null;
+        String nombresSegundoEstudiante =null;
+        String nombresTercerEstudiante =null;
 
-        if (vistaPropuestaExistente.getFirst().getCategoria().equals("multimodal")) {
+        if (vistaPropuestaExistente.getFirst().getCategoria().equals("multimodal")){
 
-            primer = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
-            segundo = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
-            tercero = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getTercerEstuId());
+            primer =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
+            segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
+            tercero =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getTercerEstuId());
 
             toEmails.add(primer.getCorreo());
             toEmails.add(segundo.getCorreo());
             toEmails.add(tercero.getCorreo());
 
-            nombresPrimerEstudiante = primer.getApellidos() + " " + primer.getNombres();
-            nombresSegundoEstudiante = segundo.getApellidos() + " " + segundo.getNombres();
-            nombresTercerEstudiante = tercero.getApellidos() + " " + tercero.getNombres();
+            nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
+            nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
+            nombresTercerEstudiante =tercero.getApellidos() +" "+tercero.getNombres();
 
 
         } else if (vistaPropuestaExistente.getFirst().getCategoria().equals("unimodal")) {
-            primer = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
+            primer =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getPrimerEstuId());
 
             toEmails.add(primer.getCorreo());
-            nombresPrimerEstudiante = primer.getApellidos() + " " + primer.getNombres();
+            nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
             System.out.println("ver si esta: " + vistaPropuestaExistente.getFirst().getSegundoEstuId());
 
-            if (vistaPropuestaExistente.getFirst().getSegundoEstuId() != null) {
+            if (vistaPropuestaExistente.getFirst().getSegundoEstuId()!= null){
 
-                segundo = this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
+                segundo =this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(vistaPropuestaExistente.getFirst().getSegundoEstuId());
                 toEmails.add(segundo.getCorreo());
-                nombresSegundoEstudiante = segundo.getApellidos() + " " + segundo.getNombres();
+                nombresSegundoEstudiante =segundo.getApellidos() +" "+segundo.getNombres();
 
             }
         }
@@ -1495,7 +1519,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
         String nombresEstudiantes = this.validaciones.obtenerNombresEstudiantes(posiblesNombres);
         String correoDireccion = this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaPropuestaExistente.getFirst().getCarrera()).getCorreoDireccion();
 
-        try {
+        try{
 
             if (!propuestaGuardada) {
 
@@ -1510,7 +1534,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
 
             logger.info("Correo enviado exitosamente a {} con copia {}", toEmails, ccEmails);
 
-        } catch (Exception e) {
+        }catch (Exception e){
             logger.error("Error en el proceso: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de correo.");
         }
@@ -1528,7 +1552,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
     @Override
     public void recordatorioRevisores(Integer idPropuesta, Integer idUsuario) {
 
-        if (idPropuesta == null) {
+        if (idPropuesta ==null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID de la propuesta no puede ser nulo.");
         }
 
@@ -1536,9 +1560,11 @@ public class PropuestaServiceImpl implements IPropuestaService {
         List<VistaPropuesta> vistaPropuestaExistente = this.vistasEntidadesService.buscarPropuestaPorIdPropuesta(idPropuesta);
 
 
+
         if (vistaPropuestaExistente.getFirst() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se ha encontrado la propuesta.");
         }
+
 
 
         Revision revision = this.revisionRepository.findByIdPropuesta(vistaPropuestaExistente.getFirst().getId()).getFirst();
@@ -1551,32 +1577,32 @@ public class PropuestaServiceImpl implements IPropuestaService {
 
         String tema = vistaPropuestaExistente.getFirst().getTema();
 
-        if (revision.getRevisor1().getId().equals(idDocente)) {
+        if (revision.getRevisor1().getId().equals(idDocente)){
 
-            toEmail = revision.getRevisor1().getUsuario().getCorreo();
+            toEmail= revision.getRevisor1().getUsuario().getCorreo();
 
             nombresRevisor = revision.getRevisor1().getUsuario().getPrimerApellido() + " "
                     + revision.getRevisor1().getUsuario().getSegundoApellido() + " "
                     + revision.getRevisor1().getUsuario().getPrimerNombre() + " "
                     + revision.getRevisor1().getUsuario().getSegundoNombre();
 
-        } else if (revision.getRevisor2().getId().equals(idDocente)) {
+        }else if(revision.getRevisor2().getId().equals(idDocente)){
 
-            toEmail = revision.getRevisor2().getUsuario().getCorreo();
+            toEmail= revision.getRevisor2().getUsuario().getCorreo();
 
             nombresRevisor = revision.getRevisor2().getUsuario().getPrimerApellido() + " "
                     + revision.getRevisor2().getUsuario().getSegundoApellido() + " "
                     + revision.getRevisor2().getUsuario().getPrimerNombre() + " "
                     + revision.getRevisor2().getUsuario().getSegundoNombre();
-        } else {
+        }else {
 
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El docente revisor no es el mismo.");
 
         }
 
-        try {
+        try{
 
-            if (toEmail == null || toEmail.isEmpty()) {
+            if (toEmail == null || toEmail.isEmpty() ) {
 
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo enviar correo por falta de toEmail.");
 
@@ -1586,17 +1612,18 @@ public class PropuestaServiceImpl implements IPropuestaService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo enviar correo por falta de nombrerevisoir.");
 
             }
-            if (tema == null || tema.isEmpty()) {
+            if ( tema ==null || tema.isEmpty() ) {
 
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo enviar correo por falta de tema.");
 
             }
 
-            if (correoDireccion == null || correoDireccion.isEmpty()) {
+            if ( correoDireccion == null || correoDireccion.isEmpty()) {
 
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo enviar correo por falta de correo direccion.");
 
             }
+
 
 
             this.correoRestClient.notificacionRecordatorioRevisor(toEmail,
@@ -1606,7 +1633,7 @@ public class PropuestaServiceImpl implements IPropuestaService {
 
             logger.info("Correo enviado exitosamente a ", toEmail);
 
-        } catch (Exception e) {
+        }catch (Exception e){
             logger.error("Error en el proceso: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de correo.");
         }

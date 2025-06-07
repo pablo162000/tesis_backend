@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Map;
 
-@FeignClient(name = "motorRestClient", url = "http://localhost:5041/API/tesis")
+@FeignClient(name = "motor-procesos", url  = "${motor.url}")
 public interface MotorRestClient {
 
     @PostMapping("/process/iniciar")

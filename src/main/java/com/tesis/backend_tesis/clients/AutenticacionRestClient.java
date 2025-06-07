@@ -1,6 +1,5 @@
 package com.tesis.backend_tesis.clients;
 
-
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,8 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(name = "autenticacionRestClient"
-            ,url = "http://localhost:5050/API/tesis/")
+@FeignClient(name = "autenticacion", url  = "${auth.url}")
 public interface AutenticacionRestClient {
 
 

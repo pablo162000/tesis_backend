@@ -51,15 +51,6 @@
             <version>2.20.110</version>  <!-- Usa una versión estable -->
         </dependency>
 
-     <!--  core
-
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>core</artifactId>
-            <version>2.20.110</version>
-        </dependency>
-
-     -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -85,11 +76,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!--Dependencia para envio de email-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
-        </dependency>
+
         <!--Dependencia para encriptar y desencriptar-->
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -120,6 +107,13 @@
             <artifactId>java-jwt</artifactId>
             <version>4.5.0</version>
             <scope>compile</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>3.5.0</version>
         </dependency>
 
     </dependencies>

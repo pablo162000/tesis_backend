@@ -7,10 +7,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 
-@FeignClient(name = "correoRestClient", url = "http://localhost:8282/API/tesis/")
+@FeignClient(name = "correo", url = "${correo.url}")
 public interface CorreoRestClient {
 
 
