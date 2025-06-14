@@ -1099,6 +1099,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
                     LocalDate.now().format(formatter);
 
             archivoGuardado=this.archivoService.guardar(rubrica, idUsuarioDocente, nombreArchivo);
+            revision.setArchivoRevisado1(archivoGuardado);
 
 
         }else if(revision.getRevisor2().getId().equals(idDocente)){
@@ -1121,7 +1122,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
 
             archivoGuardado=this.archivoService.guardar(rubrica, idUsuarioDocente, nombreArchivo);
-
+            revision.setArchivoRevisado2(archivoGuardado);
         }else {
 
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El docente revisor no es el mismo.");
@@ -1131,6 +1132,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
         if (archivoGuardado == null) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar el archivo.");
         }
+
 
         Boolean revisionGuardada = false;
         try {

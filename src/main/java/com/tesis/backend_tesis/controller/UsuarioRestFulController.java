@@ -41,8 +41,9 @@ public class UsuarioRestFulController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/actualizar")
     public ResponseEntity<Boolean> actulizarContrasena(@RequestParam(value = "correo") String correo,
-                                                       @RequestParam(value = "password") String password) {
-        Boolean resultado = this.usuarioService.actulizarContrasena(correo, password);
+                                                       @RequestParam(value = "oldPassword") String oldFpassword,
+                                                       @RequestParam(value = "newPassword") String newPassword) {
+        Boolean resultado = this.usuarioService.actulizarContrasena(correo, oldFpassword, newPassword);
         return ResponseEntity.ok(resultado);
     }
 

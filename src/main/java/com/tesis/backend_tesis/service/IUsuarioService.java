@@ -9,7 +9,7 @@ public interface IUsuarioService {
 
     public Boolean activarCuenta (String token, String password);
 
-    public Boolean actulizarContrasena (String correo, String password);
+    public Boolean actulizarContrasena (String correo, String oldPassword, String newPassword);
 
     public Boolean recuperarCuenta (String correo);
 

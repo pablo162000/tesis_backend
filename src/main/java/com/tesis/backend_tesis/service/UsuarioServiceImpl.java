@@ -188,10 +188,17 @@ public class UsuarioServiceImpl implements IUsuarioService{
     }
 
     @Override
-    public Boolean actulizarContrasena(String correo, String password) {
+    public Boolean actulizarContrasena(String correo, String oldPassword, String newPassword) {
 
-        if (password == null || password.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "la password no puede ser vacia o nula");
+
+
+        if (oldPassword == null || oldPassword.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "la password Actual no puede ser vacia o nula");
+
+        }
+
+        if (newPassword == null || newPassword.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "la password Nueva no puede ser vacia o nula");
 
         }
 
@@ -202,7 +209,11 @@ public class UsuarioServiceImpl implements IUsuarioService{
 
         }
 
-        usuario.setPassword(this.encriptionService.encriptPass(password.trim()));
+        if (!this.encriptionService.verificarEncriptedText(usuario.getPassword(), oldPassword)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Password actual incorrecta.");
+        }
+
+        usuario.setPassword(this.encriptionService.encriptPass(newPassword.trim()));
 
         // Llamada a actualizar el usuario
         Usuario usuarioActualizado = this.usuarioRepository.actualizar(usuario);
