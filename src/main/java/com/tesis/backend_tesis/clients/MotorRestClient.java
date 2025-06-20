@@ -12,12 +12,7 @@ import java.util.Map;
 public interface MotorRestClient {
 
     @PostMapping("/process/iniciar")
-    ResponseEntity<String> iniciarProceso(
-            @RequestParam("propuestaId") Integer propuestaId,
-            @RequestParam(value = "idEstudiante1", required = false) Integer idEstudiante1,
-            @RequestParam("idDireccion") Integer idDireccion
-
-    );
+    ResponseEntity<String> iniciarProceso(@RequestBody Map<String, Object> variables);
 
 
     @PostMapping("/process/tasks/complete")

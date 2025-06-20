@@ -26,7 +26,7 @@ public class AwsClientConfig {
         AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessKeyId, secretKey);
 
         return S3Client.builder()
-                .endpointOverride(URI.create("http://localstack:4566"))
+                .endpointOverride(URI.create("http://localhost:4566"))
                 .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
                 .region(software.amazon.awssdk.regions.Region.of(region))
                 .forcePathStyle(true)

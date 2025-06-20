@@ -56,7 +56,7 @@ public class PropuestaRestFulController {
 
     }
 
-    @PreAuthorize("hasRole('secretaria')")
+    @PreAuthorize("hasRole('secretaria') ")
     @PutMapping(value = "/{idPropuesta}/asignarrevisores")
     public ResponseEntity<Boolean> asignarRevisores(@PathVariable Integer idPropuesta,
                                                     @RequestParam("idDocente1") Integer idDocente1,
@@ -73,7 +73,7 @@ public class PropuestaRestFulController {
     }
 
 
-    @PreAuthorize("hasRole('docente')")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @PutMapping(value = "/{idPropuesta}/calificar")
     public ResponseEntity<Boolean> asignarCalificacion(@PathVariable Integer idPropuesta,
                                                        @RequestParam("nota")  Double nota,

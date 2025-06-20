@@ -11,4 +11,5 @@ public interface IArchivoService {
 
     public Archivo guardar(MultipartFile file, Integer idUsuario, String name)throws IOException;
 
+
 }

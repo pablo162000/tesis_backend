@@ -12,6 +12,7 @@ import com.tesis.backend_tesis.service.dto.*;
 import com.tesis.backend_tesis.service.dto.utils.Converter;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -222,6 +223,9 @@ public class UsuarioServiceImpl implements IUsuarioService{
         return usuarioActualizado != null;
     }
 
+    @Value("${corsorigin.url}")
+    private String origen;
+
     @Override
     public Boolean recuperarCuenta(String correo) {
 
@@ -241,7 +245,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
         }
 
         String usarioARecuperar = usuario.getPrimerNombre() + " " + usuario.getPrimerApellido();
-        String enlace = "http://localhost:4200/vista-verificacion-correo/" + token;
+        String enlace = origen+"//restaurar-contrasenia/" + token;
 
         try {
             this.correoRestClient.recuperacionCuentav2(usuario.getCorreo(), usarioARecuperar, enlace,

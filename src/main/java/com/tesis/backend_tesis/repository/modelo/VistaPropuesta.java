@@ -42,8 +42,8 @@ public class VistaPropuesta {
     @Column(name = "archivo_fecha_creacion")
     private String archivoEstudianteFecha;
 
-    @Column(name = "archivo_url")
-    private String archivoEstudianteUrl;
+    @Column(name = "archivo_nombre")
+    private String archivoEstudianteNombre;
 
     @Column(name = "prop_tema")
     private String tema;
@@ -132,8 +132,8 @@ public class VistaPropuesta {
     @Column(name = "archivo_fecha_revisor_1")
     private String archivoFechaRevisor1;
 
-    @Column(name = "archivo_url_revisor_1")
-    private String archivoUrlRevisor1;
+    @Column(name = "archivo_nombre_revisor_1")
+    private String archivoNombreRevisor1;
 
     @Column(name = "nota_1")
     private Double nota1;
@@ -157,8 +157,8 @@ public class VistaPropuesta {
     @Column(name = "archivo_fecha_revisor_2")
     private String archivoFechaRevisor2;
 
-    @Column(name = "archivo_url_revisor_2")
-    private String archivoUrlRevisor2;
+    @Column(name = "archivo_nombre_revisor_2")
+    private String archivoNombreRevisor2;
 
     @Column(name = "nota_2")
     private Double nota2;

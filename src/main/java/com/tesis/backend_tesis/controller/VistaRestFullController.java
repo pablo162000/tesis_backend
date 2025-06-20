@@ -22,32 +22,32 @@ public class VistaRestFullController {
     private static final Logger logger = LogManager.getLogger(VistaRestFullController.class);
 
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/estudiante/usuario/{idUsuario}")
     //@PreAuthorize("hasRole('estudiante')")
     public VistaEstudiante buscarEstudiantePorIdUsuario(@PathVariable Integer idUsuario) {
         return this.vistasEntidadesService.buscarEstudiantePorIdUsuario(idUsuario);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/estudiante/{idEstudiante}")
     public VistaEstudiante buscarEstudiantePorIdEstudiante(@PathVariable Integer idEstudiante) {
         return this.vistasEntidadesService.buscarEstudiantePorIdEstudiante(idEstudiante);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/estudiantes")
     public List<VistaEstudiante> buscarTodosEstudiantes() {
         return this.vistasEntidadesService.buscarTodosEstudiantes();
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/estudiantes/estado/{estado}")
     public List<VistaEstudiante> buscarEstudiantesPorEstadoActivacion(@PathVariable Boolean estado) {
         return this.vistasEntidadesService.buscarEstudiantesPorEstadoActivacion(estado);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/estudiantes/correo")
     public VistaEstudiante buscarEstudiantePorCorreo(@RequestParam("correo") String correo){
         return this.vistasEntidadesService.buscarPorCorreoEstudainte(correo);
@@ -55,31 +55,31 @@ public class VistaRestFullController {
 
     //------------------------ Rutas para VistaDocente ------------------------
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/docente/usuario/{idUsuario}")
     public VistaDocente buscarDocentePorIdUsuario(@PathVariable Integer idUsuario) {
         return this.vistasEntidadesService.buscarDocentePorIdUsuario(idUsuario);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/docente/{idDocente}")
     public VistaDocente buscarDocentePorIdDocente(@PathVariable Integer idDocente) {
         return this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/docentes")
     public List<VistaDocente> buscarTodosDocentes() {
         return this.vistasEntidadesService.buscarTodosDocente();
     }
 
-    @PreAuthorize("hasAnyRole('estudiante','docente', 'secretaria', 'direccion', 'ADMIN') ")
+    @PreAuthorize("hasAnyRole('estudiante','docente', 'secretaria', 'direccion', 'ADMIN','coordinador') ")
     @GetMapping("/docentes/estado/{activo}")
     public List<VistaDocente> buscarDocentesPorEstado(@PathVariable Boolean activo) {
         return this.vistasEntidadesService.buscarDocentesPorEstado(activo);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/docentes/facultad")
     public List<VistaDocente> buscarDocentesPorFacultad(@RequestParam("nombreFacultad") String nombreFacultad) {
         return this.vistasEntidadesService.buscarDocentesPorFacultad(nombreFacultad);
@@ -105,7 +105,7 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarSecretariaPorIdSecretaria(idSecretaria);
     }
 
-    @PreAuthorize("hasAnyRole(' ', 'direccion', 'ADMIN') ")
+    @PreAuthorize("hasAnyRole('direccion', 'ADMIN') ")
     @GetMapping("/secretarias")
     public List<VistaSecretaria> buscarTodosSecretarias() {
         return this.vistasEntidadesService.buscarTodosSecretarias();
@@ -201,55 +201,55 @@ public class VistaRestFullController {
 //------------------- Vista Propuestas-----------------------//
 
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion', 'estudiante') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion', 'estudiante','coordinador') ")
     @GetMapping("/propuestas/{idPropuesta}")
     public VistaPropuesta buscarPropuestaPorIdPropuesta(@PathVariable Integer idPropuesta) {
         return this.vistasEntidadesService.buscarPropuestaPorIdPropuesta(idPropuesta).getFirst();
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/propuestas/carrera")
     public List<VistaPropuesta> buscarPropuestaPorCarrera(@RequestParam("carrera")  String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorCarrera(carrera);
     }
 
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/propuestas/validacion/{numero}")
     public List<VistaPropuesta> buscarPropuestaPorEstadoValidacion(@PathVariable Integer numero,
                                                                    @RequestParam("carrera") String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorEstadoValidacion(numero, carrera);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion', 'ADMIN') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion', 'ADMIN','coordinador') ")
     @GetMapping("/propuestas/aprobacion/{numero}")
     public List<VistaPropuesta> buscarPropuestaPorEstadoAprobacion(@PathVariable Integer numero,
                                                                    @RequestParam("carrera") String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorEstadoAprobacion(numero, carrera);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/propuestas/periodo/{valor}")
     public List<VistaPropuesta> buscarPropuestaPorPeriodo(@PathVariable String valor,
                                                           @RequestParam("carrera") String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorPeriodo(valor, carrera);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/propuestas/tipo")
     public List<VistaPropuesta> buscarPropuestaPorTipo(@RequestParam("nombre") String nombre,
                                                        @RequestParam("carrera") String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorTipo(nombre, carrera);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/propuestas/por-categoria")
     public List<VistaPropuesta> buscarPropuestaPorCategoria(@RequestParam("categoria") String categoria,
                                                             @RequestParam("carrera") String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorCategoria(categoria, carrera);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/propuestas/tipo-categoria")
     public List<VistaPropuesta> buscarPropuestaPorCategoriaTipo(@RequestParam("tipo") String tipo,
                                                             @RequestParam("categoria") String categoria,
@@ -257,21 +257,21 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarPropuestaPorTipoCategoria(tipo,categoria, carrera);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/propuestas/tema/{nombre}")
     public List<VistaPropuesta> buscarPropuestaPorTema(@PathVariable String nombre,
                                                        @RequestParam("carrera") String carrera ) {
         return this.vistasEntidadesService.buscarPropuestaPorTema(nombre, carrera);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/propuestas/tutor/usuario/{idUsuario}")
     public List<VistaPropuesta> buscarPropuestaPorTutor(@PathVariable Integer idUsuario,
                                                        @RequestParam("facultad") String facultad ) {
         return this.vistasEntidadesService.buscarPropuestaPorTutor(idUsuario, facultad);
     }
 
-    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/propuestas/revisor/usuario/{idUsuario}")
     public List<VistaPropuesta> buscarPropuestaPorRevisor(@PathVariable Integer idUsuario,
                                                         @RequestParam("facultad") String facultad ) {
@@ -279,7 +279,7 @@ public class VistaRestFullController {
     }
 
 
-    @PreAuthorize("hasAnyRole('docente', 'estudiante', 'secretaria', 'direccion') ")
+    @PreAuthorize("hasAnyRole('docente', 'estudiante', 'secretaria', 'direccion','coordinador') ")
     @GetMapping("/propuestas/estudiante/usuario/{idUsuario}")
     public List<VistaPropuesta> buscarPropuestaPorEstudiante(@PathVariable("idUsuario") Integer idUsuario) {
         return this.vistasEntidadesService.buscarPropuestaPorEstudiante(idUsuario);

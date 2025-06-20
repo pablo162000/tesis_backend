@@ -2,6 +2,7 @@ package com.tesis.backend_tesis.service;
 
 import com.tesis.backend_tesis.clients.CorreoRestClient;
 import com.tesis.backend_tesis.clients.MotorRestClient;
+import com.tesis.backend_tesis.config.AwsConfig;
 import com.tesis.backend_tesis.repository.IPropuestaRepository;
 import com.tesis.backend_tesis.repository.IRevisionRepository;
 import com.tesis.backend_tesis.repository.modelo.*;
@@ -10,10 +11,10 @@ import com.tesis.backend_tesis.service.dto.EstudianteDTO;
 import com.tesis.backend_tesis.service.dto.UsuarioDTO;
 import com.tesis.backend_tesis.service.dto.utils.Converter;
 import com.tesis.backend_tesis.utilitarios.Validaciones;
-import feign.FeignException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,11 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+
 import java.util.stream.Stream;
 
 import static com.tesis.backend_tesis.utilitarios.Validaciones.esCorreoValido;
@@ -54,6 +53,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
     @Autowired
     private IVistasEntidadesService vistasEntidadesService;
+
     @Autowired
     private Validaciones validaciones;
 
@@ -68,6 +68,13 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
     @Autowired
     private IUsuarioService usuarioService;
+
+    @Autowired
+    private AwsConfig awsConfig;
+
+    @Value("${aws.nombrebucket}")
+    private String nombreBucket;
+
 
     @Override
     @Transactional
@@ -352,17 +359,32 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
+        String extension = "";
+
+        int i = archivo.getOriginalFilename().lastIndexOf('.');
+
+        if (i == -1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo no tiene extension.");
+        }
+
         String nombreArchivo = "prop-"+ tipo+"-"+categoria+"-"+vistaEstudiantePrimero.getCarrera()+"-"+tema+"-"+LocalDate.now().format(formatter);
+
+        if (i > 0) {
+            extension = archivo.getOriginalFilename().substring(i);
+        }
+        //System.out.println(archivo.getContentType());
 
 
         // 5. Guardar el archivo
-        Archivo ar = this.archivoService.guardar(archivo, estudiantePrimero.getIdUsuario(),nombreArchivo);
+        Archivo ar = this.archivoService.guardar(archivo, estudiantePrimero.getIdUsuario(),nombreArchivo.concat(extension));
         if (Objects.isNull(ar)) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar el archivo.");
         }
 
         Propuesta guardada;
         Revision revisionGuardada;
+
+        //String periodoGenerado = validaciones.generarPeriodo();
 
         try {
 
@@ -377,7 +399,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
                     .estudiante3(estudianteTercero != null ? this.converter.toEntity(estudianteTercero) : null)
                     .tutor(tutor!= null ? this.converter.toEntity(tutor) : null)
                     .estadoValidacion(EstadoValidacion.NO_REVISADO)
-                    .periodo("2024")
+                    .periodo(validaciones.generarPeriodo())
                     .estadoAprobacion(EstadoAprobacion.EN_REVISON)
                     .build();
 
@@ -442,11 +464,30 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
 
  */
-
-
-
         try {
-            this.motorRestClient.iniciarProceso(guardada.getId(), guardada.getEstudiante1().getId(), idUsuarioCarrera);
+            Map<String, Object> variables = new HashMap<>();
+            String nombreTutor="";
+            if (guardada.getTutor()!=null){
+                nombreTutor = guardada.getTutor().getUsuario().getPrimerApellido() +" "+
+                        guardada.getTutor().getUsuario().getSegundoApellido() +" "+
+                        guardada.getTutor().getUsuario().getPrimerNombre()+" "+
+                        guardada.getTutor().getUsuario().getSegundoNombre() ;
+
+                variables.put("tutor", nombreTutor);
+            }else {
+
+                nombreTutor = "Sin Tutor";
+                variables.put("tutor", nombreTutor);
+            }
+
+            variables.put("propuestaId", guardada.getId());
+            variables.put("idEstudiante1", guardada.getEstudiante1().getId());
+            variables.put("idDireccion", idUsuarioCarrera);
+            variables.put("carrera", guardada.getCarrera());
+            variables.put("periodo", guardada.getPeriodo());
+
+            //this.motorRestClient.iniciarProceso(guardada.getId(), guardada.getEstudiante1().getId(), idUsuarioCarrera);
+            this.motorRestClient.iniciarProceso(variables);
 
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error iniciando proceso en Flowable");
@@ -711,6 +752,8 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
 
             seGuardo= this.propuestaRepository.update(propuestaExistente);
+
+            /*
             try {
 
                 this.correoRestClient.notificacionNegacionTemaV2(
@@ -728,6 +771,8 @@ public class PropuestaServiceImpl implements IPropuestaService{
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo.");
             }
 
+             */
+
             try {
                 Map<String, Object> variables = new HashMap<>();
                 variables.put("validacionAprobada", estadoValidacion);
@@ -742,9 +787,20 @@ public class PropuestaServiceImpl implements IPropuestaService{
         }else{
             // ✅ Hasta aquí sabemos que todo salió bien, así que completamos la tarea BPMN
             try {
+
+                VistaSecretaria secretaria =this.vistasEntidadesService.buscarSecretariaPorIdUsuario(idUsuarioSecretaria);
+
+                if (secretaria==null){
+
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se encontró a la secretaria");
+                }
+                String nombreSecretaria = secretaria.getNombres()+" "+secretaria.getApellidos();
+
+
                 Map<String, Object> variables = new HashMap<>();
                 variables.put("validacionAprobada", estadoValidacion);
                 variables.put("idSecretaria", idUsuarioSecretaria);
+                variables.put("nombreSecretaria", nombreSecretaria);
 
                 this.motorRestClient.completarTarea(taskID, variables);
 
@@ -1071,7 +1127,8 @@ public class PropuestaServiceImpl implements IPropuestaService{
          */
 
         Integer idUsuarioDocente = this.vistasEntidadesService.buscarDocentePorIdDocente(idDocente).getIdUsuario();
-
+        String extension = "";
+        int i = rubrica.getOriginalFilename().lastIndexOf('.');
         // Guardar el archivo
         Archivo archivoGuardado = null;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -1090,6 +1147,10 @@ public class PropuestaServiceImpl implements IPropuestaService{
                     + revision.getRevisor1().getUsuario().getSegundoNombre();
             variables.put("NotaRevisor1", nota);
 
+            if (i == -1) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo no tiene extension.");
+            }
+
 
             String nombreArchivo = "revision-"+
                     vistaPropuestaExistente.getFirst().getTema()+"-"+
@@ -1098,7 +1159,11 @@ public class PropuestaServiceImpl implements IPropuestaService{
                     revision.getRevisor1().getUsuario().getSegundoApellido()+"-"+
                     LocalDate.now().format(formatter);
 
-            archivoGuardado=this.archivoService.guardar(rubrica, idUsuarioDocente, nombreArchivo);
+            if (i > 0) {
+                extension = rubrica.getOriginalFilename().substring(i);
+            }
+
+            archivoGuardado=this.archivoService.guardar(rubrica, idUsuarioDocente, nombreArchivo.concat(extension));
             revision.setArchivoRevisado1(archivoGuardado);
 
 
@@ -1113,6 +1178,15 @@ public class PropuestaServiceImpl implements IPropuestaService{
                     + revision.getRevisor2().getUsuario().getSegundoNombre();
             variables.put("NotaRevisor2", nota);
 
+
+
+
+
+            if (i == -1) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo no tiene extension.");
+            }
+
+
             String nombreArchivo = "revision-"+
                     vistaPropuestaExistente.getFirst().getTema()+"-"+
                     "revisor2-"+
@@ -1120,8 +1194,12 @@ public class PropuestaServiceImpl implements IPropuestaService{
                     revision.getRevisor2().getUsuario().getSegundoApellido()+"-"+
                     LocalDate.now().format(formatter);
 
+            if (i > 0) {
+                extension = rubrica.getOriginalFilename().substring(i);
+            }
 
-            archivoGuardado=this.archivoService.guardar(rubrica, idUsuarioDocente, nombreArchivo);
+
+            archivoGuardado=this.archivoService.guardar(rubrica, idUsuarioDocente, nombreArchivo.concat(extension));
             revision.setArchivoRevisado2(archivoGuardado);
         }else {
 
@@ -1284,11 +1362,18 @@ public class PropuestaServiceImpl implements IPropuestaService{
             // Ya hay un tutor asignado
             if (idTutor != null && !idTutor.equals(tutorActualId)) {
                 // Se quiere cambiar el tutor
-                DocenteDTO nuevoTutor = this.docenteService.buscarPorIdUsuario(idTutor);
+                VistaDocente nuevoTutor = this.vistasEntidadesService.buscarDocentePorIdDocente(idTutor);
                 if (nuevoTutor == null) {
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró un docente con el ID: " + idTutor);
                 }
-                propuesta.setTutor(this.converter.toEntity(nuevoTutor));
+
+                List<Integer> posiblesTutores = Arrays.asList(revision.getRevisor1().getId(), revision.getRevisor2().getId());
+                // Verificar que ningun revisor sea el mismo tutor si ya esta asignado
+                if (posiblesTutores.contains(nuevoTutor.getIdDocente())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El tutor no puede ser un revisor");
+                }
+
+                propuesta.setTutor(this.converter.toEntity(this.docenteService.buscarPorIdUsuario(nuevoTutor.getIdUsuario())));
             }
             // Si idTutor es null o igual al actual, no se hace nada (se mantiene el tutor existente)
         } else {
@@ -1297,11 +1382,19 @@ public class PropuestaServiceImpl implements IPropuestaService{
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID del tutor no puede ser nulo.");
             }
 
-            DocenteDTO nuevoTutor = this.docenteService.buscarPorIdUsuario(idTutor);
+            VistaDocente nuevoTutor = this.vistasEntidadesService.buscarDocentePorIdDocente(idTutor);
             if (nuevoTutor == null) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró un docente con el ID: " + idTutor);
             }
-            propuesta.setTutor(this.converter.toEntity(nuevoTutor));
+
+            List<Integer> posiblesTutores = Arrays.asList(revision.getRevisor1().getId(), revision.getRevisor2().getId());
+            // Verificar que ningun revisor sea el mismo tutor si ya esta asignado
+            if (posiblesTutores.contains(nuevoTutor.getIdDocente())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El tutor no puede ser un revisor");
+            }
+
+            propuesta.setTutor(this.converter.toEntity(this.docenteService.buscarPorIdUsuario(nuevoTutor.getIdUsuario())));
+
         }
 
 
@@ -1331,7 +1424,31 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
         propuesta.setEstadoAprobacion(EstadoAprobacion.APROBADO);
         //propuesta.set(archivoGuardado);
+
+        String nombreOrigen = revision.getArchivoSubidoEstudiantes().getNombre();
+
+        String nombreDestino = "aprobadas/"+nombreOrigen;
+
+        awsConfig.moverYEliminar(nombreBucket, nombreOrigen,nombreDestino);
+
+        revision.getArchivoSubidoEstudiantes().setNombre(nombreDestino);
+        String urlSertvicio = "https://tesis.local/localstack/";
+        revision.getArchivoSubidoEstudiantes().setUrl(urlSertvicio+nombreBucket+"/"+nombreDestino);
+
+
+        Boolean revisionGuardada = false;
+        try {
+            revisionGuardada = this.revisionRepository.update(revision);
+            if (!revisionGuardada) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo actualizar el neuvo destino del archivo.");
+            }
+        } catch (Exception e) {
+            logger.error("Error al actualizar la revisión por el archivo de propuesta: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar la nueva ruat de loa propuesta.");
+        }
+
         propuesta.setObservaciones(observaciones);
+
 
 
         Boolean propuestaGuardada = this.propuestaRepository.update(propuesta);
@@ -1416,6 +1533,8 @@ public class PropuestaServiceImpl implements IPropuestaService{
         }
 
         Map<String, Object> variables = new HashMap<>();
+        variables.put("tutor", nombreTutor);
+
 
         try {
             this.motorRestClient.completarTarea(taskID, variables);
@@ -1541,7 +1660,22 @@ public class PropuestaServiceImpl implements IPropuestaService{
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el motor de correo.");
         }
 
+        String nombreTutor="";
         Map<String, Object> variables = new HashMap<>();
+        if (propuesta.getTutor()!=null){
+            nombreTutor = propuesta.getTutor().getUsuario().getPrimerApellido() +" "+
+                    propuesta.getTutor().getUsuario().getSegundoApellido() +" "+
+                    propuesta.getTutor().getUsuario().getPrimerNombre()+" "+
+                    propuesta.getTutor().getUsuario().getSegundoNombre() ;
+
+            variables.put("tutor", nombreTutor);
+        }else {
+
+            nombreTutor = "Sin Tutor";
+            variables.put("tutor", nombreTutor);
+        }
+
+
         try {
             this.motorRestClient.completarTarea(taskID, variables);
         } catch (Exception e) {

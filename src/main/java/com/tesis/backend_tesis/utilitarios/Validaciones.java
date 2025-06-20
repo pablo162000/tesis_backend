@@ -4,11 +4,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -89,5 +91,27 @@ public class Validaciones {
         if (contentType == null || tiposPermitidos.stream().noneMatch(contentType::equals)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato inválido para el archivo: " + nombreCampo);
         }
+    }
+
+    public String generarPeriodo(){
+
+        LocalDate fechaActual = LocalDate.now();
+        int year = fechaActual.getYear();
+
+        // Periodo 1: 20 mar - 20 ago del año actual
+        LocalDate inicioP1 = LocalDate.of(year, 3, 20);
+        LocalDate finP1    = LocalDate.of(year, 8, 20);
+
+        // Periodo 2: 21 ago (del año anterior) - 19 mar (del año actual)
+        LocalDate inicioP2 = LocalDate.of(year - 1, 8, 21);
+        LocalDate finP2    = LocalDate.of(year, 3, 19);
+
+        if (!fechaActual.isBefore(inicioP1) && !fechaActual.isAfter(finP1)) {
+            return year + "-" + year;
+        } else if (!fechaActual.isBefore(inicioP2) && !fechaActual.isAfter(finP2)) {
+            return (year - 1) + "-" + year;
+        }
+
+        return "-";
     }
 }
