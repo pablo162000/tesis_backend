@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.tesis.backend_tesis.utilitarios.Validaciones.esCorreoValido;
@@ -1791,6 +1792,25 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
  */
 
+    }
+
+    public List<String> periodosRegistrados(){
+
+        List<Propuesta> propuestasObtenidas=propuestaRepository.finall();
+
+        if (propuestasObtenidas.isEmpty()){
+
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existen propuestas.");
+
+        }
+
+        List<String> totalPeriodos = propuestasObtenidas.parallelStream()
+                .map(Propuesta::getPeriodo)
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+
+        return  totalPeriodos;
     }
 
 

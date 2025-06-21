@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -112,14 +113,20 @@ public class PropuestaRestFulController {
     }
 
 
-    @PostMapping(value = "/{idPropuesta}/recordatorio")
+    //@PostMapping(value = "/{idPropuesta}/recordatorio")
     public void recordatorioRevisor(@PathVariable Integer idPropuesta,
                                                   @RequestParam("idUsuario") Integer idUsuario){
 
         this.propuestaService.recordatorioRevisores(idPropuesta, idUsuario);
 
     }
+    @PreAuthorize("hasAnyRole('direccion', 'coordinador', 'ADMIN')")
+    @GetMapping(value = "/periodos")
+    public List<String> periodosExistentes(){
 
+      return   this.propuestaService.periodosRegistrados();
+
+    }
 
 
 }

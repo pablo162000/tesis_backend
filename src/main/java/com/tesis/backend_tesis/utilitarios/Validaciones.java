@@ -1,21 +1,24 @@
 package com.tesis.backend_tesis.utilitarios;
 
+import com.tesis.backend_tesis.repository.IPropuestaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class Validaciones {
+
+
 
     private Validaciones() {
     }
@@ -114,4 +117,5 @@ public class Validaciones {
 
         return "-";
     }
+
 }
