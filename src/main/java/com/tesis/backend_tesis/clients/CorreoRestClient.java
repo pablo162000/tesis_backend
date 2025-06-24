@@ -140,6 +140,29 @@ public interface CorreoRestClient {
                                @RequestParam String revisor,
                                @RequestParam String tema,
                                @RequestParam String correoDireccion);
+
+
+
+    @PostMapping("correo/notificacionparaactivacionv2")
+    String notificacionActivacionEstudiane( @RequestParam List<String> toEmails,
+                                            @RequestParam String usuario,
+                                            @RequestParam String enlaceCuenta,
+                                            @RequestParam String correoDireccion);
+
+
+    @PostMapping("correo/notificacionactivacionv2")
+    String notificacionEstudianteActivado( @RequestParam String toEmail,
+                                           @RequestParam String usuario,
+                                           @RequestParam String enlaceCuenta,
+                                           @RequestParam String correoDireccion);
+
+
+    @PostMapping("correo/notificacionnoactivacionv2")
+    String notificacionEstudianteNoActivado(@RequestParam String toEmail,
+                                            @RequestParam String usuario,
+                                            @RequestParam String correoDireccion);
+
+
 }
 
 

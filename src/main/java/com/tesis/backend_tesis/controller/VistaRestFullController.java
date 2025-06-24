@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 import java.util.List;
 
@@ -116,6 +117,19 @@ public class VistaRestFullController {
     public List<VistaSecretaria> buscarSecretariasPorEstado(@PathVariable Boolean activo) {
         return this.vistasEntidadesService.buscarSecretariasPorEstado(activo);
     }
+
+    @GetMapping("/secretarias/estado/{activo}/carrera/{carrera}")
+    public List<VistaSecretaria> buscarSecretariasPorEstadoCarrera(@PathVariable Boolean activo , @PathVariable String carrera) {
+        return this.vistasEntidadesService.buscarSecretariasPorEstadoCarrera(activo, carrera);
+    }
+
+    @GetMapping("/secretarias/estado/{activo}/facultad")
+    public List<VistaSecretaria> buscarSecretariasPorEstadoFacultad(@PathVariable Boolean activo , @RequestParam ("nombre") String facultad) {
+        return this.vistasEntidadesService.buscarSecretariasPorEstadoFacultad(activo, facultad);
+    }
+
+
+
 
     //------------------------ Rutas para VistaCarrera ------------------------
 
@@ -271,8 +285,16 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarPropuestaPorTutor(idUsuario, facultad);
     }
 
+    //@PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
+    @GetMapping("/propuestas/tutor/usuario/{idUsuario}/aprobacion/{numero}")
+    public List<VistaPropuesta> buscarPropuestaPorTutorEstadoAprobacion(@PathVariable Integer idUsuario,
+                                                                        @PathVariable Integer numero) {
+        return this.vistasEntidadesService.buscarPropuestaPorTutorEstadoAprobacion(idUsuario, numero);
+    }
+
+
     @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion','coordinador') ")
-    @GetMapping("/propuestas/revisor/usuario/{idUsuario}")
+    @GetMapping("/propuestas/revisor/usuario/{idUsuario}/")
     public List<VistaPropuesta> buscarPropuestaPorRevisor(@PathVariable Integer idUsuario,
                                                         @RequestParam("facultad") String facultad ) {
         return this.vistasEntidadesService.buscarPropuestaPorRevisor(idUsuario, facultad);

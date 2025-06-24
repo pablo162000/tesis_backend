@@ -236,7 +236,6 @@ public class MailRestController {
             // Llamar al servicio para enviar el correo
             this.mailGunServices.sendEmaiNegacionTema(toEmail, ccEmails, estudiante, tema, correoDireccion, observaciones);
 
-            // Si todo va bien, respondemos con un mensaje de éxito
             return ResponseEntity.status(HttpStatus.OK).body("Correo enviado exitosamente de negacion tema.");
         }  catch (UnirestException e) {
             return ResponseEntity.status(500).body("Error al enviar el correo de negacion tema: " + e.getMessage());
@@ -254,6 +253,54 @@ public class MailRestController {
 
         try {
             this.mailGunServices.sendNotificacionRevision(toEmail, revisor, tema,
+                    correoDireccion);
+            return ResponseEntity.ok("Correo enviado exitosamente a " + toEmail);
+        } catch (UnirestException e) {
+            return ResponseEntity.status(500).body("Error al enviar el correo: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/notificacionparaactivacionv2")
+    public ResponseEntity<String> activacionEstudiane(
+            @RequestParam List<String>toEmails,
+            @RequestParam String usuario,
+            @RequestParam String enlaceCuenta,
+            @RequestParam String correoDireccion) {
+
+        try {
+            this.mailGunServices.sendEmailRegistroEstudianteToSecretaria(toEmails, usuario, enlaceCuenta,
+                    correoDireccion);
+            return ResponseEntity.ok("Correo enviado exitosamente a " + toEmails);
+        } catch (UnirestException e) {
+            return ResponseEntity.status(500).body("Error al enviar el correo: " + e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/notificacionactivacionv2")
+    public ResponseEntity<String> estuidanteActivado(
+            @RequestParam String toEmail,
+            @RequestParam String usuario,
+            @RequestParam String enlaceCuenta,
+            @RequestParam String correoDireccion) {
+
+        try {
+            this.mailGunServices.sendEmailActivacionToEstudiante(toEmail, usuario, enlaceCuenta,
+                    correoDireccion);
+            return ResponseEntity.ok("Correo enviado exitosamente a " + toEmail);
+        } catch (UnirestException e) {
+            return ResponseEntity.status(500).body("Error al enviar el correo: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/notificacionnoactivacionv2")
+    public ResponseEntity<String> estuidanteNoActivado(
+            @RequestParam String toEmail,
+            @RequestParam String usuario,
+            @RequestParam String correoDireccion) {
+
+        try {
+            this.mailGunServices.sendEmailNoActivacionToEstudiante(toEmail, usuario,
                     correoDireccion);
             return ResponseEntity.ok("Correo enviado exitosamente a " + toEmail);
         } catch (UnirestException e) {

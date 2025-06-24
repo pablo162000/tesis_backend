@@ -264,6 +264,30 @@ public class VistaPropuestaRepositoryImpl implements IVistaPropuestaRepository {
     }
 
     @Override
+    public List<VistaPropuesta> findByTutorEstadoAprobacion(Integer idUsuario,EstadoAprobacion estadoAprobacion) {
+        try {
+            TypedQuery<VistaPropuesta> query = this.entityManager.createQuery(
+                    "SELECT p FROM VistaPropuesta p WHERE p.tutorUsuaId =:idUsuario AND  p.estadoAprobacion = :estadoAprobacion",
+                    VistaPropuesta.class
+            );
+            query.setParameter("idUsuario", idUsuario);
+            query.setParameter("estadoAprobacion", estadoAprobacion);
+            List<VistaPropuesta> vistaPropuestas = query.getResultList();
+
+            if (vistaPropuestas.isEmpty()) {
+                logger.debug("No se encontraron propuestas en VistaPropuesta con tutor idUsuario {} y estado aprobación {}.", idUsuario, estadoAprobacion);
+            } else {
+                logger.debug("Se encontraron {} propuestas en VistaPropuesta con tutor idUsuario {} y estado aprobación {}.", vistaPropuestas.size(), idUsuario, estadoAprobacion);
+            }
+
+            return vistaPropuestas;
+        } catch (Exception e) {
+            logger.error("Error al buscar propuestas en VistaPropuesta con tutor idUsuario y estado aprobación: {}", e.getMessage(), e);
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
     public List<VistaPropuesta> findByRevisor(Integer idUsuario,  String facultad) {
         try {
             TypedQuery<VistaPropuesta> query = this.entityManager.createQuery(

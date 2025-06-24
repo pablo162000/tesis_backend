@@ -18,6 +18,7 @@ public interface IVistaPropuestaRepository {
     public List<VistaPropuesta> findByTipoCategoria(String tipo,String categoria, String carrera);
     public List<VistaPropuesta> findByTema(String tema, String carrera);
     public List<VistaPropuesta> findByTutor(Integer idUsuario, String facultad);
+    public List<VistaPropuesta> findByTutorEstadoAprobacion(Integer idUsuario,EstadoAprobacion estadoAprobacion);
     public List<VistaPropuesta> findByRevisor (Integer idUsuario, String facultad);
     public List<VistaPropuesta> findByEstudiante(Integer idUsuario);
 

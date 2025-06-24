@@ -109,6 +109,58 @@ public class VistaSecretariaRepositoryImpl implements IVistaSecretariaRepository
         }
     }
 
+    @Override
+    public List<VistaSecretaria> findByEstadoCarrera(Boolean estado, String carrera) {
+
+        try {
+            TypedQuery<VistaSecretaria> query = this.entityManager.createQuery(
+                    "SELECT s FROM VistaSecretaria s WHERE s.activo = :estado AND s.carrera = :carrera",
+                    VistaSecretaria.class
+            );
+            query.setParameter("estado", estado);
+            query.setParameter("carrera", carrera);
+            List<VistaSecretaria> vistaSecretaria = query.getResultList();
+
+            System.out.println(vistaSecretaria);
+
+            if (vistaSecretaria.isEmpty()) {
+                logger.debug("No se encontraron secretarias en VistaSecretaria con estado {} y carrera {}.", estado, carrera);
+            } else {
+                logger.debug("Se encontraron {} secretarias en VistaSecretaria con estado {} y carrera {}.", vistaSecretaria.size(), estado, carrera);
+            }
+
+            return vistaSecretaria;
+        } catch (Exception e) {
+            logger.error("Error al buscar secretarias en VistaSecretaria con estado: {}", e.getMessage(), e);
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<VistaSecretaria> findByEstadoFacultad(Boolean estado, String facultad) {
+        try {
+            TypedQuery<VistaSecretaria> query = this.entityManager.createQuery(
+                    "SELECT s FROM VistaSecretaria s WHERE s.activo = :estado AND s.facultad = :facultad",
+                    VistaSecretaria.class
+            );
+            query.setParameter("estado", estado);
+            query.setParameter("facultad", facultad);
+            List<VistaSecretaria> vistaSecretaria = query.getResultList();
+
+            System.out.println(vistaSecretaria);
+
+            if (vistaSecretaria.isEmpty()) {
+                logger.debug("No se encontraron secretarias en VistaSecretaria con estado {} y carrera {}.", estado, facultad);
+            } else {
+                logger.debug("Se encontraron {} secretarias en VistaSecretaria con estado {} y carrera {}.", vistaSecretaria.size(), estado, facultad);
+            }
+
+            return vistaSecretaria;
+        } catch (Exception e) {
+            logger.error("Error al buscar secretarias en VistaSecretaria con estado: {}", e.getMessage(), e);
+            return Collections.emptyList();
+        }
+    }
 
 
 }

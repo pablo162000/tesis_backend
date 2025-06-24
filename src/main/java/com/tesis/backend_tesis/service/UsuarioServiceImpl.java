@@ -5,9 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tesis.backend_tesis.clients.AutenticacionRestClient;
 import com.tesis.backend_tesis.clients.CorreoRestClient;
 import com.tesis.backend_tesis.repository.*;
-import com.tesis.backend_tesis.repository.modelo.Carrera;
-import com.tesis.backend_tesis.repository.modelo.Usuario;
-import com.tesis.backend_tesis.repository.modelo.UsuarioRol;
+import com.tesis.backend_tesis.repository.modelo.*;
 import com.tesis.backend_tesis.service.dto.*;
 import com.tesis.backend_tesis.service.dto.utils.Converter;
 import feign.FeignException;
@@ -23,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,6 +60,9 @@ public class UsuarioServiceImpl implements IUsuarioService{
 
     @Autowired
     private ICarreraRepository carreraRepository;
+
+    @Autowired
+    private IVistasEntidadesService vistasEntidadesService;
 
 
 
@@ -150,6 +152,38 @@ public class UsuarioServiceImpl implements IUsuarioService{
             case "estudiante":
 
                 usuario.setCorreoValido(Boolean.TRUE);
+
+                VistaEstudiante vistaEstudiante= this.vistasEntidadesService.buscarEstudiantePorIdUsuario(usuario.getId());
+
+                List<VistaSecretaria> secretariasCarrera = this.vistasEntidadesService.buscarSecretariasPorEstadoCarrera(true, vistaEstudiante.getCarrera());
+
+                List<VistaSecretaria> secretariasFacultad = this.vistasEntidadesService.buscarSecretariasPorEstadoFacultad(true, vistaEstudiante.getFacultad());
+                List<String> toEmails =new ArrayList<>();
+
+                String nombre = usuario.getPrimerApellido() + " "+ usuario.getPrimerNombre();
+                String correoDireccion = this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaEstudiante.getCarrera()).getCorreoDireccion();
+
+                if (!secretariasCarrera.isEmpty()) {
+                    toEmails.add(secretariasCarrera.get(0).getCorreo());
+                } else if (!secretariasFacultad.isEmpty()) {
+                    toEmails = secretariasFacultad.parallelStream()
+                            .map(VistaSecretaria::getCorreo)
+                            .distinct()
+                            .collect(Collectors.toList());
+                }
+
+                if (!toEmails.isEmpty()) {
+                    try {
+                        this.correoRestClient.notificacionActivacionEstudiane(
+                                toEmails,
+                                nombre,
+                                "hhjh",
+                                correoDireccion
+                        );
+                    } catch (Exception e) {
+                        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo.");
+                    }
+                }
 
                 break;
 
@@ -336,6 +370,33 @@ public class UsuarioServiceImpl implements IUsuarioService{
         if (usuario == null) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Usuario no encontrado.");
+        }
+
+        VistaUsuarioRol e= this.vistasEntidadesService.buscarUsuarioRolPorIdUsuario(usuario.getId()).get(0);
+
+        if (accion==true && e.getNombreRol().equals("estudiante")){
+
+
+            String correoEstudiante =usuario.getCorreo();
+            String nombre = usuario.getPrimerApellido() + " " + usuario.getPrimerNombre();
+            VistaEstudiante vistaEstudiante = this.vistasEntidadesService.buscarEstudiantePorIdUsuario(usuario.getId());
+
+            String correoDireccion = this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaEstudiante.getCarrera()).getCorreoDireccion();
+
+
+            try {
+                if (accion) {
+                    this.correoRestClient.notificacionEstudianteActivado(
+                            correoEstudiante,
+                            nombre,
+                            "Activación de estudiante",
+                            correoDireccion
+                    );
+
+                }
+            } catch (Exception e2) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo.");
+            }
         }
 
         Boolean respuesta = this.usuarioRepository.activarDesactivarUsuario(id, accion);

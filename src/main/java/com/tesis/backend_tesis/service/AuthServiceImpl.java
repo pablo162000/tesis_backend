@@ -319,7 +319,7 @@ public class AuthServiceImpl implements IAuthService {
         String usuarioCreado = registroRequest.getPrimerNombre() + " " + registroRequest.getPrimerApellido();
        String enlace;
         if(registroRequest.getTipoUsuario().equalsIgnoreCase("estudiante") ){
-            enlace = "http://localhost:8080/API/tesis/usuario/activar/"+ nombreRol+ "/"+token;
+            enlace = "http://localhost:4200/vista-verificacion-correo/"+token;
         }else{
             enlace = "http://localhost:4200/password-docente/" + token;
         }

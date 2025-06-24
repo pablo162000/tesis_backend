@@ -526,10 +526,120 @@ public class MailGunService {
         }
     }
 
+//----------------------------------------------------------------------------------
 
 
+    public void sendEmailRegistroEstudianteToSecretaria(List<String> toEmails, String usuario, String enlaceSistema,
+                          String correoDireccion) throws UnirestException {
+        List<String> toEmail = new ArrayList<>();
+        toEmail.add("luismosquera97@gmail.com") ;
+        List<String> ccEmailsQuemados = new ArrayList<>();
+        ccEmailsQuemados.add("jdmasabanda@uce.edu.ec");
+        ccEmailsQuemados.add("lfmosquerar@uce.edu.ec");
+        ccEmailsQuemados.add("pasuntaxih@uce.edu.ec");
+
+        // Crear el mapa de variables dinámicas
+        Map<String, String> variablesMap = new HashMap<>();
+        variablesMap.put("usuario", usuario);
+        variablesMap.put("enlace_sistema", enlaceSistema);
+        variablesMap.put("correoDireccion", correoDireccion);
+
+        String variablesJson;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            variablesJson = objectMapper.writeValueAsString(variablesMap);
+        } catch (Exception e) {
+            throw new UnirestException("Error al generar JSON de variables", e);
+        }
+
+        MultipartBody request = Unirest.post("https://api.mailgun.net/v3/" + sandboxDomain + "/messages")
+                .basicAuth("api", apiKey)
+                .field("from", fromEmail)
+                .field("subject", "Verificación Activación Estudiante")
+                .field("template", "registroestudiantetosecretaria")
+                .field("h:X-Mailgun-Variables", variablesJson);
+
+        // Agregar destinatarios principales
+        if (toEmail != null && !toEmail.isEmpty()) {
+            for (String email : toEmail) {
+                request.field("to", email);
+            }
+        }
+
+        HttpResponse<JsonNode> response = request.asJson();
+
+        if (response.getStatus() != 200) {
+            throw new UnirestException("Error al enviar el correo: " + response.getStatus() + " " + response.getBody());
+        }
+    }
 
 
+    public void sendEmailActivacionToEstudiante(String toEmail, String usuario, String enlaceSistema,
+                                                        String correoDireccion) throws UnirestException {
+        toEmail = "luismosquera97@gmail.com"; //FORZADO SOLO PARA PRUEBAS
 
+
+        //Crear el mapa de variables dinámicas
+        Map<String, String> variablesMap = new HashMap<>();
+        variablesMap.put("usuario", usuario);
+        variablesMap.put("enlace_sistema", enlaceSistema);
+        variablesMap.put("correoDireccion", correoDireccion);
+
+        //Convertir el mapa a JSON
+        String variablesJson;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            variablesJson = objectMapper.writeValueAsString(variablesMap);
+        } catch (Exception e) {
+            throw new UnirestException("Error al generar JSON de variables", e);
+        }
+
+        HttpResponse<JsonNode> response = Unirest.post("https://api.mailgun.net/v3/" + sandboxDomain + "/messages")
+                .basicAuth("api", apiKey)
+                .queryString("from", fromEmail)
+                .queryString("to", toEmail)
+                .queryString("subject", "Estudiante Activado")
+                .queryString("template", "estudianteactivado") // 🔹 Nombre de la plantilla
+                .queryString("h:X-Mailgun-Variables", variablesJson) // 🔹 Enviar JSON bien formateado
+                .asJson();
+
+        if (response.getStatus() != 200) {
+            throw new UnirestException("Error al enviar el correo: " + response.getStatus() + " " + response.getBody());
+        }
+    }
+
+    public void sendEmailNoActivacionToEstudiante(String toEmail,
+                                                  String usuario,
+                                                  String correoDireccion) throws UnirestException {
+        toEmail = "luismosquera97@gmail.com"; //FORZADO SOLO PARA PRUEBAS
+
+
+        //Crear el mapa de variables dinámicas
+        Map<String, String> variablesMap = new HashMap<>();
+        variablesMap.put("usuario", usuario);
+        variablesMap.put("correoDireccion", correoDireccion);
+
+        //Convertir el mapa a JSON
+        String variablesJson;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            variablesJson = objectMapper.writeValueAsString(variablesMap);
+        } catch (Exception e) {
+            throw new UnirestException("Error al generar JSON de variables", e);
+        }
+
+        HttpResponse<JsonNode> response = Unirest.post("https://api.mailgun.net/v3/" + sandboxDomain + "/messages")
+                .basicAuth("api", apiKey)
+                .queryString("from", fromEmail)
+                .queryString("to", toEmail)
+                .queryString("subject", "Estudiante Activado")
+                .queryString("template", "estudiantenoactivado") // 🔹 Nombre de la plantilla
+                .queryString("h:X-Mailgun-Variables", variablesJson) // 🔹 Enviar JSON bien formateado
+                .asJson();
+
+        if (response.getStatus() != 200) {
+            throw new UnirestException("Error al enviar el correo: " + response.getStatus() + " " + response.getBody());
+        }
+    }
 
 }

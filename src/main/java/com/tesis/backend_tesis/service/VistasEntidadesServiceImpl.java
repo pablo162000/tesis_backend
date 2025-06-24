@@ -320,6 +320,44 @@ public class VistasEntidadesServiceImpl implements IVistasEntidadesService {
     }
 
     @Override
+    public List<VistaSecretaria> buscarSecretariasPorEstadoCarrera(Boolean activo, String carrera) {
+        if (activo == null) {
+            logger.warn("El ESTADO no puede ser nulo.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ESTADO no puede ser nulo.");
+        }
+
+        List<VistaSecretaria> vistaSecretarias = this.vistaSecretariaRepository.findByEstadoCarrera(activo, carrera);
+
+        if (vistaSecretarias.isEmpty()) {
+            logger.warn("No se encontraron registros en VistaSecretaria con estado {} y carrea {}.", activo, carrera);
+            //throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron registros en VistaSecretaria con estado " + activo + " y carrera "+ carrera);
+        } else {
+            logger.info("Se encontraron {} registros en VistaSecretaria con estado {} y carrera.", vistaSecretarias.size(), activo, carrera);
+        }
+
+        return vistaSecretarias;
+    }
+
+    @Override
+    public List<VistaSecretaria> buscarSecretariasPorEstadoFacultad(Boolean activo, String facultad) {
+        if (activo == null) {
+            logger.warn("El ESTADO no puede ser nulo.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ESTADO no puede ser nulo.");
+        }
+
+        List<VistaSecretaria> vistaSecretarias = this.vistaSecretariaRepository.findByEstadoFacultad(activo, facultad);
+
+        if (vistaSecretarias.isEmpty()) {
+            logger.warn("No se encontraron registros en VistaSecretaria con estado {} y carrea {}.", activo, facultad);
+            //throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron registros en VistaSecretaria con estado " + activo + " y carrera "+ facultad);
+        } else {
+            logger.info("Se encontraron {} registros en VistaSecretaria con estado {} y facultad.", vistaSecretarias.size(), activo, facultad);
+        }
+
+        return vistaSecretarias;
+    }
+
+    @Override
     public VistaCarrera buscarCarreraPorIdCarrera(Integer idCarrera) {
 
         if (idCarrera == null || idCarrera <= 0) {
@@ -759,6 +797,41 @@ public class VistasEntidadesServiceImpl implements IVistasEntidadesService {
         }
 
         logger.info("Se encontraron {} registros de VistaPropuesta con facultad '{}' e idUsuario para tutor{} .", vistaPropuestas.size(), facultad, idUsuario);
+        return vistaPropuestas;
+    }
+
+    @Override
+    public List<VistaPropuesta> buscarPropuestaPorTutorEstadoAprobacion(Integer idUsuario, Integer estadoAprobacion) {
+        if (idUsuario == null || idUsuario <= 0 ) {
+            logger.warn("La facultad no puede ser nulo o vacío y el idUsuario para tutor no puede ser nullo o negativo.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "La facultad no puede ser nulo o vacío y el idUsuario para tutor no puede ser nullo o negativo.");
+        }
+        if (estadoAprobacion < 0  || estadoAprobacion >=3) {
+            logger.warn("La carrea no puede ser nulo o vacío y el estado de validacion es 0, 1 o 2.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La carrea no puede ser nulo o vacío y el estado de aprobacion es 0, 1 o 2.");
+        }
+        EstadoAprobacion aprobacion = null;
+
+        if(estadoAprobacion == 0){
+            aprobacion = EstadoAprobacion.NO_APROBADO;
+        }
+        if(estadoAprobacion == 1){
+            aprobacion = EstadoAprobacion.EN_REVISON;
+        }
+
+        if(estadoAprobacion == 2){
+            aprobacion = EstadoAprobacion.APROBADO;
+        }
+
+        List<VistaPropuesta> vistaPropuestas = this.vistaPropuestaRepository.findByTutorEstadoAprobacion(idUsuario, aprobacion);
+
+        if (vistaPropuestas.isEmpty()) {
+            logger.warn("No se encontraron registros de VistaPropuesta con  idUsuario para tutor {} y estado aprobación {}'.", idUsuario, aprobacion);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron registros con carrera e idTutor proporcionados.");
+        }
+
+        logger.info("Se encontraron {} registros de VistaPropuesta con idUsuario para tutor {} y estado aprobación {}.", vistaPropuestas.size(),  idUsuario, aprobacion);
         return vistaPropuestas;
     }
 

@@ -29,6 +29,8 @@ public interface IVistasEntidadesService {
     public VistaSecretaria buscarSecretariaPorIdSecretaria(Integer idDocente);
     public List<VistaSecretaria> buscarTodosSecretarias();
     public List<VistaSecretaria> buscarSecretariasPorEstado(Boolean activo);
+    public List<VistaSecretaria> buscarSecretariasPorEstadoCarrera(Boolean activo, String carrera);
+    public List<VistaSecretaria> buscarSecretariasPorEstadoFacultad(Boolean activo, String facultad);
 
 
     //------------------Carrera--------------------------------------
@@ -65,6 +67,7 @@ public interface IVistasEntidadesService {
     public List<VistaPropuesta> buscarPropuestaPorTipoCategoria(String tipo,String categoria, String carrera);
     public List<VistaPropuesta> buscarPropuestaPorTema(String tema, String carrera);
     public List<VistaPropuesta> buscarPropuestaPorTutor(Integer idUsuario, String facultad);
+    public List<VistaPropuesta> buscarPropuestaPorTutorEstadoAprobacion(Integer idUsuario,Integer estadoAprobacion);
     public List<VistaPropuesta> buscarPropuestaPorRevisor (Integer idUsuario, String facultad);
     public List<VistaPropuesta> buscarPropuestaPorEstudiante(Integer idUsuario);
 }
