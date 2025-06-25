@@ -432,6 +432,25 @@ public class VistasEntidadesServiceImpl implements IVistasEntidadesService {
     }
 
     @Override
+    public VistaCarrera buscarPorIdUsuarioCoordiandor(Integer idUsuarioCarrera) {
+        if (idUsuarioCarrera == null || idUsuarioCarrera <= 0) {
+            logger.warn("El IDUSUARIOCOORDIANDOR no puede ser nulo, 0 o negativo.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El IDUSUARIOCOORDIANDOR no puede ser nulo, 0 o negativo.");
+        }
+
+        VistaCarrera vistaCarrera = this.vistaCarreraRepository.findByIdUsuarioCoordiandor(idUsuarioCarrera);
+
+        if (vistaCarrera == null) {
+            logger.warn("No se encontró una VistaCarrera con IDUSUARIOCOORDIANDOR {}.", idUsuarioCarrera);
+            //throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró una VistaCarrera con IDUSUARIOCARRERA: " + idCarrera);
+        }
+
+        logger.info("VistaCarrera recuperada con IDCARRERA {} correctamente.", vistaCarrera.getIdCarrera());
+        return vistaCarrera;
+
+    }
+
+    @Override
     public VistaUsuarioRol buscarUsuarioRolPorIdUsuarioRol(Integer idUsuarioRol) {
         if (idUsuarioRol == null || idUsuarioRol <= 0) {
             logger.warn("El IDUSUARIOROL no puede ser nulo, 0 o negativo.");

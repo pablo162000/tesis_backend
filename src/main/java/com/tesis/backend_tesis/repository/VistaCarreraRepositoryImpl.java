@@ -115,4 +115,28 @@ public class VistaCarreraRepositoryImpl implements IVistaCarreraRepository {
 
     }
 
+    @Override
+    public VistaCarrera findByIdUsuarioCoordiandor(Integer idUsuarioCarrera) {
+        try {
+            TypedQuery<VistaCarrera> query = this.entityManager.createQuery(
+                    "SELECT c FROM VistaCarrera c WHERE c.idCoordinador = :idUsuarioCarrera",
+                    VistaCarrera.class);
+
+            query.setParameter("idUsuarioCarrera", idUsuarioCarrera);
+
+            VistaCarrera vistaCarrera = query.getSingleResult();
+
+            if (vistaCarrera != null) {
+                logger.info("Carrera encontrado en VistaCarrera con IDUSUARIOCOORDIANDOR: {}", idUsuarioCarrera);
+            } else {
+                logger.warn("No se encontró una Carrera en VistaCarrera con IDUSUARIOCOORDIANDOR: {}", idUsuarioCarrera);
+            }
+
+            return vistaCarrera;
+        } catch (Exception e) {
+            logger.error("Error al buscar el Carrera en VistaCarrera con IDUSUARIOCARRERA {}: {}", idUsuarioCarrera, e.getMessage(), e);
+            throw new RuntimeException("Error al buscar Carrera en VistaCarrera con IDUSUARIOCARRERA: " + idUsuarioCarrera, e);
+        }
+    }
+
 }

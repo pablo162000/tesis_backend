@@ -39,6 +39,7 @@ public interface IVistasEntidadesService {
     public List<VistaCarrera> buscarCarreraIdFacultad(Integer idFacultad);
     public List<VistaCarrera> buscarTodasCarreras();
     public VistaCarrera buscarCarreraPorNombreCarrera(String nombreCarrera);
+    public VistaCarrera buscarPorIdUsuarioCoordiandor(Integer idUsuarioCarrera);
 
 
 

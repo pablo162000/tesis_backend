@@ -442,7 +442,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
         Integer idUsuarioCarrera =
                 this.vistasEntidadesService.buscarCarreraPorNombreCarrera(vistaEstudiantePrimero.getCarrera()).getIdUsuarioCarrera();
 
-/*
+
         try {
             if (revisionGuardada == null || guardada == null ||
                     this.revisionRepository.findById(revisionGuardada.getId()) == null ||
@@ -464,7 +464,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
         }
 
 
- */
         try {
             Map<String, Object> variables = new HashMap<>();
             String nombreTutor="";

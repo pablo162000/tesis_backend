@@ -456,7 +456,9 @@ public class AuthServiceImpl implements IAuthService {
                 }
 
                 nombreFacultad = this.facultadService.buscarFacultadPorId(coordinadorDTO.getIdFacultad()).getNombre();
-                nombreCarrera = "MultiCarrera";
+
+                nombreCarrera =  this.vistasEntidadesService.buscarPorIdUsuarioCoordiandor(coordinadorDTO.getId()).getCarrera();
+                System.out.println(coordinadorDTO);
                 idCarrera=coordinadorDTO.getId();
                 idFacultad=coordinadorDTO.getIdFacultad();
                 break;

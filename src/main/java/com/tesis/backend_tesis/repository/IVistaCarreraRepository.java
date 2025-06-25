@@ -12,5 +12,6 @@ public interface IVistaCarreraRepository {
     public List<VistaCarrera> findByIdFacultad(Integer idFacultad);
     public List<VistaCarrera> findAllCarreras();
     public VistaCarrera findByNombreCarrera(String nombreCarrera);
+    public VistaCarrera findByIdUsuarioCoordiandor(Integer idUsuarioCarrera);
 
 }
