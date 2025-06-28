@@ -58,6 +58,9 @@ public class CarreraServiceImpl implements ICarreraService {
     @Autowired
     private IDocenteService docenteService;
 
+    @Autowired
+    private IVistasEntidadesService vistasEntidadesService;
+
     @Override
     public Boolean insertar(CarreraRequest carreraRequest) {
         try {
@@ -256,6 +259,7 @@ public class CarreraServiceImpl implements ICarreraService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Todos los datos son obligatorios.");
         }
 
+
         Carrera carreraExistente = this.carreraRepository.findById(idCarrera);
         if (carreraExistente == null) {
             logger.warn("La carrera con ID {} no existe.", idCarrera);
@@ -267,6 +271,17 @@ public class CarreraServiceImpl implements ICarreraService {
             logger.warn("El docente con ID USUARIO {} no existe.", idUsuario);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Docente no existe.");
         }
+
+
+        VistaCarrera vistaCarrera = this.vistasEntidadesService.buscarPorIdUsuarioCoordiandor(docenteExistenteDTO.getId());
+
+        if (vistaCarrera!=null){
+
+                logger.warn("El usuario ya esta ligado a otra carrera, la carrera es {} .", vistaCarrera.getCarrera());
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "El usuario ya esta ligado a otra carrera.");
+
+        }
+
 
         // Si ya hay un coordinador, se le revierte el rol a "docente"
         if (carreraExistente.getCoordinador() != null) {

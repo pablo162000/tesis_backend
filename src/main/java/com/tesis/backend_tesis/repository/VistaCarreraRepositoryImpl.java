@@ -116,26 +116,27 @@ public class VistaCarreraRepositoryImpl implements IVistaCarreraRepository {
     }
 
     @Override
-    public VistaCarrera findByIdUsuarioCoordiandor(Integer idUsuarioCarrera) {
+    public VistaCarrera findByIdUsuarioCoordiandor(Integer idUsuarioCoordinador) {
         try {
             TypedQuery<VistaCarrera> query = this.entityManager.createQuery(
-                    "SELECT c FROM VistaCarrera c WHERE c.idCoordinador = :idUsuarioCarrera",
+                    "SELECT c FROM VistaCarrera c WHERE c.idCoordinador = :idUsuarioCoordinador",
                     VistaCarrera.class);
 
-            query.setParameter("idUsuarioCarrera", idUsuarioCarrera);
+            query.setParameter("idUsuarioCoordinador", idUsuarioCoordinador);
 
             VistaCarrera vistaCarrera = query.getSingleResult();
 
+
             if (vistaCarrera != null) {
-                logger.info("Carrera encontrado en VistaCarrera con IDUSUARIOCOORDIANDOR: {}", idUsuarioCarrera);
+                logger.info("Carrera encontrado en VistaCarrera con IDUSUARIOCOORDIANDOR: {}", idUsuarioCoordinador);
             } else {
-                logger.warn("No se encontró una Carrera en VistaCarrera con IDUSUARIOCOORDIANDOR: {}", idUsuarioCarrera);
+                logger.warn("No se encontró una Carrera en VistaCarrera con IDUSUARIOCOORDIANDOR: {}", idUsuarioCoordinador);
             }
 
             return vistaCarrera;
         } catch (Exception e) {
-            logger.error("Error al buscar el Carrera en VistaCarrera con IDUSUARIOCARRERA {}: {}", idUsuarioCarrera, e.getMessage(), e);
-            throw new RuntimeException("Error al buscar Carrera en VistaCarrera con IDUSUARIOCARRERA: " + idUsuarioCarrera, e);
+            logger.error("Error al buscar el Carrera en VistaCarrera con IDUSUARIOCARRERA {}: {}", idUsuarioCoordinador, e.getMessage(), e);
+            throw new RuntimeException("Error al buscar Carrera en VistaCarrera con IDUSUARIOCARRERA: " + idUsuarioCoordinador, e);
         }
     }
 

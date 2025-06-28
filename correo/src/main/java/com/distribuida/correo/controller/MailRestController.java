@@ -32,9 +32,6 @@ public class MailRestController {
             @RequestParam String correoDireccion,
             @RequestParam String tipoUsuario) {
 
-        String enlaceSoporte = "http://miapp.com/soporte";
-        String enlacePrivacidad = "http://miapp.com/privacidad";
-
         try {
             this.mailGunServices.sendEmail(toEmail, usuario, enlaceCuenta,
                     correoDireccion,
