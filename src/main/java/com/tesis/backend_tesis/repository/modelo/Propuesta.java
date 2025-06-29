@@ -28,7 +28,7 @@ public class Propuesta {
     @Column(name = "prop_tipo", nullable = false)
     private String tipo;
 
-    @Column(name = "prop_tema", nullable = false, unique = true)
+    @Column(name = "prop_tema", nullable = false, unique = true, length = 1500)
     private String tema;
 
     @Column(name = "prop_categoria", nullable = false)
@@ -42,7 +42,7 @@ public class Propuesta {
     @Enumerated(EnumType.STRING)
     private EstadoAprobacion estadoAprobacion;
 
-    @Column(name = "prop_observaciones", nullable = true)
+    @Column(name = "prop_observaciones", nullable = true, length = 2000)
     private String observaciones;
 
     @ManyToOne(fetch = FetchType.LAZY)
