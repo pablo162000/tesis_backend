@@ -25,10 +25,10 @@ public class Archivo {
     @SequenceGenerator(name = "archivo_id_seq", sequenceName = "archivo_id_seq", allocationSize = 1, initialValue = 1)
     private Integer id;  // ID único para identificar cada archivo
 
-    @Column(name = "archivo_nombre")
+    @Column(name = "archivo_nombre", length = 1500)
     private String nombre;  // Nombre del archivo, como 'mi-documento.pdf'
 
-    @Column(name = "archivo_url")
+    @Column(name = "archivo_url", length = 1500)
     private String url;
 
     @Builder.Default
