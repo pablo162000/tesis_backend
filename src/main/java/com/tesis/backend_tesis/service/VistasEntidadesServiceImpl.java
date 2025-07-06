@@ -442,7 +442,9 @@ public class VistasEntidadesServiceImpl implements IVistasEntidadesService {
 
         if (vistaCarrera == null) {
             logger.warn("No se encontró una VistaCarrera con IDUSUARIOCOORDIANDOR {}.", idUsuarioCarrera);
+
             //throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró una VistaCarrera con IDUSUARIOCARRERA: " + idCarrera);
+            return null;
         }
 
         logger.info("VistaCarrera recuperada con IDCARRERA {} correctamente.", vistaCarrera.getIdCarrera());

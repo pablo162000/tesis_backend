@@ -126,14 +126,12 @@ public class VistaCarreraRepositoryImpl implements IVistaCarreraRepository {
 
             VistaCarrera vistaCarrera = query.getSingleResult();
 
-
-            if (vistaCarrera != null) {
-                logger.info("Carrera encontrado en VistaCarrera con IDUSUARIOCOORDIANDOR: {}", idUsuarioCoordinador);
-            } else {
-                logger.warn("No se encontró una Carrera en VistaCarrera con IDUSUARIOCOORDIANDOR: {}", idUsuarioCoordinador);
-            }
-
+            logger.info("Carrera encontrado en VistaCarrera con IDUSUARIOCOORDIANDOR: {}", idUsuarioCoordinador);
             return vistaCarrera;
+
+        } catch (NoResultException e) {
+            logger.warn("No se encontró una Carrera en VistaCarrera con IDUSUARIOCOORDIANDOR: {}", idUsuarioCoordinador);
+            return null; // o lanza una excepción personalizada si lo prefieres
         } catch (Exception e) {
             logger.error("Error al buscar el Carrera en VistaCarrera con IDUSUARIOCARRERA {}: {}", idUsuarioCoordinador, e.getMessage(), e);
             throw new RuntimeException("Error al buscar Carrera en VistaCarrera con IDUSUARIOCARRERA: " + idUsuarioCoordinador, e);
