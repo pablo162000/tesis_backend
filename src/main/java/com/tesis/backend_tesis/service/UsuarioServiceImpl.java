@@ -411,7 +411,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
 
     @Override
     @Transactional
-    @Scheduled(cron = "0 */2 * * * ?")
+    @Scheduled(initialDelay = 0, fixedRate = 1000 * 60 * 60 * 24 * 2) // Cada 2 días
     public void eliminarUsuariosNoVerificadosCarrera() {
         // Obtener usuarios no verificados
         List<Usuario> usuariosNoVerificados = this.usuarioRepository.findUsuariosNoVerificadosAntesDe();
@@ -442,7 +442,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
 
     @Override
     @Transactional
-    @Scheduled(cron = "5 */2 * * * ?") // Se ejecuta cada 2 minutos
+    @Scheduled(initialDelay = 5000, fixedRate = 1000 * 60 * 60 * 24 * 2) // Cada 2 días + 5 segundos
     public void eliminarUsuariosNoVerificados() {
 
         // Obtener usuarios no verificados

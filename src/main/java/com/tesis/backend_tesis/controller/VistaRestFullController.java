@@ -145,6 +145,13 @@ public class VistaRestFullController {
         return this.vistasEntidadesService.buscarCarreraIdFacultad(idFacultad);
     }
 
+
+    @GetMapping("/facultad/{idFacultad}/disponibles/carreras")
+    public List<VistaCarrera> buscarCarreraIdFacultadConDireccion(@PathVariable Integer idFacultad) {
+        return this.vistasEntidadesService.buscarCarreraIdFacultadConDireccion(idFacultad);
+    }
+
+
     @PreAuthorize("hasAnyRole('docente', 'secretaria', 'direccion') ")
     @GetMapping("/carreras")
     public List<VistaCarrera> buscarTodasCarreras() {
