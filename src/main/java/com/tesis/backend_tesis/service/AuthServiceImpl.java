@@ -76,8 +76,6 @@ public class AuthServiceImpl implements IAuthService {
     private String rutaFront;
 
 
-
-
     @Transactional
     @Override
     public Boolean registroNuevoEstudiante(RegistroRequest registroRequest) {
@@ -390,10 +388,11 @@ public class AuthServiceImpl implements IAuthService {
         }
 
         // Recuperar los roles del usuario
-        UsuarioRol rolUsuario = this.usuarioRolRepository.findByIdUsuario(usua.getId()).getFirst();
+        List<UsuarioRol> rolesUsuario = this.usuarioRolRepository.findByIdUsuario(usua.getId());
 
-        if (rolUsuario == null) {
-            throw new RuntimeException("El usuario no tiene rol asignados.");
+        if (rolesUsuario.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no tiene roles asignados.");
+
         }
 
         String nombreFacultad = null;
@@ -402,7 +401,7 @@ public class AuthServiceImpl implements IAuthService {
         Integer idFacultad = null;
 
 
-        switch (rolUsuario.getRol().getNombre()) {
+        switch (rolesUsuario.get(0).getRol().getNombre()) {
             case "estudiante":
                 EstudianteDTO estudianteDTO = this.estudianteService.buscarPorIdUsuario(usua.getId());
                 if (estudianteDTO == null) {
@@ -472,11 +471,11 @@ public class AuthServiceImpl implements IAuthService {
 
 
             default:
-                throw new RuntimeException("Rol desconocido: " + rolUsuario);
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no tiene roles asignados.");
         }
 
         List<String> r = new ArrayList<>();
-        r.add(rolUsuario.getRol().getNombre());
+        r.add(rolesUsuario.get(0).getRol().getNombre());
 
         String tokenSesion = null;
 
@@ -496,7 +495,7 @@ public class AuthServiceImpl implements IAuthService {
                 .primerApellido(usua.getPrimerApellido())
                 .segundoApellido(usua.getSegundoApellido())
                 .correo(usua.getCorreo())
-                .rol(rolUsuario.getRol().getNombre())
+                .rol(rolesUsuario.get(0).getRol().getNombre())
                 .idUsuario(usua.getId())
                 .nombreCarrera(nombreCarrera)
                 .idCarrera(idCarrera)

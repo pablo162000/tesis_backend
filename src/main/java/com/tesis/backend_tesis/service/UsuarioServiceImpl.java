@@ -417,7 +417,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
         List<Usuario> usuariosNoVerificados = this.usuarioRepository.findUsuariosNoVerificadosAntesDe();
 
         for (Usuario usuario : usuariosNoVerificados) {
-            if (ChronoUnit.MINUTES.between(usuario.getFechaCreacion(), LocalDateTime.now()) > 2) {
+            if (ChronoUnit.DAYS.between(usuario.getFechaCreacion(), LocalDateTime.now()) > 2) {
                 try {
 
                     // Eliminar la referencia en Carrera si existe
@@ -449,7 +449,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
         List<Usuario> usuariosNoVerificados = this.usuarioRepository.findUsuariosNoVerificadosAntesDe();
 
         for (Usuario usuario : usuariosNoVerificados) {
-            if (ChronoUnit.MINUTES.between(usuario.getFechaCreacion(), LocalDateTime.now()) > 2) {
+            if (ChronoUnit.DAYS.between(usuario.getFechaCreacion(), LocalDateTime.now()) > 2) {
                 try {
 
                     // Eliminar referencias en otras tablas antes de eliminar el usuario

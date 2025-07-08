@@ -109,10 +109,6 @@ public class CarreraServiceImpl implements ICarreraService {
         }
     }
 
-    @Override
-    public CarreraDTO buscarCarreraPorNombre(String nombre) {
-        return null;
-    }
 
     @Override
     public CarreraDTO buscarCarreraPorId(Integer id) {

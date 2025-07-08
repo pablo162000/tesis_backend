@@ -8,7 +8,6 @@ public interface ICarreraService {
 
 
     public Boolean insertar(CarreraRequest carreraRequest);
-    public CarreraDTO buscarCarreraPorNombre(String nombre);
     public CarreraDTO buscarCarreraPorId(Integer id);
     public Boolean insertarUsuarioCarrera(RegistroRequest registroRequest);
     public CarreraDTO buscarPorIDUsuario(Integer idUsuario);
