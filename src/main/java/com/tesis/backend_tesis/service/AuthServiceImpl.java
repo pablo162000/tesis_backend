@@ -344,12 +344,12 @@ public class AuthServiceImpl implements IAuthService {
         String direccion= null;
 
         if(registroRequest.getIdCarrera()!=null && registroRequest.getIdCarrera()>=1){
+            direccion = this.carreraRepository.findById(idCarrera).getUsuario().getCorreo();
 
-            direccion = this.facultadService.buscarFacultadPorId(registroRequest.getIdFacultad()).getCorreo();
         }
 
         if (registroRequest.getIdFacultad()!=null && registroRequest.getIdFacultad()>=1){
-            direccion = this.carreraRepository.findById(idCarrera).getUsuario().getCorreo();
+            direccion = this.facultadService.buscarFacultadPorId(registroRequest.getIdFacultad()).getCorreo();
 
         }
 
