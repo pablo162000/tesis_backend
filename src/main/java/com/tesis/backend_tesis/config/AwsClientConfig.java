@@ -21,12 +21,16 @@ public class AwsClientConfig {
     @Value("${aws.region}")
     private String region;
 
+    @Value("${aws.urlS3}")
+    private String url;
+
+
     @Bean
     public S3Client s3Client() {
         AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessKeyId, secretKey);
 
         return S3Client.builder()
-                .endpointOverride(URI.create("http://localhost:4566"))
+                .endpointOverride(URI.create(url))
                 .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
                 .region(software.amazon.awssdk.regions.Region.of(region))
                 .forcePathStyle(true)

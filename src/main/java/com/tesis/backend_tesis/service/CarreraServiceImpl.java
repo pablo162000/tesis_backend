@@ -15,6 +15,7 @@ import feign.FeignException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,6 +61,10 @@ public class CarreraServiceImpl implements ICarreraService {
 
     @Autowired
     private IVistasEntidadesService vistasEntidadesService;
+
+    @Value("${corsorigin.url}")
+    private String rutaFront;
+
 
     @Override
     public Boolean insertar(CarreraRequest carreraRequest) {
@@ -216,7 +221,7 @@ public class CarreraServiceImpl implements ICarreraService {
         }
 
         String usuarioCreado = "Dirección de la carrera de " + usuarioGuardado.getPrimerNombre();
-        String enlace = "http://localhost:4200/password-docente/" + token;
+        String enlace =  rutaFront + "/password-docente/" + token;
 
         try {
             this.correoRestClient.registrarUsuariov2(usuarioGuardado.getCorreo(), usuarioCreado, enlace,

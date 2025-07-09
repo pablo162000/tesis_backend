@@ -32,6 +32,8 @@ public class VistaCarrera {
     @Column(name = "usuario_carrera_id")
     private Integer idUsuarioCarrera;
 
+    @Column(name = "usuario_carrera_activo")
+    private Boolean activoUsuarioCarrera;
 
 
     @Column(name = "coordinador_id")

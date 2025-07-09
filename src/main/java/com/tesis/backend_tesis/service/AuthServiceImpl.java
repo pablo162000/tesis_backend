@@ -10,6 +10,7 @@ import feign.FeignException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,10 +69,12 @@ public class AuthServiceImpl implements IAuthService {
     @Autowired
     private IVistasEntidadesService vistasEntidadesService;
 
-
-
     @Autowired
     private Converter converter;
+
+    @Value("${corsorigin.url}")
+    private String rutaFront;
+
 
 
 
@@ -167,7 +170,7 @@ public class AuthServiceImpl implements IAuthService {
         }
 
         String usuarioCreado = registroRequest.getPrimerNombre() + " " + registroRequest.getPrimerApellido();
-        String enlace = "http://localhost:4200/vista-verificacion-correo/" + token;
+        String enlace =  rutaFront + "/vista-verificacion-correo/" + token;
 
         try {
             this.correoRestClient.registrarUsuario(usuarioCreado, usuarioGuardado.getCorreo(), enlace,
@@ -319,9 +322,9 @@ public class AuthServiceImpl implements IAuthService {
         String usuarioCreado = registroRequest.getPrimerNombre() + " " + registroRequest.getPrimerApellido();
        String enlace;
         if(registroRequest.getTipoUsuario().equalsIgnoreCase("estudiante") ){
-            enlace = "http://localhost:4200/vista-verificacion-correo/"+token;
+            enlace = rutaFront + "/vista-verificacion-correo/"+token;
         }else{
-            enlace = "http://localhost:4200/password-docente/" + token;
+            enlace = rutaFront + "/password-docente/" + token;
         }
 
         String direccion= null;

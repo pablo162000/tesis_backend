@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -391,6 +392,28 @@ public class VistasEntidadesServiceImpl implements IVistasEntidadesService {
         }
 
         return vistaCarreras;
+
+    }
+
+    @Override
+    public List<VistaCarrera> buscarCarreraIdFacultadConDireccion(Integer idFacultad) {
+        List<VistaCarrera> vistaCarreras = this.vistaCarreraRepository.findByIdFacultad(idFacultad);
+
+        List<VistaCarrera> filtro =vistaCarreras.parallelStream()
+                .filter(vc -> vc.getIdUsuarioCarrera()!=null
+                        && vc.getActivoUsuarioCarrera() != null && vc.getActivoUsuarioCarrera() == true )
+                .collect(Collectors.toList());
+
+        if (filtro.isEmpty()) {
+            logger.warn("No se encontraron registros en VistaCarrera para la facultad con ID {}.", idFacultad);
+            //throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron registros en VistaCarrera para la facultad con ID: " + idFacultad);
+            return null;
+
+        } else {
+            logger.info("Se encontraron {} registros en VistaCarrera para la facultad con ID {}.", vistaCarreras.size(), idFacultad);
+        }
+
+        return filtro;
 
     }
 
