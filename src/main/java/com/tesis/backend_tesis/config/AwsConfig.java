@@ -49,6 +49,7 @@ public class AwsConfig implements IBucket {
         this.s3Client = s3Client;
     }
 
+    /*
     @PostConstruct
     public void ensureBucketExists() {
         //String bucketName = "my-first-bucket";
@@ -59,6 +60,8 @@ public class AwsConfig implements IBucket {
             System.out.println("⚠ Bucket ya existe o error al crear: " + e.getMessage());
         }
     }
+
+     */
 
     @Override
     public BucketObject uploadFile(MultipartFile multipartFile, String nombre) throws IOException {

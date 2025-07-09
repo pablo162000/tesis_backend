@@ -262,17 +262,23 @@ public class AuthServiceImpl implements IAuthService {
             throw new RuntimeException("Error al guardar la relación UsuarioRol");
         }
 
-        Integer idCarrera = registroRequest.getIdCarrera();
 
-        if (idCarrera!=null &&this.carreraService.buscarCarreraPorId(idCarrera)==null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "No existe carrera con id: " + idCarrera);
 
-        }
+        Integer idCarrera = null;
+
+
 
         // Creación de entidades específicas según el tipo de usuario
         switch (registroRequest.getTipoUsuario().toLowerCase()) {
             case "estudiante":
+
+                idCarrera= registroRequest.getIdCarrera();
+
+                if (idCarrera!=null &&this.carreraService.buscarCarreraPorId(idCarrera)==null) {
+                    throw new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST, "No existe carrera con id: " + idCarrera);
+
+                }
 
                 EstudianteDTO estudianteDTO = EstudianteDTO.builder()
                         .idUsuario(usuarioGuardado.getId())
@@ -295,6 +301,16 @@ public class AuthServiceImpl implements IAuthService {
                 break;
 
             case "secretaria":
+
+                idCarrera = registroRequest.getIdCarrera();
+
+                if (idCarrera!=null &&this.carreraService.buscarCarreraPorId(idCarrera)==null) {
+                    throw new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST, "No existe carrera con id: " + idCarrera);
+
+                }
+
+
                 SecretariaDTO secretariaDTO = SecretariaDTO.builder()
                         .idUsuario(usuarioGuardado.getId())
                         .idCarrera(idCarrera)
