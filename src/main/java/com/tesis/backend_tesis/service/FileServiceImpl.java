@@ -37,9 +37,15 @@ public class FileServiceImpl implements IFileService{
         // Crear archivo temporal
         File temp = File.createTempFile("descarga-", extension);
 
+        System.out.println(nombre);
+
+
         // Descargar desde S3 y escribir en el archivo temporal
         try (ResponseInputStream<GetObjectResponse> s3Object = awsConfig.downFile(nombre);
+
              FileOutputStream fos = new FileOutputStream(temp)) {
+
+
 
             s3Object.transferTo(fos);
         } catch (Exception e) {

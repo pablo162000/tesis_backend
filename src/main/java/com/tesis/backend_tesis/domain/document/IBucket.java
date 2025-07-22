@@ -5,6 +5,7 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface IBucket {
 
@@ -13,6 +14,12 @@ public interface IBucket {
     ResponseInputStream<GetObjectResponse> downFile(String nombre) throws IOException;
 
     public Boolean moverYEliminar(String bucket, String keyOrigen, String keyDestino)throws IOException;
+/*
+    public List<String> listarBuckets() ;
+
+    public List<String> listarArchivosEnBucket(String bucketName);
 
 
+
+ */
 }

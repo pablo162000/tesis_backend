@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class JwtFilter extends UsernamePasswordAuthenticationFilter {
-/*
+
 
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
@@ -38,8 +38,6 @@ public class JwtFilter extends UsernamePasswordAuthenticationFilter {
         chain.doFilter(request, response);
     }
 
-
-
     private String getTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
@@ -47,5 +45,4 @@ public class JwtFilter extends UsernamePasswordAuthenticationFilter {
         }
         return null;
     }
-    */
 }

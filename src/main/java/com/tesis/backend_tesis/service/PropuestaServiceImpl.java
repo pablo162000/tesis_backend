@@ -76,6 +76,9 @@ public class PropuestaServiceImpl implements IPropuestaService{
     @Value("${aws.nombrebucket}")
     private String nombreBucket;
 
+    @Value("${aws.urlS3}")
+    private String url;
+
 
     @Override
     @Transactional
@@ -1424,16 +1427,15 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
         propuesta.setEstadoAprobacion(EstadoAprobacion.APROBADO);
         //propuesta.set(archivoGuardado);
-
         String nombreOrigen = revision.getArchivoSubidoEstudiantes().getNombre();
 
-        String nombreDestino = "aprobadas/"+nombreOrigen;
+        String nombreDestino = "aprobadas/"+revision.getArchivoSubidoEstudiantes().getNombre();
 
         awsConfig.moverYEliminar(nombreBucket, nombreOrigen,nombreDestino);
 
         revision.getArchivoSubidoEstudiantes().setNombre(nombreDestino);
-        String urlSertvicio = "https://tesis.local/localstack/";
-        revision.getArchivoSubidoEstudiantes().setUrl(urlSertvicio+nombreBucket+"/"+nombreDestino);
+        String urlSertvicio = url;
+        revision.getArchivoSubidoEstudiantes().setUrl(urlSertvicio+ "/"+ nombreDestino);
 
 
         Boolean revisionGuardada = false;

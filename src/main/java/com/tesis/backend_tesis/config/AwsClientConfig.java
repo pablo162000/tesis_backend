@@ -30,10 +30,8 @@ public class AwsClientConfig {
         AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessKeyId, secretKey);
 
         return S3Client.builder()
-                .endpointOverride(URI.create(url))
                 .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
                 .region(software.amazon.awssdk.regions.Region.of(region))
-                .forcePathStyle(true)
                 .build();
     }
 }

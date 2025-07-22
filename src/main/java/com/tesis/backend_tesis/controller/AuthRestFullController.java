@@ -5,7 +5,6 @@ import com.tesis.backend_tesis.repository.modelo.LoginRequest;
 import com.tesis.backend_tesis.repository.modelo.RegistroRequest;
 import com.tesis.backend_tesis.service.IAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

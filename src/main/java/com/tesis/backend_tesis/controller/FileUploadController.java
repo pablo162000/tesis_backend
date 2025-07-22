@@ -17,6 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/archivo")
@@ -30,8 +33,6 @@ public class FileUploadController {
 
     @Autowired
     private IFileService fileService;
-
-
 
 
     @PreAuthorize("hasAnyRole('ADMIN')")
@@ -78,10 +79,23 @@ public class FileUploadController {
         MediaType mediaType = detectarMimeType(nombreArchivo);
         InputStreamResource resource = new InputStreamResource(new FileInputStream(archivo));
 
+        // 🔥 Sanitizar y codificar el nombre
+        String nombreArchivoSeguro = nombreArchivo
+                .replaceAll("[\\r\\n]", "") // Quitar saltos de línea
+                .replace("\"", "'");        // Evitar comillas dobles
+
+        String encodedFilename = URLEncoder.encode(nombreArchivoSeguro, StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20"); // Espacios como %20
+
+        // 🔥 Cabecera segura
+        ContentDisposition contentDisposition = ContentDisposition.builder("inline")
+                .filename(nombreArchivoSeguro, StandardCharsets.UTF_8) // Codifica UTF-8
+                .build();
+
         return ResponseEntity.ok()
                 .contentLength(archivo.length())
                 .contentType(mediaType)
-                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline().filename(nombreArchivo).build().toString())
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
                 .body(resource);
     }
 
@@ -97,7 +111,17 @@ public class FileUploadController {
         return MediaType.APPLICATION_OCTET_STREAM; // Por defecto
     }
 
+/*
+    @GetMapping("/buckets")
+    public List<String> obtenerBuckets() {
+        return  this.awsConfig.listarBuckets();
+    }
 
 
+    @GetMapping("/buckets/{bucketName}/objects")
+    public List<String> listarObjetos(@PathVariable String bucketName) {
+        return awsConfig.listarArchivosEnBucket(bucketName);
+    }
 
+ */
 }

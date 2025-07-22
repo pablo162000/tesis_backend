@@ -18,7 +18,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Desactivar CSRF si usas JWT
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // No usar sesiones
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**").permitAll() // Permitir rutas publicas
+                                .requestMatchers("/**").permitAll() // Permitir rutas públicas
+                        //.anyRequest().authenticated() // Proteger todo lo demás
                 )
                 .addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class); // Agregar el filtro JWT
 

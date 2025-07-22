@@ -17,6 +17,8 @@ import software.amazon.awssdk.services.s3.model.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Configuration
@@ -41,7 +43,8 @@ public class AwsConfig implements IBucket {
 
     @Value("${aws.nombrebucket}")
     private String nombreBucket;
-
+    @Value("${aws.urlS3}")
+    private String url;
 
     private final S3Client s3Client;
 
@@ -50,6 +53,42 @@ public class AwsConfig implements IBucket {
     }
 
     /*
+
+    public List<String> listarBuckets() {
+        ListBucketsResponse bucketsResponse = s3Client.listBuckets();
+        List<Bucket> buckets = bucketsResponse.buckets();
+
+        // Retorna solo los nombres de los buckets
+        return buckets.stream()
+                .map(Bucket::name)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> listarArchivosEnBucket(String bucketName) {
+        try {
+            ListObjectsV2Request request = ListObjectsV2Request.builder()
+                    .bucket(bucketName)
+                    .build();
+
+            ListObjectsV2Response response = s3Client.listObjectsV2(request);
+
+            // Retornar solo los nombres (keys) de los objetos
+            return response.contents()
+                    .stream()
+                    .map(S3Object::key)
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            System.err.println("❌ Error al listar archivos en el bucket: " + e.getMessage());
+            throw e;
+        }
+    }
+
+
+
+
+
     @PostConstruct
     public void ensureBucketExists() {
         //String bucketName = "my-first-bucket";
@@ -81,7 +120,7 @@ public class AwsConfig implements IBucket {
 
             s3Client.putObject(putObjectRequest, RequestBody.fromFile(file));
 
-            String fileUrl = "http://localhost:4566/" + nombreBucket + "/" + nombre;
+            String fileUrl = url+ "/"  + nombreBucket + "/" + nombre;
             return new BucketObject(nombre, nombreBucket, fileUrl);
         } catch (Exception e) {
             throw new IOException("Error al subir el archivo a S3", e);
