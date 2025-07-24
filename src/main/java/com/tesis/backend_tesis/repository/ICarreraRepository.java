@@ -13,7 +13,7 @@ public interface ICarreraRepository {
     public void actualizar(Integer idUsuario);
 
     public Carrera findByIdDireccion(Integer idDireccion);
-    public Carrera findByNombre(String nombre);
+
     public List<Carrera> findByFacultad(Integer idFacultad);
     public List<Carrera> findAll();
 }

@@ -121,7 +121,7 @@ public class VistaSecretariaRepositoryImpl implements IVistaSecretariaRepository
             query.setParameter("carrera", carrera);
             List<VistaSecretaria> vistaSecretaria = query.getResultList();
 
-            System.out.println(vistaSecretaria);
+
 
             if (vistaSecretaria.isEmpty()) {
                 logger.debug("No se encontraron secretarias en VistaSecretaria con estado {} y carrera {}.", estado, carrera);
@@ -147,7 +147,7 @@ public class VistaSecretariaRepositoryImpl implements IVistaSecretariaRepository
             query.setParameter("facultad", facultad);
             List<VistaSecretaria> vistaSecretaria = query.getResultList();
 
-            System.out.println(vistaSecretaria);
+
 
             if (vistaSecretaria.isEmpty()) {
                 logger.debug("No se encontraron secretarias en VistaSecretaria con estado {} y carrera {}.", estado, facultad);

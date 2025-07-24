@@ -100,7 +100,7 @@ public class CarreraServiceImpl implements ICarreraService {
             // Guardar usuario
             Carrera carreraGuardada = this.carreraRepository.insert(carrera);
             logger.info("Usuario con correo {} insertado correctamente en la facultad {}.", carrera.getNombre(), carrera.getFacultad().getNombre());
-            System.out.println("service de usuario insertado correctamente." + this.carreraRepository.insert(carrera));
+
             return carreraGuardada != null;
 
         } catch (Exception e) {

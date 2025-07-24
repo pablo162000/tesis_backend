@@ -1,7 +1,5 @@
 package com.tesis.backend_tesis.repository;
 
-
-import com.tesis.backend_tesis.repository.modelo.Estudiante;
 import com.tesis.backend_tesis.repository.modelo.Secretaria;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -10,7 +8,6 @@ import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository

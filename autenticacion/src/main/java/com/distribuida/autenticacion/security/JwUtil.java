@@ -15,10 +15,6 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class JwUtil {
 
-    //private static final String SECRET_KEY = "calveSuperScreta1267@34hjdsd##Fkjfnb@"; // Cambia esto por una clave más segura
-
-    //private static final String SECRET_KEY_SESION = "PW#dkfjdsEIDK_KDsdf6786FHSDF-$FBJDFBA-9847838-#calveSuperScreta1267@34hjdsd##Fkjfnb@"; // Cambia esto por una clave más segura
-
 
     @Value("${security.token.key}")
     private String secretKey;
@@ -51,8 +47,6 @@ public class JwUtil {
     // Metodo generar token desde el login
     public static String generateTokenSesion(String username, List<String> roles) {
 
-        System.out.println("Generando token sesion en jutil " + username );
-        System.out.println("Generando token sesion en jutil" + roles );
 
         return JWT.create()
                 .withSubject(username)
@@ -72,9 +66,6 @@ public class JwUtil {
         }
     }
 
-
-
-    // Metodo para verificar el token
     public static DecodedJWT verifyToken(String token) {
         try {
             return JWT.require(Algorithm.HMAC256(SECRET_KEY))

@@ -130,25 +130,6 @@ public class CarreraRepositoryImpl implements ICarreraRepository{
         }
     }
 
-    @Override
-    public Carrera findByNombre(String nombre) {
-        try {
-
-            TypedQuery<Carrera> myQuery = this.entityManager.createQuery(
-                    "SELECT c FROM Carrera c WHERE c.nombre=:nombre",
-                    Carrera.class);
-            myQuery.setParameter("nombre", nombre);
-            Carrera carrera = myQuery.getSingleResult();
-            logger.info("Carrera encontrada con nombre: {}", nombre);
-            return carrera;
-        } catch (NoResultException e) {
-            logger.warn("No se encontró una carrera con nombre: {}", nombre);
-            return null;
-        } catch (Exception e) {
-            logger.error("Error al buscar carrera con nombre {}: {}", nombre, e.getMessage(), e);
-            throw new RuntimeException("Error al buscar la carrera con nombre: " + nombre, e);
-        }
-    }
 
     @Override
     public List<Carrera> findByFacultad(Integer idFacultad) {

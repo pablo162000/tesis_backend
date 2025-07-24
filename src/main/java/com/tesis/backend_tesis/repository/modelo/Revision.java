@@ -1,10 +1,8 @@
 package com.tesis.backend_tesis.repository.modelo;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -65,26 +63,6 @@ public class Revision {
     @JoinColumn(name = "revi_propuesta_id", referencedColumnName = "prop_id")
     @ToString.Exclude
     private Propuesta propuesta;
-
-    /*
-    @OneToMany(mappedBy = "primeraRevision", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<Propuesta> propuestasRevisionPrimera;
-
-    @OneToMany(mappedBy = "segundaRevision", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<Propuesta> propuestasRevisionSegunda;
-
-     */
-
-
-
-/*
-    @OneToMany(mappedBy = "revision", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    private List<EvaluacionRevisor> evaluaciones;
-
- */
 
 
 

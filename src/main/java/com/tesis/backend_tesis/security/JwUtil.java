@@ -10,10 +10,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwUtil {
 
-    //@Value("${security.token.sesion}")
-    //private static final String SECRET_KEY_SESION = "PW#dkfjdsEIDK_KDsdf6786FHSDF-$FBJDFBA-9847838-#calveSuperScreta1267@34hjdsd##Fkjfnb@"; // Cambia esto por una clave más segura
-    //private static String SECRET_KEY_SESION;
-
 
     @Value("${security.token.sesion}")
     private String secretKeySesion;

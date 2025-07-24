@@ -1,6 +1,6 @@
 package com.tesis.backend_tesis.service.dto;
 
-import com.tesis.backend_tesis.repository.modelo.Facultad;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

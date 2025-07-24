@@ -526,7 +526,7 @@ public class MailGunService {
         }
     }
 
-//----------------------------------------------------------------------------------
+
 
 
     public void sendEmailRegistroEstudianteToSecretaria(List<String> toEmails, String usuario, String enlaceSistema,

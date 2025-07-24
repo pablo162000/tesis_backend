@@ -1,11 +1,9 @@
 package com.tesis.backend_tesis.controller;
 
-import com.tesis.backend_tesis.config.AwsConfig;
 import com.tesis.backend_tesis.repository.modelo.Archivo;
 import com.tesis.backend_tesis.service.IArchivoService;
 import com.tesis.backend_tesis.service.IFileService;
 import com.tesis.backend_tesis.service.S3Service;
-import kong.unirest.FileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -13,13 +11,12 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+
 
 @RestController
 @RequestMapping(path = "/archivo")
@@ -55,8 +52,6 @@ public class FileUploadController {
             return ResponseEntity.badRequest().body("No se ha seleccionado ningún nombre.");
         }
 
-        System.out.println(file.getOriginalFilename());
-        System.out.println(file.getContentType());
 
         // Intentar guardar el archivo
         Archivo ar = archivoService.guardar(file, idUsuario, nombre);
@@ -111,17 +106,5 @@ public class FileUploadController {
         return MediaType.APPLICATION_OCTET_STREAM; // Por defecto
     }
 
-/*
-    @GetMapping("/buckets")
-    public List<String> obtenerBuckets() {
-        return  this.awsConfig.listarBuckets();
-    }
 
-
-    @GetMapping("/buckets/{bucketName}/objects")
-    public List<String> listarObjetos(@PathVariable String bucketName) {
-        return awsConfig.listarArchivosEnBucket(bucketName);
-    }
-
- */
 }

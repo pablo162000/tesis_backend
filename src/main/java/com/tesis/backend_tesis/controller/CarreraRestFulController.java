@@ -33,15 +33,7 @@ public class CarreraRestFulController {
         return ResponseEntity.ok(registro);
     }
 
-    /*
-    @PutMapping("/vincularautoridades")
-    public ResponseEntity<Boolean> registroAutoridades(@RequestParam Integer idCarrera,
-                                                       @RequestParam Integer idUsuario,
-                                                       @RequestParam String tipo) {
-        Boolean registro = this.carreraService.insertarAutoridadesCarrera(idCarrera, idUsuario, tipo);
-        return ResponseEntity.ok(registro);
-    }
-     */
+
     @PreAuthorize("hasAnyRole('direccion', 'secretaria', 'ADMIN')")
     @PutMapping("/{idCarrera}/autoridades/{idUsuario}")
     public ResponseEntity<Boolean> registroAutoridades(@PathVariable Integer idCarrera,

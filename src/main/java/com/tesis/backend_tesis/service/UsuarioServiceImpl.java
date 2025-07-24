@@ -425,10 +425,10 @@ public class UsuarioServiceImpl implements IUsuarioService{
                     if (carreraActualizar != null) {
                         carreraActualizar.setUsuario(null);
                         this.carreraRepository.update(carreraActualizar); // Guardar cambio
-                        System.out.println("Carrera actualizada: " + carreraActualizar);
+
                     }
 
-                    System.out.println("Usuario en Carrera con ID " + usuario.getId() + " eliminado.");
+
 
                 } catch (Exception e) {
                     System.err.println("Error eliminando usuario en Carrera con ID  " + usuario.getId() + ": " + e.getMessage());
@@ -436,7 +436,6 @@ public class UsuarioServiceImpl implements IUsuarioService{
             }
         }
 
-        System.out.println("Proceso de eliminación de usuarios en Carrera no verificados completado.");
 
     }
 
@@ -460,7 +459,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
 
                     // Eliminar el usuario
                     this.usuarioRepository.deleteUsuario(usuario.getId());
-                    System.out.println("Usuario con ID " + usuario.getId() + " eliminado.");
+
 
                 } catch (Exception e) {
                     System.err.println("Error eliminando usuario con ID " + usuario.getId() + ": " + e.getMessage());
@@ -468,6 +467,6 @@ public class UsuarioServiceImpl implements IUsuarioService{
             }
         }
 
-        System.out.println("Proceso de eliminación de usuarios no verificados completado.");
+
     }
 }

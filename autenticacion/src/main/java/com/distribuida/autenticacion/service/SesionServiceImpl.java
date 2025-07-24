@@ -17,11 +17,8 @@ public class SesionServiceImpl implements ISesionService{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Faltan valores.");
         }
-        //System.out.println("Generando token sesion " + username );
-        //System.out.println("Generando token sesion " + roles );
 
         String token = JwUtil.generateTokenSesion(username, roles);
-
         return token;
     }
 }

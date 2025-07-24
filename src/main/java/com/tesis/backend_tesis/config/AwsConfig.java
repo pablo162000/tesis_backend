@@ -2,7 +2,6 @@ package com.tesis.backend_tesis.config;
 
 import com.tesis.backend_tesis.domain.document.BucketObject;
 import com.tesis.backend_tesis.domain.document.IBucket;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -13,32 +12,14 @@ import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Configuration
 @EnableConfigurationProperties
 public class AwsConfig implements IBucket {
-/*
-    @Bean
-    public S3Client s3Client() {
-        AwsBasicCredentials awsCreds = AwsBasicCredentials.create(
-                "test",
-                "test"
-        );
-
-        return S3Client.builder()
-                .region(Region.of("us-east-1"))
-                .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
-                .build();
-    }
-
- */
 
 
     @Value("${aws.nombrebucket}")
@@ -52,55 +33,6 @@ public class AwsConfig implements IBucket {
         this.s3Client = s3Client;
     }
 
-    /*
-
-    public List<String> listarBuckets() {
-        ListBucketsResponse bucketsResponse = s3Client.listBuckets();
-        List<Bucket> buckets = bucketsResponse.buckets();
-
-        // Retorna solo los nombres de los buckets
-        return buckets.stream()
-                .map(Bucket::name)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<String> listarArchivosEnBucket(String bucketName) {
-        try {
-            ListObjectsV2Request request = ListObjectsV2Request.builder()
-                    .bucket(bucketName)
-                    .build();
-
-            ListObjectsV2Response response = s3Client.listObjectsV2(request);
-
-            // Retornar solo los nombres (keys) de los objetos
-            return response.contents()
-                    .stream()
-                    .map(S3Object::key)
-                    .collect(Collectors.toList());
-
-        } catch (Exception e) {
-            System.err.println("❌ Error al listar archivos en el bucket: " + e.getMessage());
-            throw e;
-        }
-    }
-
-
-
-
-
-    @PostConstruct
-    public void ensureBucketExists() {
-        //String bucketName = "my-first-bucket";
-        try {
-            s3Client.createBucket(CreateBucketRequest.builder().bucket(nombreBucket).build());
-            System.out.println("✔ Bucket creado: " + nombreBucket);
-        } catch (Exception e) {
-            System.out.println("⚠ Bucket ya existe o error al crear: " + e.getMessage());
-        }
-    }
-
-     */
 
     @Override
     public BucketObject uploadFile(MultipartFile multipartFile, String nombre) throws IOException {

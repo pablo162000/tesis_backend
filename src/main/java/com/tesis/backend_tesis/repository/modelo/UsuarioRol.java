@@ -4,8 +4,6 @@ package com.tesis.backend_tesis.repository.modelo;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

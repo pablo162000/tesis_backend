@@ -1,6 +1,5 @@
 package com.tesis.backend_tesis.repository;
 
-import com.tesis.backend_tesis.repository.modelo.VistaCarrera;
 import com.tesis.backend_tesis.repository.modelo.VistaUsuarioRol;
 
 import java.util.List;

@@ -24,10 +24,6 @@ public class FacultadServiceImpl implements IFacultadService {
     @Autowired
     private Converter converter;
 
-    @Override
-    public FacultadDTO buscarFacultadPorNombre(String nombre) {
-        return null;
-    }
 
     @Override
     public FacultadDTO buscarFacultadPorId(Integer id) {

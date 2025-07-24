@@ -376,7 +376,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
         if (i > 0) {
             extension = archivo.getOriginalFilename().substring(i);
         }
-        //System.out.println(archivo.getContentType());
+
 
 
         // 5. Guardar el archivo
@@ -533,10 +533,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
         List<Propuesta> propuestasValidas2 = propuestaRepository.findPropuestasByCompleta(idEstudiante2, tipo, "multimodal");
         List<Propuesta> propuestasValidas3 = propuestaRepository.findPropuestasByCompleta(idEstudiante3, tipo, "multimodal");
 
-        System.out.println("propuestasValidas1:"+propuestasValidas1);
-
-        System.out.println("propuestasValidas2:"+propuestasValidas2);
-        System.out.println("propuestasValidas3:"+propuestasValidas3);
 
         if (propuestasValidas1.isEmpty() && propuestasValidas2.isEmpty() && propuestasValidas3.isEmpty()){
 
@@ -750,8 +746,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
             String nombres = this.validaciones.obtenerNombresEstudiantes(posiblesNombres);
 
-            System.out.println(nombres);
-            System.out.println(ccEmails);
 
 
             seGuardo= this.propuestaRepository.update(propuestaExistente);
@@ -921,8 +915,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
                 revision.setRevisor2(
                         this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente2.getIdUsuario())));
 
-                System.out.println("revisor 1..."+revision.getRevisor1());
-                System.out.println("revisor 2..."+revision.getRevisor2());
+
 
                 cambioRealizado= true;
             }
@@ -935,8 +928,7 @@ public class PropuestaServiceImpl implements IPropuestaService{
             revision.setRevisor2(
                     this.converter.toEntity(this.docenteService.buscarPorIdUsuario(docenteExistente2.getIdUsuario())));
 
-            System.out.println("revisor 1..."+revision.getRevisor1());
-            System.out.println("revisor 2..."+revision.getRevisor2());
+
 
             cambioRealizado= true;
 
@@ -989,7 +981,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
             ccEmails.add(primer.getCorreo());
             nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
-            System.out.println("ver si esta: " + vistaPropuestaExistente.getFirst().getSegundoEstuId());
 
             if (vistaPropuestaExistente.getFirst().getSegundoEstuId()!= null){
 
@@ -1065,7 +1056,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
         variables.put("duracionTimerRevisor", timer);
         variables.put("c", correoDireccion);
 
-        System.out.print("valor timer...: " + timer);
 
 
 
@@ -1096,7 +1086,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID de la propuesta no puede ser nulo.");
         }
         if (nota == null || Double.isNaN(nota) || nota < 0 || nota > 20) {
-            System.out.println("Nota inválida: " + nota);  // Verifica el valor de la nota
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La nota debe estar entre 0 y 20.");
         }
 
@@ -1258,7 +1247,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
             ccEmails.add(primer.getCorreo());
             nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
-            System.out.println("ver si esta: " + vistaPropuestaExistente.getFirst().getSegundoEstuId());
 
             if (vistaPropuestaExistente.getFirst().getSegundoEstuId()!= null){
 
@@ -1623,7 +1611,6 @@ public class PropuestaServiceImpl implements IPropuestaService{
 
             toEmails.add(primer.getCorreo());
             nombresPrimerEstudiante =primer.getApellidos() +" "+primer.getNombres();
-            System.out.println("ver si esta: " + vistaPropuestaExistente.getFirst().getSegundoEstuId());
 
             if (vistaPropuestaExistente.getFirst().getSegundoEstuId()!= null){
 

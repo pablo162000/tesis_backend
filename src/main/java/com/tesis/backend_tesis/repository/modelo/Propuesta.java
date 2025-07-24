@@ -2,8 +2,6 @@ package com.tesis.backend_tesis.repository.modelo;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalTime;
 import java.util.List;
 
 @Data
@@ -64,25 +62,10 @@ public class Propuesta {
     @JoinColumn(name = "prop_tutor_id", referencedColumnName = "docen_id", nullable = true)
     @ToString.Exclude
     private Docente tutor;
-/*
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "prop_revi_primera_id", referencedColumnName = "revi_id", nullable = false)
-    @ToString.Exclude
-    private Revision primeraRevision;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "prop_revi_segunda_id", referencedColumnName = "revi_id", nullable = true)
-    @ToString.Exclude
-    private Revision segundaRevision;
-
- */
-
 
     @OneToMany(mappedBy = "propuesta", cascade = CascadeType.ALL, orphanRemoval = false, fetch = FetchType.LAZY)
     @ToString.Exclude
     private List<Revision> revisiones;
-
-
 
     @Column(name = "prop_periodo", length = 80, nullable = false)
     private String periodo;

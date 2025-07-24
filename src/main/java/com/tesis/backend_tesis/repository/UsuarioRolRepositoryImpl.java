@@ -1,6 +1,5 @@
 package com.tesis.backend_tesis.repository;
 
-import com.tesis.backend_tesis.repository.modelo.Propuesta;
 import com.tesis.backend_tesis.repository.modelo.UsuarioRol;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;

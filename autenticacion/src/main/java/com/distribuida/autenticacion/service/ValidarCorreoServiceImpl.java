@@ -11,8 +11,7 @@ public class ValidarCorreoServiceImpl implements IValidarCorreoService{
 
     @Override
     public String generarTokenCorreo(String correo ) {
-
-
+        
         if(correo.isEmpty() || correo == null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Falta el correo del usuario.");
@@ -52,6 +51,5 @@ public class ValidarCorreoServiceImpl implements IValidarCorreoService{
         return correo;
 
     }
-
 
 }

@@ -1,9 +1,6 @@
 package com.tesis.backend_tesis.service;
 
 import com.tesis.backend_tesis.repository.modelo.*;
-import org.springframework.web.bind.annotation.PathVariable;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
-
 import java.util.List;
 
 public interface IVistasEntidadesService {

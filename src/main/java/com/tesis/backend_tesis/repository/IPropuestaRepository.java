@@ -15,14 +15,6 @@ public interface IPropuestaRepository {
     public List<Propuesta> finall();
 
 
-    public List<Propuesta> buscarPorApellidoEstudiante(String apellido);
-    public List<Propuesta> buscarPorPeriodo(String periodo);
-    public List<Propuesta> buscarPorEstado(String estado);
-    public Propuesta actualizarEstado(Propuesta propuesta);
-    /*
-    public Propuesta eliminar(Long id);
-    public Propuesta actualizar(Propuesta propuesta);
-    public List<Propuesta> buscarTodos();
 
-     */
+
 }

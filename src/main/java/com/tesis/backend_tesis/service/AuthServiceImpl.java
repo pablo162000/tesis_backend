@@ -26,7 +26,6 @@ public class AuthServiceImpl implements IAuthService {
 
     private static final Logger logger = LogManager.getLogger(AuthServiceImpl.class);
 
-
     @Autowired
     private IEncriptionService encriptionService;
 
@@ -74,113 +73,6 @@ public class AuthServiceImpl implements IAuthService {
 
     @Value("${corsorigin.url}")
     private String rutaFront;
-
-
-    @Transactional
-    @Override
-    public Boolean registroNuevoEstudiante(RegistroRequest registroRequest) {
-        if (registroRequest == null ||
-                registroRequest.getCorreo() == null || registroRequest.getCorreo().isEmpty() ||
-                registroRequest.getPassword() == null || registroRequest.getPassword().isEmpty() ||
-                registroRequest.getIdCarrera() == null) {
-            logger.error("Registro inválido. Datos faltantes: {}", registroRequest);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Los datos del registro son inválidos. Verifique correo, contraseña e ID de carrera.");
-        }
-
-        if (!esCorreoValido(registroRequest.getCorreo())) {
-            logger.error("Correo no válido: {}", registroRequest.getCorreo());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo no es válido.");
-        }
-
-        if (this.usuarioRepository.existeUsuarioConEmail(registroRequest.getCorreo())) {
-            logger.error("El correo ya está registrado: {}", registroRequest.getCorreo());
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "El correo ya está registrado.");
-        }
-
-        if (this.usuarioRepository.existeUsuarioConCedula(registroRequest.getCedula())) {
-            logger.error("La cédula ya está registrada: {}", registroRequest.getCedula());
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "La cédula ya está registrada en otro usuario.");
-        }
-
-        CarreraDTO carreraDTO = this.converter.toDTO(this.carreraRepository.findById(registroRequest.getIdCarrera()));
-        if (carreraDTO == null) {
-            logger.error("Carrera no encontrada: {}", registroRequest.getIdCarrera());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La carrera seleccionada no existe.");
-        }
-
-        // Crear usuario
-        UsuarioDTO usuarioDTO = UsuarioDTO.builder()
-                .primerNombre(registroRequest.getPrimerNombre())
-                .segundoNombre(registroRequest.getSegundoNombre())
-                .primerApellido(registroRequest.getPrimerApellido())
-                .segundoApellido(registroRequest.getSegundoApellido())
-                .cedula(registroRequest.getCedula())
-                .correo(registroRequest.getCorreo())
-                .password(this.encriptionService.encriptPass(registroRequest.getPassword()))
-                .fechaCreacion(LocalDateTime.now())
-                .correoValido(Boolean.FALSE)
-                .activo(Boolean.FALSE)
-                .build();
-
-
-        UsuarioDTO usuarioGuardado = this.usuarioService.insertar(usuarioDTO);
-
-
-        if (usuarioGuardado == null || usuarioGuardado.getId() == null) {
-            logger.error("Error al guardar el usuario con correo: {}", registroRequest.getCorreo());
-            throw new RuntimeException("Error al guardar el usuario");
-        }
-
-        Rol rol = this.rolRepository.findByNombre("estudiante");
-
-        UsuarioRol usuarioRolEstudiante = new UsuarioRol().builder()
-                .usuario(this.converter.toEntity(usuarioGuardado))
-                .rol(rol)
-                .build();
-        UsuarioRol usuarioRolGuaradado = this.usuarioRolRepository.insert(usuarioRolEstudiante);
-
-        if (usuarioRolGuaradado == null || usuarioRolGuaradado.getId() == null) {
-            logger.error("Error al guardar el usuario guaradado: {}", usuarioGuardado);
-            throw new RuntimeException("Error al guardar la relacion UsuarioRol");
-        }
-
-
-        // Crear estudiante
-        EstudianteDTO estudianteDTO = EstudianteDTO.builder()
-                .idUsuario(usuarioGuardado.getId())
-                .idCarrera(registroRequest.getIdCarrera())
-                .build();
-
-        EstudianteDTO estudianteGuardado = this.estudianteService.insertar(estudianteDTO);
-
-        if (estudianteGuardado == null || estudianteGuardado.getId() == null) {
-            logger.error("Error al guardar el estudiante con ID de usuario: {}", usuarioDTO.getId());
-            throw new RuntimeException("Error al guardar el estudiante.");
-        }
-
-        String token = null;
-        try {
-            token = this.autenticacionRestClient.crearToken(usuarioGuardado.getCorreo()).getBody();
-        } catch (FeignException.Conflict ex) {
-            logger.error("Error al generar token para validar correo: {}", usuarioGuardado.getCorreo(), ex);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al generar token para validar correo.");
-        }
-
-        String usuarioCreado = registroRequest.getPrimerNombre() + " " + registroRequest.getPrimerApellido();
-        String enlace =  rutaFront + "/vista-verificacion-correo/" + token;
-
-        try {
-            this.correoRestClient.registrarUsuario(usuarioCreado, usuarioGuardado.getCorreo(), enlace,
-                    "fing.direccion.computacion@uce.edu.ec", "estudiante");
-        } catch (FeignException.Conflict ex) {
-            logger.error("Error al enviar el correo de validación al correo: {}", usuarioGuardado.getCorreo(), ex);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al enviar el correo de validación.");
-        }
-
-        logger.info("Estudiante registrado exitosamente: {}", registroRequest.getCorreo());
-        return Boolean.TRUE;
-    }
 
 
     @Transactional
@@ -353,7 +245,7 @@ public class AuthServiceImpl implements IAuthService {
 
         }
 
-        System.out.print( direccion );
+
 
         try {
             this.correoRestClient.registrarUsuariov2(usuarioGuardado.getCorreo(), usuarioCreado,enlace,
@@ -476,7 +368,7 @@ public class AuthServiceImpl implements IAuthService {
                 nombreFacultad = this.facultadService.buscarFacultadPorId(coordinadorDTO.getIdFacultad()).getNombre();
 
                 nombreCarrera =  this.vistasEntidadesService.buscarPorIdUsuarioCoordiandor(coordinadorDTO.getId()).getCarrera();
-                System.out.println(coordinadorDTO);
+
                 idCarrera=coordinadorDTO.getId();
                 idFacultad=coordinadorDTO.getIdFacultad();
                 break;
@@ -498,7 +390,7 @@ public class AuthServiceImpl implements IAuthService {
         try {
             tokenSesion=this.autenticacionRestClient.crearTokenSesion(usua.getCorreo(), r).getBody();
 
-            System.out.println("token seseion:----" + tokenSesion);
+
 
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al generar el token de sesion.");

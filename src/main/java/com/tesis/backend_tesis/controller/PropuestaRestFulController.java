@@ -112,14 +112,6 @@ public class PropuestaRestFulController {
         return ResponseEntity.ok(exito);
     }
 
-
-    //@PostMapping(value = "/{idPropuesta}/recordatorio")
-    public void recordatorioRevisor(@PathVariable Integer idPropuesta,
-                                                  @RequestParam("idUsuario") Integer idUsuario){
-
-        this.propuestaService.recordatorioRevisores(idPropuesta, idUsuario);
-
-    }
     @PreAuthorize("hasAnyRole('direccion', 'coordinador', 'ADMIN')")
     @GetMapping(value = "/periodos")
     public List<String> periodosExistentes(){

@@ -37,7 +37,7 @@ public class FileServiceImpl implements IFileService{
         // Crear archivo temporal
         File temp = File.createTempFile("descarga-", extension);
 
-        System.out.println(nombre);
+
 
 
         // Descargar desde S3 y escribir en el archivo temporal
@@ -54,35 +54,6 @@ public class FileServiceImpl implements IFileService{
 
         return temp;
     }
-    /*
-    public File downFileToTemp(String nombre) throws IOException {
-        if (nombre == null || nombre.isEmpty()) {
-            ResponseEntity.badRequest().body("Nombre del archivo no puede ser nulo");
-        }
-
-
-        // Crear archivo temporal
-        File temp = File.createTempFile("descarga-", nombre);
-
-        System.out.println("nombrearchivo en downloadfile....: "+nombre);
-        //System.out.println("nombrearchivo seguro en downloadfile....: "+nombreArchivoSeguro);
-
-        // Obtener el archivo desde S3
-        try (ResponseInputStream<GetObjectResponse> s3Object = awsConfig.downFile(nombre);
-             FileOutputStream fos = new FileOutputStream(temp)) {
-
-            // Transferir los bytes al archivo temporal
-            s3Object.transferTo(fos);
-        } catch (Exception e) {
-            throw new IOException("Error al guardar archivo temporal: " + e.getMessage(), e);
-        }
-
-        return temp;
-    }
-
-     */
-
-
 
 
 }

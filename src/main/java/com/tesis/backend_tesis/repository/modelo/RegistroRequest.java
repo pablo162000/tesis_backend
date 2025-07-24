@@ -3,7 +3,7 @@ package com.tesis.backend_tesis.repository.modelo;
 import java.io.Serializable;
 import java.util.*;
 
-import jakarta.persistence.Column;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

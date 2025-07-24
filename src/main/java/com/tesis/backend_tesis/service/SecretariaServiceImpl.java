@@ -2,9 +2,7 @@ package com.tesis.backend_tesis.service;
 
 
 import com.tesis.backend_tesis.repository.ISecretariaRepository;
-import com.tesis.backend_tesis.repository.modelo.Estudiante;
 import com.tesis.backend_tesis.repository.modelo.Secretaria;
-import com.tesis.backend_tesis.service.dto.EstudianteDTO;
 import com.tesis.backend_tesis.service.dto.SecretariaDTO;
 import com.tesis.backend_tesis.service.dto.utils.Converter;
 import org.apache.logging.log4j.LogManager;

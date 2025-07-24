@@ -1,8 +1,6 @@
 package com.tesis.backend_tesis.repository;
 
-
 import com.tesis.backend_tesis.repository.modelo.VistaDocente;
-import com.tesis.backend_tesis.repository.modelo.VistaEstudiante;
 
 import java.util.List;
 

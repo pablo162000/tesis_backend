@@ -3,10 +3,7 @@ package com.tesis.backend_tesis.repository.modelo;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 @Data
@@ -40,12 +37,6 @@ public class Archivo {
     @JoinColumn(name = "archivo_usua_id",referencedColumnName = "usua_id", nullable = false)
     private Usuario usuario;
 
-    /*
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "prop_id", referencedColumnName = "prop_id", nullable = true)
-    private Propuesta propuesta;
-
-     */
 
     // Relación con Revision
     @OneToMany(mappedBy = "archivoSubidoEstudiantes", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

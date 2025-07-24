@@ -1,6 +1,6 @@
 package com.tesis.backend_tesis.repository;
 
-import com.tesis.backend_tesis.repository.modelo.Estudiante;
+
 import com.tesis.backend_tesis.repository.modelo.Secretaria;
 
 public interface ISecretariaRepository {

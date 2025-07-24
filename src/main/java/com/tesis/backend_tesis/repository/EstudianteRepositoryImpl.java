@@ -1,7 +1,5 @@
 package com.tesis.backend_tesis.repository;
 
-
-import com.tesis.backend_tesis.repository.modelo.Docente;
 import com.tesis.backend_tesis.repository.modelo.Estudiante;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
